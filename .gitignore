@@ -1,0 +1,16 @@
+# Ignorar entornos virtuales de Python
+venv/
+
+# Ignorar dependencias de Node.js
+node_modules/
+
+# Ignorar archivos compilados de Python
+*.pyc
+__pycache__/
+
+# Ignorar archivos de logs
+*.log
+
+# Ignorar configuraciones específicas de editores
+.vscode/
+.idea/

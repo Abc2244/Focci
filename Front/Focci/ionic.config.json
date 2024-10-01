@@ -1,0 +1,7 @@
+{
+  "name": "Focci",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
