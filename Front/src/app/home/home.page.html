@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>App de Recordatorios</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item>
+    <ion-label position="floating">Texto del Recordatorio</ion-label>
+    <ion-input [(ngModel)]="textoRecordatorio"></ion-input>
+  </ion-item>
+
+  <ion-button expand="full" (click)="crearRecordatorio()">Crear Recordatorio</ion-button>
+  <ion-button expand="full" color="tertiary" (click)="obtenerRecomendaciones()">Obtener Recomendaciones</ion-button>
+
+  <ion-list *ngIf="recomendaciones.length > 0">
+    <ion-list-header>Recomendaciones:</ion-list-header>
+    <ion-item *ngFor="let rec of recomendaciones">{{ rec.texto }}</ion-item>
+  </ion-list>
+</ion-content>
