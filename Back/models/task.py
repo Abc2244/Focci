@@ -2,7 +2,8 @@ from pydantic import BaseModel
 from datetime import datetime
 
 class Task(BaseModel):
-    subject_name: str
+    user_id: str  # ID del usuario
+    subject_id: str  # ID de la materia
     description: str
     due_date: datetime
-    difficulty: int  # Clasificado por BERT (0: fácil, 1: intermedio, 2: difícil)
+    difficulty: int  # Dificultad determinada por BERT
