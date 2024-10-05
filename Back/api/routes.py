@@ -15,10 +15,12 @@ async def root():
 
 
 # Ruta para crear un usuario
+
 @router.post("/users/")
 async def create_user(user: User):
-    user_data = user.dict()
-    user_id = await mongodb.get_collection("users").insert_one(user_data)
+    user_data = user.dict()  # Convierte el modelo en un diccionario
+    user_collection = mongodb.get_collection("users")  # Ya no es necesario usar await aquí
+    user_id = await user_collection.insert_one(user_data)  # Se sigue usando await en las operaciones de MongoDB
     return {"message": "User created", "user_id": str(user_id.inserted_id)}
 
 
