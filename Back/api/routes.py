@@ -1,3 +1,4 @@
+import datetime
 from fastapi import APIRouter, HTTPException
 from models.user import User
 from models.subject import Subject
@@ -50,14 +51,16 @@ async def get_user_subjects(user_id: str):
     raise HTTPException(status_code=404, detail="No subjects found for the user")
 
 
-# Ruta para crear una tarea
-@router.post("/tasks/")
+
+
+@router.post("/create-task")
 async def create_task(task: Task):
     task_data = task.dict()
+    # Asegurarte de que "due_date" sea una instancia de datetime
+    task_data['due_date'] = datetime.strptime(task_data['due_date'], "%Y-%m-%d %H:%M:%S")
+    
     task_id = await mongodb.get_collection("tasks").insert_one(task_data)
     return {"message": "Task created", "task_id": str(task_id.inserted_id)}
-
-
 # Ruta para obtener las tareas de un usuario
 @router.get("/users/{user_id}/tasks")
 async def get_user_tasks(user_id: str):
