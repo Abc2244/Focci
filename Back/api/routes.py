@@ -15,17 +15,16 @@ async def root():
     return {"message": "API is running!"}
 
 
-# Ruta para crear un usuario
-
+# Crear un usuario
 @router.post("/users/")
 async def create_user(user: User):
-    user_data = user.dict()  # Convierte el modelo en un diccionario
-    user_collection = mongodb.get_collection("users")  # Ya no es necesario usar await aquí
-    user_id = await user_collection.insert_one(user_data)  # Se sigue usando await en las operaciones de MongoDB
+    user_data = user.dict()
+    user_collection = mongodb.get_collection("users")
+    user_id = await user_collection.insert_one(user_data)
     return {"message": "User created", "user_id": str(user_id.inserted_id)}
 
 
-# Ruta para obtener un usuario por ID
+# Obtener un usuario por ID
 @router.get("/users/{user_id}")
 async def get_user(user_id: str):
     user = await mongodb.get_collection("users").find_one({"_id": ObjectId(user_id)})
@@ -34,7 +33,7 @@ async def get_user(user_id: str):
     raise HTTPException(status_code=404, detail="User not found")
 
 
-# Ruta para crear una materia
+# Crear una materia
 @router.post("/subjects/")
 async def create_subject(subject: Subject):
     subject_data = subject.dict()
@@ -42,7 +41,7 @@ async def create_subject(subject: Subject):
     return {"message": "Subject created", "subject_id": str(subject_id.inserted_id)}
 
 
-# Ruta para obtener las materias de un usuario
+# Obtener las materias de un usuario
 @router.get("/users/{user_id}/subjects")
 async def get_user_subjects(user_id: str):
     subjects = await mongodb.get_collection("subjects").find({"user_id": user_id}).to_list(length=100)
@@ -51,17 +50,21 @@ async def get_user_subjects(user_id: str):
     raise HTTPException(status_code=404, detail="No subjects found for the user")
 
 
-
-
-@router.post("/create-task")
+# Crear una tarea
+@router.post("/tasks/")
 async def create_task(task: Task):
     task_data = task.dict()
-    # Asegurarte de que "due_date" sea una instancia de datetime
-    task_data['due_date'] = datetime.strptime(task_data['due_date'], "%Y-%m-%d %H:%M:%S")
+    try:
+        # Asegurarte de que "due_date" sea una instancia de datetime
+        task_data['due_date'] = datetime.datetime.strptime(task_data['due_date'], "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD HH:MM:SS.")
     
     task_id = await mongodb.get_collection("tasks").insert_one(task_data)
     return {"message": "Task created", "task_id": str(task_id.inserted_id)}
-# Ruta para obtener las tareas de un usuario
+
+
+# Obtener las tareas de un usuario
 @router.get("/users/{user_id}/tasks")
 async def get_user_tasks(user_id: str):
     tasks = await mongodb.get_collection("tasks").find({"user_id": user_id}).to_list(length=100)
@@ -70,7 +73,7 @@ async def get_user_tasks(user_id: str):
     raise HTTPException(status_code=404, detail="No tasks found for the user")
 
 
-# Ruta para crear un recordatorio para una tarea
+# Crear un recordatorio
 @router.post("/reminders/")
 async def create_reminder(reminder: Reminder):
     reminder_data = reminder.dict()
@@ -78,7 +81,7 @@ async def create_reminder(reminder: Reminder):
     return {"message": "Reminder created", "reminder_id": str(reminder_id.inserted_id)}
 
 
-# Ruta para obtener los recordatorios de un usuario
+# Obtener los recordatorios de un usuario
 @router.get("/users/{user_id}/reminders")
 async def get_user_reminders(user_id: str):
     reminders = await mongodb.get_collection("reminders").find({"user_id": user_id}).to_list(length=100)

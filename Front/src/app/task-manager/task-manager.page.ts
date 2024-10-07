@@ -12,15 +12,21 @@ export class TaskManagerPage {
   taskPriority: number = 0;
   dueDate: string = '';
   taskId: number = 0;
+  userId: string = '';  // Nuevo campo para el ID del usuario
+  subjectId: string = '';  // Nuevo campo para el ID de la materia
+  difficulty: number = 0;  // Campo para la dificultad de la tarea
 
   constructor(private apiService: ApiService) {}
 
   // Función para crear una nueva tarea
   crearNuevaTarea() {
     const nuevaTarea = {
+      user_id: this.userId,  // Enviar el ID del usuario
+      subject_id: this.subjectId,  // Enviar el ID de la materia
       description: this.taskDescription,
-      subject_priority: this.taskPriority,
-      due_date: this.dueDate
+      due_date: this.dueDate,
+      difficulty: this.difficulty,  // Enviar la dificultad
+      subject_priority: this.taskPriority  // Prioridad de la materia
     };
 
     this.apiService.createTask(nuevaTarea).subscribe(response => {

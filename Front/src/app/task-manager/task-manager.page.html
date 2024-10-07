@@ -11,6 +11,16 @@
     </ion-card-header>
     <ion-card-content>
       <ion-item>
+        <ion-label position="floating">ID de Usuario</ion-label>
+        <ion-input [(ngModel)]="userId"></ion-input> <!-- Añadimos el campo del usuario -->
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">ID de Materia</ion-label>
+        <ion-input [(ngModel)]="subjectId"></ion-input> <!-- Añadimos el campo de la materia -->
+      </ion-item>
+
+      <ion-item>
         <ion-label position="floating">Descripción de la tarea</ion-label>
         <ion-input [(ngModel)]="taskDescription"></ion-input>
       </ion-item>
@@ -21,9 +31,15 @@
       </ion-item>
 
       <ion-item>
+        <ion-label position="floating">Dificultad (1-5)</ion-label>
+        <ion-input [(ngModel)]="difficulty" type="number"></ion-input> <!-- Campo para dificultad -->
+      </ion-item>
+
+      <ion-item>
         <ion-label position="floating">Fecha de entrega (YYYY-MM-DD HH:MM:SS)</ion-label>
         <ion-input [(ngModel)]="dueDate"></ion-input>
       </ion-item>
+
       <ion-button expand="full" (click)="crearNuevaTarea()">Crear Tarea</ion-button>
     </ion-card-content>
   </ion-card>
