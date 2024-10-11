@@ -35,14 +35,25 @@ export class ApiService {
     user_id: string, 
     subject_id: string, 
     description: string, 
-    due_date: string, 
-    difficulty: number 
-}): Observable<any> {
-    return this.http.post(`${this.apiUrl}/create-task`, task);
+    due_date: string
+  }): Observable<any> {
+      return this.http.post(`${this.apiUrl}/tasks/`, task);
+  }
+  
+// Obtener las materias del usuario
+getUserSubjects(user_id: string): Observable<any> {
+  return this.http.get(`${this.apiUrl}/users/${user_id}/subjects`);
 }
 
   // Marcar una tarea como completada
   completeTask(task_id: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/complete-task`, { task_id });
+  }
+  loginUser(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/login/`, data);
+  }
+
+  registerUser(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/register/`, data);
   }
 }

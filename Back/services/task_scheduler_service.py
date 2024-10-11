@@ -1,22 +1,57 @@
 import random
 from datetime import datetime, timedelta
 
-# Definir plantillas de recordatorios como constantes
+
 EXAM_REMINDER_TEMPLATES = [
     "Recuerda estudiar para el examen de {task_description} antes de {reminder_time}.",
     "Tienes que repasar para el examen de {task_description}. No lo dejes para el último momento.",
+    "El examen de {task_description} está cerca. Asegúrate de estudiar antes de {reminder_time}.",
+    "No olvides estudiar para el examen de {task_description}. La fecha límite es {reminder_time}.",
+    "Es tiempo de repasar para tu examen de {task_description}. ¡Estudia antes de {reminder_time}!",
+    "El examen de {task_description} está muy cerca. Aprovecha el tiempo para estudiar antes de {reminder_time}.",
+    "Es importante que estudies para el examen de {task_description} antes de {reminder_time}.",
+    "No olvides que el examen de {task_description} es pronto. ¡Prepárate bien antes de {reminder_time}!",
+    "Asegúrate de revisar tus apuntes para el examen de {task_description} antes de {reminder_time}.",
+    "¡El tiempo pasa rápido! No olvides estudiar para el examen de {task_description} antes de {reminder_time}."
 ]
 
 PROJECT_REMINDER_TEMPLATES = [
     "Asegúrate de avanzar en tu proyecto de {task_description}. Fecha límite: {reminder_time}.",
+    "Recuerda que el proyecto de {task_description} está por vencer. Trabaja en él antes de {reminder_time}.",
+    "El proyecto de {task_description} está pendiente. ¡No olvides completarlo antes de {reminder_time}!",
+    "Dedica tiempo a tu proyecto de {task_description} antes de la fecha límite: {reminder_time}.",
+    "Es importante avanzar en tu proyecto de {task_description}. Termina antes de {reminder_time}.",
+    "Recuerda trabajar en el proyecto de {task_description} para evitar prisas antes de {reminder_time}.",
+    "Es un buen momento para dedicar tiempo al proyecto de {task_description}. ¡Fecha límite: {reminder_time}!",
+    "No olvides que debes entregar tu proyecto de {task_description} antes de {reminder_time}.",
+    "Aprovecha el tiempo y avanza en tu proyecto de {task_description} antes de {reminder_time}.",
+    "¡No dejes el proyecto de {task_description} para el último momento! Trabaja en él antes de {reminder_time}."
 ]
 
 READING_REMINDER_TEMPLATES = [
     "Recuerda terminar la lectura de {task_description} antes de {reminder_time}.",
+    "La lectura de {task_description} es importante. No olvides leer antes de {reminder_time}.",
+    "Asegúrate de completar la lectura de {task_description}. La fecha límite es {reminder_time}.",
+    "Tienes que leer {task_description}. Recuerda que debes hacerlo antes de {reminder_time}.",
+    "No olvides que debes leer {task_description}. Termina antes de {reminder_time}.",
+    "Es un buen momento para avanzar en la lectura de {task_description}. Finaliza antes de {reminder_time}.",
+    "No olvides que la lectura de {task_description} es fundamental. Completa antes de {reminder_time}.",
+    "Dedica un poco de tiempo cada día para leer {task_description} antes de {reminder_time}.",
+    "Es necesario que completes la lectura de {task_description} antes de {reminder_time}.",
+    "Lee {task_description} con atención y asegúrate de terminarlo antes de {reminder_time}."
 ]
 
 GENERAL_REMINDER_TEMPLATES = [
     "Recuerda {task_description} antes de {reminder_time}.",
+    "Es importante {task_description}. Asegúrate de hacerlo antes de {reminder_time}.",
+    "No olvides {task_description}. Tienes que completarlo antes de {reminder_time}.",
+    "La tarea de {task_description} está pendiente. Debes completarla antes de {reminder_time}.",
+    "Asegúrate de {task_description}. La fecha límite es {reminder_time}.",
+    "Debes completar {task_description} antes de {reminder_time}. No lo dejes pasar.",
+    "Recuerda que debes terminar {task_description} antes de {reminder_time}.",
+    "Es esencial que completes {task_description} antes de la fecha límite: {reminder_time}.",
+    "No olvides realizar {task_description} antes de {reminder_time}.",
+    "¡El tiempo corre! Completa {task_description} antes de {reminder_time}."
 ]
 
 class TaskScheduler:

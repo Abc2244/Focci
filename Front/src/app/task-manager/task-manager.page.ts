@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../api.service';  // Asegúrate de que la ruta es correcta
 
 @Component({
@@ -6,17 +6,36 @@ import { ApiService } from '../api.service';  // Asegúrate de que la ruta es co
   templateUrl: './task-manager.page.html',
   styleUrls: ['./task-manager.page.scss'],
 })
-export class TaskManagerPage {
+export class TaskManagerPage implements OnInit {  // Implementa OnInit
 
   taskDescription: string = '';  // Inicializa las propiedades
-  taskPriority: number = 0;
   dueDate: string = '';
   taskId: number = 0;
-  userId: string = '';  // Nuevo campo para el ID del usuario
-  subjectId: string = '';  // Nuevo campo para el ID de la materia
-  difficulty: number = 0;  // Campo para la dificultad de la tarea
+  userId: string = '';  // Campo para el ID del usuario
+  subjectId: string = '';  // Campo para seleccionar la materia
+  subjects: any[] = [];  // Lista de materias obtenidas del backend
 
   constructor(private apiService: ApiService) {}
+
+  ngOnInit() {
+    // Simulando la obtención del userId desde algún lugar (puede ser un servicio de autenticación)
+    this.userId = "6700687e895d4fe3cc358103";  // Reemplaza con el valor real del ID del usuario
+
+    if (this.userId) {
+      this.loadSubjects();  // Carga las materias si el ID de usuario es válido
+    } else {
+      console.error("No se ha encontrado el ID del usuario.");
+    }
+  }
+
+  // Cargar las materias disponibles
+  loadSubjects() {
+    this.apiService.getUserSubjects(this.userId).subscribe(response => {
+      this.subjects = response;
+    }, error => {
+      console.error('Error al cargar las materias:', error);
+    });
+  }
 
   // Función para crear una nueva tarea
   crearNuevaTarea() {
@@ -25,8 +44,6 @@ export class TaskManagerPage {
       subject_id: this.subjectId,  // Enviar el ID de la materia
       description: this.taskDescription,
       due_date: this.dueDate,
-      difficulty: this.difficulty,  // Enviar la dificultad
-      subject_priority: this.taskPriority  // Prioridad de la materia
     };
 
     this.apiService.createTask(nuevaTarea).subscribe(response => {
