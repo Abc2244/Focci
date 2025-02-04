@@ -1,5 +1,6 @@
 # Ignorar entornos virtuales de Python
 venv/
+venv-back/
 
 # Ignorar dependencias de Node.js
 node_modules/
