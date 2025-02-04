@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+motor
+pymongo
+spacy
+nltk
+passlib[bcrypt]
+python-jose
+
