@@ -22,6 +22,7 @@ class TaskService:
         self.task_prioritizer = TaskPrioritizer()
         self.task_scheduler = TaskScheduler()
 
+
     async def process_task(self, user_id: str, subject_id: str, task_description: str, due_date: str) -> Optional[Dict]:
         """
         Procesa una tarea, ajusta la prioridad según la descripción y la materia, genera recordatorios, etc.
@@ -36,11 +37,11 @@ class TaskService:
             print("Formato de fecha inválido. Use YYYY-MM-DD HH:MM:SS")
             return None
 
-        # Obtener información de la materia (por ejemplo, los créditos)
+        # Obtener información de la materia
         subject = await mongodb.get_collection("subjects").find_one({"_id": ObjectId(subject_id)})
         if not subject:
             raise HTTPException(status_code=404, detail="Materia no encontrada")
-        
+
         subject_priority = subject['credits']  # Ejemplo: la prioridad se basa en los créditos
 
         # Procesar la descripción de la tarea
@@ -57,7 +58,7 @@ class TaskService:
         # Calcular nivel de insistencia
         insistence_level = self.task_scheduler.calculate_insistence_level(adjusted_priority, due_date_dt, urgent_keywords_detected)
 
-        # Generar los recordatorios
+        # Generar recordatorios
         reminders = self.task_scheduler.generate_advanced_reminders(task_description, adjusted_priority, due_date_dt, insistence_level, task_type)
 
         # Guardar la tarea en la base de datos
@@ -66,19 +67,30 @@ class TaskService:
             "subject_id": subject_id,
             "description": task_description,
             "due_date": due_date_dt,
-            "completed": False,
-            "reminders": reminders,
+            "completed": False
         }
         task_id = await mongodb.get_collection("tasks").insert_one(task_data)
 
-        return {
+    # Guardar cada recordatorio en la colección de recordatorios
+    for reminder_date in reminders:
+        reminder_data = {
+            "user_id": user_id,
             "task_id": str(task_id.inserted_id),
-            "keywords": keywords,
-            "adjusted_priority": adjusted_priority,
-            "insistence_level": insistence_level,
-            "task_type": task_type,
-            "reminders": reminders
+            "reminder_date": reminder_date,
+            "status": "pendiente",
+            "priority": adjusted_priority,
+            "insistence_level": insistence_level
         }
+        await mongodb.get_collection("reminders").insert_one(reminder_data)
+
+    return {
+        "task_id": str(task_id.inserted_id),
+        "keywords": keywords,
+        "adjusted_priority": adjusted_priority,
+        "insistence_level": insistence_level,
+        "task_type": task_type,
+        "reminders": reminders
+    }
 
     def extract_keywords(self, doc) -> list:
         return [token.text for token in doc if not token.is_stop and not token.is_punct]
