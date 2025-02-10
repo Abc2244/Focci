@@ -80,44 +80,136 @@ def reminder_id(client, access_token, user_data, task_id):
 
 # 📝 **TESTS UNITARIOS**
 
-# 1️⃣ Test de Registro de Usuario
+# ✅ Test de Registro de Usuario
 def test_register_user(user_data):
     assert "user_id" in user_data
 
-# 2️⃣ Test de Login
+# ✅ Test de Login
 def test_login_user(access_token):
     assert access_token is not None
 
-# 3️⃣ Obtener Usuario Actual
+# ✅ Obtener Usuario Actual
 def test_get_current_user(client, access_token):
     response = client.get("me/", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200
     data = response.json()
     assert "email" in data
 
-# 4️⃣ Crear Materia
+# ✅ Crear Materia
 def test_create_subject(subject_id):
     assert subject_id is not None
 
-# 5️⃣ Crear Tarea
+# ✅ Actualizar Materia
+
+def test_update_subject(client, access_token, subject_id, user_data):
+    response = client.put(f"subjects/{subject_id}/", json={
+        "user_id": user_data["user_id"],  # Se agrega el user_id obligatorio
+        "name": "Matemáticas Avanzadas",
+        "credits": 4,
+        "schedule": ["Lunes", "Jueves"]
+    }, headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == 200
+    assert response.json()["message"] == "Materia actualizada"
+
+# ✅ Asegura que el usuario tenga materias antes de obtenerlas
+def test_get_subjects_by_user(client, access_token, user_data, subject_id):
+    response = client.get(f"users/{user_data['user_id']}/subjects/", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+    assert len(response.json()) > 0  # Verifica que haya al menos una materia
+# ✅ Obtener Materias de un Usuario
+# Asegura que el usuario tenga materias antes de obtenerlas
+def test_get_subjects_by_user(client, access_token, user_data, subject_id):
+    """Asegura que haya materias creadas antes de consultar"""
+    response = client.get(f"users/{user_data['user_id']}/subjects/", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == 200
+    subjects = response.json()
+    assert isinstance(subjects, list)
+    assert len(subjects) > 0  # Verifica que haya materias
+# ✅ Eliminar Materia
+def test_delete_subject(client, access_token, subject_id):
+    response = client.delete(f"subjects/{subject_id}/", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == 200
+    assert response.json()["message"] == "Materia eliminada"
+
+# ✅ Crear Tarea
 def test_create_task(task_id):
     assert task_id is not None
 
-# 6️⃣ Crear Recordatorio
-def test_create_reminder(reminder_id):
-    assert reminder_id is not None
+# ✅ Obtener Lista de Tareas de un Usuario
+def test_get_tasks_by_user(client, access_token, user_data):
+    response = client.get(f"users/{user_data['user_id']}/tasks/", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
 
-# 7️⃣ Marcar tarea como completada
+# ✅ Completar Tarea
 def test_complete_task(client, access_token, task_id):
     response = client.patch(f"tasks/{task_id}/complete/", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200
     assert response.json()["message"] == "Tarea marcada como completada"
 
-# 8️⃣ Eliminar Usuario
-def test_delete_user(client, access_token, user_data):
-    response = client.delete(f"users/{user_data['user_id']}/", headers={"Authorization": f"Bearer {access_token}"})
+# ✅ Obtener Tareas Completadas de un Usuario
+
+def test_get_completed_tasks(client, access_token, user_data, task_id):
+    """Marca una tarea como completada antes de consultar las tareas completadas"""
+    client.patch(f"tasks/{task_id}/complete/", headers={"Authorization": f"Bearer {access_token}"})
+
+    response = client.get(f"users/{user_data['user_id']}/tasks/completed/", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200
-    assert response.json()["message"] == "Usuario eliminado"
+    tasks = response.json()
+    assert isinstance(tasks, list)
+    assert len(tasks) > 0  # Verifica que haya tareas completadas
+# ✅ Eliminar Tareas Completadas de un Usuario
+
+def test_delete_completed_tasks(client, access_token, user_data, task_id):
+    """Marca una tarea como completada antes de eliminar tareas completadas"""
+    client.patch(f"tasks/{task_id}/complete/", headers={"Authorization": f"Bearer {access_token}"})
+
+    response = client.delete(f"users/{user_data['user_id']}/tasks/completed/", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == 200
+    assert "tareas completadas eliminadas" in response.json()["message"]
+# ✅ Eliminar una Tarea
+def test_delete_task(client, access_token, task_id):
+    response = client.delete(f"tasks/{task_id}/", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == 200
+    assert response.json()["message"] == "Tarea eliminada"
+
+# ✅ Crear Recordatorio
+def test_create_reminder(reminder_id):
+    assert reminder_id is not None
+
+# ✅ Obtener Lista de Recordatorios de un Usuario
+def test_get_reminders_by_user(client, access_token, user_data):
+    response = client.get(f"users/{user_data['user_id']}/reminders/upcoming/", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+
+def test_update_reminder(client, access_token, reminder_id, user_data, task_id):
+    """Corrige la estructura del request para actualizar un recordatorio"""
+    response = client.put(f"reminders/{reminder_id}/", json={
+        "user_id": user_data["user_id"],  # Se asegura de incluir el user_id
+        "task_id": task_id,  # Se debe incluir el task_id obligatorio
+        "reminder_date": "2024-02-10T12:00:00",  # Se mantiene el formato correcto de datetime
+        "status": "completado",  # Se usa un valor esperado
+        "priority": 3,  # Se incluye prioridad, de 1 a 5
+        "insistence_level": 2  # Se agrega insistence_level
+    }, headers={"Authorization": f"Bearer {access_token}"})
+
+    assert response.status_code == 200, f"Error: {response.text}"  # Mensaje de error si falla
+    assert response.json()["message"] == "Recordatorio actualizado"
+
+
+# ✅ Eliminar un Recordatorio
+def test_delete_reminder(client, access_token, reminder_id):
+    response = client.delete(f"reminders/{reminder_id}/", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == 200
+    assert response.json()["message"] == "Recordatorio eliminado"
+
+# ✅ Limpiar Datos del Usuario
+def test_clean_user_data(client, access_token, user_data):
+    response = client.delete(f"users/{user_data['user_id']}/clean/", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == 200
+    assert "Se eliminaron" in response.json()["message"]
 
 # 🔥 **Ejecución Automática**
 if __name__ == "__main__":
