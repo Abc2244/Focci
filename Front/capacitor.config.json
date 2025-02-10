@@ -1,0 +1,6 @@
+{
+  "appId": "com.tuempresa.focci",
+  "appName": "Focci",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
