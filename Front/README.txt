@@ -21,9 +21,7 @@ Esto descargará los últimos cambios sin sobrescribir nada que hayas modificado
 ### 📦 **Instalar dependencias**
 ```bash
 cd Back
-python -m venv venv-back  # Crear un entorno virtual
 source venv-back/bin/activate  # Activar entorno en Mac/Linux
-venv-back\Scripts\activate  # Activar entorno en Windows
 
 pip install -r requirements.txt  # Instalar dependencias
 ```
