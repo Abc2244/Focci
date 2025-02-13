@@ -33,6 +33,7 @@ uvicorn api.main:app --reload
 La API estará disponible en `http://127.0.0.1:8000/docs` para probar los endpoints con Swagger.
 
 ---
+##Santiago start here##
 ## 🔹 **3. Configurar el Frontend**
 ### 📦 **Instalar dependencias**
 ```bash
