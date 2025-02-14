@@ -108,3 +108,106 @@ git push origin Julian
 
 ¡Con esto ya puedes empezar a trabajar sin problemas! 🚀
 
+SANTIAGO DE AQUI EN ADELANTE ETO TE SIRVE PARA CAPACITOR Y ANDROID Studio
+
+# Configuración del Frontend con Capacitor y Android Studio
+
+Este documento explica cómo configurar **Capacitor** en Ionic y preparar el entorno para ejecutar el frontend de **Focci** en un emulador o dispositivo Android.
+
+---
+
+## 1. Instalación de Dependencias
+### 1.1 Asegúrate de tener **Node.js 20+** y **npm** instalado.
+Para verificarlo, ejecuta:
+```sh
+node -v
+npm -v
+```
+Si no tienes la versión correcta, descarga **Node.js LTS** desde [https://nodejs.org/](https://nodejs.org/).
+
+### 1.2 Instalar las dependencias del proyecto:
+```sh
+cd Front
+npm install
+```
+
+### 1.3 Instalar Capacitor:
+```sh
+npm install -g @capacitor/cli
+```
+
+### 1.4 Verificar que Capacitor está instalado correctamente:
+```sh
+npx cap --version
+```
+
+---
+
+## 2. Configurar Capacitor para Android
+### 2.1 Sincronizar Capacitor con el proyecto:
+```sh
+npx cap sync android
+```
+Esto genera la carpeta `android/` con los archivos necesarios.
+
+### 2.2 Abrir el proyecto en Android Studio:
+```sh
+npx cap open android
+```
+Si muestra un error diciendo que no encuentra **Android Studio**, verifica su instalación y ubicación.
+
+#### Configurar la RUTA de Android Studio (si es necesario)
+Si no abre **Android Studio**, configura la variable de entorno ejecutando:
+```sh
+setx CAPACITOR_ANDROID_STUDIO_PATH "C:\\Path\\To\\Android Studio\\bin\\studio64.exe"
+```
+(Reemplaza `"C:\\Path\\To\\Android Studio\\bin\\studio64.exe"` con la ubicación real.)
+
+Después, vuelve a intentar:
+```sh
+npx cap open android
+```
+
+---
+
+## 3. Ejecutar la Aplicación en un Emulador o Dispositivo
+### 3.1 Iniciar un emulador en **Android Studio**
+- Abre **Android Studio**.
+- Ve a **Device Manager** y ejecuta un **dispositivo virtual**.
+
+### 3.2 Ejecutar la app en el emulador o dispositivo físico:
+```sh
+npx cap run android
+```
+> **Nota:** Si usas un **dispositivo físico**, activa el **Modo Depuración USB**.
+
+---
+
+## 4. Solución de Problemas
+### Capacitor no encuentra Android Studio
+Ejecuta:
+```sh
+where studio
+```
+Si no aparece la ruta, configura manualmente la variable de entorno como se explicó antes.
+
+### No se instala Capacitor correctamente
+Intenta borrar y reinstalar las dependencias:
+```sh
+rm -rf node_modules package-lock.json
+npm install
+```
+
+---
+
+## 5. Ejecutar en el Navegador (Modo Desarrollo)
+Si solo quieres probar la app en el navegador sin usar un emulador, ejecuta:
+```sh
+ionic serve
+```
+Esto abrirá la aplicación en el navegador con recarga automática.
+
+---
+
+Con estos pasos, tu entorno estará listo para trabajar con Capacitor y Android Studio en **Windows**. 🚀📱
+
