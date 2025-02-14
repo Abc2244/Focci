@@ -1,0 +1,55 @@
+<ion-menu contentId="main-content">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Menú</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+    <ion-list>
+      <ion-item routerLink="/home" routerDirection="root">
+        <ion-icon name="home-outline" slot="start"></ion-icon>
+        <ion-label>Inicio</ion-label>
+      </ion-item>
+
+      <ion-item routerLink="/tasks">
+        <ion-icon name="checkbox-outline" slot="start"></ion-icon>
+        <ion-label>Tareas</ion-label>
+      </ion-item>
+
+      <ion-item routerLink="/subjects">
+        <ion-icon name="book-outline" slot="start"></ion-icon>
+        <ion-label>Materias</ion-label>
+      </ion-item>
+
+      <ion-item routerLink="/reminders">
+        <ion-icon name="alarm-outline" slot="start"></ion-icon>
+        <ion-label>Recordatorios</ion-label>
+      </ion-item>
+
+      <ion-item button (click)="logout()">
+        <ion-icon name="log-out-outline" slot="start"></ion-icon>
+        <ion-label>Cerrar Sesión</ion-label>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+
+<div class="ion-page" id="main-content">
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <ion-title>Inicio</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content class="home-content">
+    <div class="logo-container">
+      <img src="assets/images/logo.png" alt="Logo" class="logo" />
+      <h1>Bienvenido a tu Gestor de Tareas</h1>
+      <p>Organiza tus tareas y recordatorios de manera eficiente</p>
+    </div>
+  </ion-content>
+</div>
