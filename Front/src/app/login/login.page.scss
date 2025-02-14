@@ -1,0 +1,99 @@
+.login-content {
+  --background: linear-gradient(135deg, #fff5e6 0%, #fff 100%);
+
+  .login-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+  }
+
+  .logo-container {
+    margin-top: 2rem;
+    text-align: center;
+
+    .logo {
+      width: 180px;
+      height: 180px;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      color: #8b4513;
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      font-weight: 600;
+    }
+  }
+
+  .form-container {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .custom-input {
+    --background: transparent;
+    --border-color: transparent;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    padding: 0.3rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    ion-label {
+      color: #8b4513;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    ion-input {
+      --padding-start: 1rem;
+      --placeholder-color: #ccc;
+      --placeholder-opacity: 0.8;
+    }
+  }
+
+  .login-button {
+    --background: #ff8c00;
+    --background-hover: #ffa500;
+    --border-radius: 10px;
+    --color: white;
+    margin-top: 2rem;
+    height: 48px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 8px rgba(255, 140, 0, 0.2);
+  }
+
+  .register-link {
+    margin-top: 2rem;
+    text-align: center;
+
+    p {
+      color: #8b4513;
+      margin-bottom: 0.5rem;
+    }
+
+    .register-button {
+      --color: #ff8c00;
+      font-weight: 500;
+      text-transform: none;
+      font-size: 1rem;
+    }
+  }
+}
+
+// Estilos para los items de ion-input cuando están enfocados
+ion-item.item-has-focus {
+  --highlight-background: #ff8c00;
+}
+
+// Animación suave para los botones
+ion-button {
+  transition: all 0.3s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}

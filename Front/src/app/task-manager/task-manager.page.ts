@@ -1,72 +1,84 @@
-import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../api.service';  // Asegúrate de que la ruta es correcta
+import { Component } from '@angular/core';
+import { ApiService } from '../api.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-task-manager',
   templateUrl: './task-manager.page.html',
   styleUrls: ['./task-manager.page.scss'],
 })
-export class TaskManagerPage implements OnInit {  // Implementa OnInit
+export class TaskManagerPage {
+  subjectId: string = ''; // Para la selección de materia
+  taskDescription: string = ''; // Para la descripción de la tarea
+  dueDate: string = ''; // Para la fecha de entrega
+  taskId: string = ''; // Para completar una tarea
 
-  taskDescription: string = '';  // Inicializa las propiedades
-  dueDate: string = '';
-  taskId: number = 0;
-  userId: string = '';  // Campo para el ID del usuario
-  subjectId: string = '';  // Campo para seleccionar la materia
-  subjects: any[] = [];  // Lista de materias obtenidas del backend
+  subjects: any[] = []; // Lista de materias del usuario
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService, private router: Router) {}
 
+  // Obtener materias al iniciar
   ngOnInit() {
-    // Simulando la obtención del userId desde algún lugar (puede ser un servicio de autenticación)
-    this.userId = "6700687e895d4fe3cc358103";  // Reemplaza con el valor real del ID del usuario
-
-    if (this.userId) {
-      this.loadSubjects();  // Carga las materias si el ID de usuario es válido
-    } else {
-      console.error("No se ha encontrado el ID del usuario.");
+    const user_id = localStorage.getItem('user_id');
+    if (user_id) {
+      this.apiService.getUserSubjects(user_id).subscribe(
+        (subjects) => {
+          this.subjects = subjects;
+        },
+        (error) => {
+          console.error('Error obteniendo materias:', error);
+        }
+      );
     }
   }
 
-  // Cargar las materias disponibles
-  loadSubjects() {
-    this.apiService.getUserSubjects(this.userId).subscribe(response => {
-      this.subjects = response;
-    }, error => {
-      console.error('Error al cargar las materias:', error);
-    });
-  }
-
-  // Función para crear una nueva tarea
+  // Crear una nueva tarea
   crearNuevaTarea() {
+    const user_id = localStorage.getItem('user_id');
+    if (!user_id) {
+      alert('Usuario no autenticado.');
+      return;
+    }
+
+    if (!this.subjectId || !this.taskDescription || !this.dueDate) {
+      alert('Por favor, llena todos los campos.');
+      return;
+    }
+
     const nuevaTarea = {
-      user_id: this.userId,  // Enviar el ID del usuario
-      subject_id: this.subjectId,  // Enviar el ID de la materia
+      user_id: user_id,
+      subject_id: this.subjectId,
       description: this.taskDescription,
       due_date: this.dueDate,
     };
 
-    this.apiService.createTask(nuevaTarea).subscribe(response => {
-      console.log('Tarea creada:', response);
-      alert('Tarea creada con éxito');
-    }, error => {
-      console.error('Error al crear la tarea:', error);
-      alert('Error al crear la tarea');
-    });
+    this.apiService.createTask(nuevaTarea).subscribe(
+      (response) => {
+        alert('Tarea creada con éxito');
+        this.taskDescription = '';
+        this.dueDate = '';
+      },
+      (error) => {
+        console.error('Error al crear tarea:', error);
+      }
+    );
   }
 
-  // Función para completar una tarea
+  // Completar una tarea
   completarTarea() {
-    if (this.taskId) {
-      this.apiService.completeTask(this.taskId).subscribe(response => {
-        console.log('Tarea completada:', response);
-        alert('Tarea completada con éxito');
-      }, error => {
-        console.error('Error al completar la tarea:', error);
-        alert('Error al completar la tarea');
-      });
-    } else {
-      alert('Por favor, introduce un ID de tarea válido');
+    if (!this.taskId) {
+      alert('Por favor, ingresa un ID de tarea válido.');
+      return;
     }
+
+    this.apiService.completeTask(this.taskId).subscribe(
+      (response) => {
+        alert('Tarea completada con éxito');
+        this.taskId = '';
+      },
+      (error) => {
+        console.error('Error al completar tarea:', error);
+      }
+    );
   }
 }

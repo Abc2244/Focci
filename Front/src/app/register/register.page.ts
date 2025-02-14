@@ -15,14 +15,21 @@ export class RegisterPage {
   constructor(private apiService: ApiService, private router: Router) {}
 
   register() {
-    const registerData = { username: this.username, email: this.email, password: this.password };
+    const registerData = {
+      username: this.username,
+      email: this.email,
+      password: this.password,
+    };
+
     this.apiService.registerUser(registerData).subscribe(
       (response) => {
+        console.log('Registro exitoso:', response); // 👈 Ver la respuesta en consola
         alert('Usuario registrado exitosamente.');
         this.router.navigate(['/login']);
       },
       (error) => {
-        alert('Error en el registro.');
+        console.error('Error en el registro:', error); // 👈 Ver el error en consola
+        alert(error.error.detail || 'Error en el registro.');
       }
     );
   }

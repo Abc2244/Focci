@@ -4,15 +4,46 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-item>
-    <ion-label position="floating">Email</ion-label>
-    <ion-input [(ngModel)]="email" type="email"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-label position="floating">Contraseña</ion-label>
-    <ion-input [(ngModel)]="password" type="password"></ion-input>
-  </ion-item>
-  <ion-button expand="full" (click)="login()">Iniciar Sesión</ion-button>
-  <ion-button expand="full" routerLink="/register">Registrarse</ion-button>
+<ion-content class="login-content">
+  <div class="login-container">
+    <!-- Logo o imagen -->
+    <div class="logo-container">
+      <img src="assets/icon/logo.png" alt="Logo" class="logo" />
+      <h1>Bienvenido</h1>
+    </div>
+
+    <!-- Formulario -->
+    <div class="form-container">
+      <ion-item lines="none" class="custom-input">
+        <ion-label position="stacked">Email</ion-label>
+        <ion-input
+          [(ngModel)]="email"
+          type="email"
+          placeholder="tucorreo@ejemplo.com"
+        >
+        </ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="custom-input">
+        <ion-label position="stacked">Contraseña</ion-label>
+        <ion-input
+          [(ngModel)]="password"
+          type="password"
+          placeholder="Tu contraseña"
+        >
+        </ion-input>
+      </ion-item>
+
+      <ion-button expand="block" class="login-button" (click)="login()">
+        Iniciar Sesión
+      </ion-button>
+
+      <div class="register-link">
+        <p>¿No tienes una cuenta?</p>
+        <ion-button fill="clear" class="register-button" routerLink="/register">
+          Regístrate aquí
+        </ion-button>
+      </div>
+    </div>
+  </div>
 </ion-content>

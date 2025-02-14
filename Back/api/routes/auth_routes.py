@@ -10,7 +10,7 @@ import jwt
 from config.database import mongodb
 from models.user import User
 
-router = APIRouter()
+router = APIRouter(prefix="/auth", tags=["authentication"])
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login/")
 

@@ -1,21 +1,59 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Registrarse</ion-title>
+    <ion-title>Registro</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-item>
-    <ion-label position="floating">Nombre de usuario</ion-label>
-    <ion-input [(ngModel)]="username" type="text"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-label position="floating">Email</ion-label>
-    <ion-input [(ngModel)]="email" type="email"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-label position="floating">Contraseña</ion-label>
-    <ion-input [(ngModel)]="password" type="password"></ion-input>
-  </ion-item>
-  <ion-button expand="full" (click)="register()">Registrarse</ion-button>
+<ion-content class="register-content">
+  <div class="register-container">
+    <!-- Logo o imagen -->
+    <div class="logo-container">
+      <img src="assets/icon/logo.png" alt="Logo" class="logo" />
+      <h1>Crear Cuenta</h1>
+    </div>
+
+    <!-- Formulario -->
+    <div class="form-container">
+      <ion-item lines="none" class="custom-input">
+        <ion-label position="stacked">Nombre de Usuario</ion-label>
+        <ion-input
+          [(ngModel)]="username"
+          type="text"
+          placeholder="Tu nombre de usuario"
+        >
+        </ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="custom-input">
+        <ion-label position="stacked">Email</ion-label>
+        <ion-input
+          [(ngModel)]="email"
+          type="email"
+          placeholder="tucorreo@ejemplo.com"
+        >
+        </ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="custom-input">
+        <ion-label position="stacked">Contraseña</ion-label>
+        <ion-input
+          [(ngModel)]="password"
+          type="password"
+          placeholder="Tu contraseña"
+        >
+        </ion-input>
+      </ion-item>
+
+      <ion-button expand="block" class="register-button" (click)="register()">
+        Crear Cuenta
+      </ion-button>
+
+      <div class="login-link">
+        <p>¿Ya tienes una cuenta?</p>
+        <ion-button fill="clear" class="login-button" routerLink="/login">
+          Inicia sesión aquí
+        </ion-button>
+      </div>
+    </div>
+  </div>
 </ion-content>
