@@ -8,22 +8,22 @@ from routes.tasks import router as tasks_router
 
 app = FastAPI()
 
-# Configurar CORS
+##Configurar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # En producción, especifica los orígenes permitidos
+    allow_origins=[""],  # En producción, especifica los orígenes permitidos
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=[""],
     allow_headers=["*"],
 )
 
-# Incluir todos los routers
+##Incluir todos los routers
 app.include_router(auth_router)
 app.include_router(reminders_router)
 app.include_router(users_router)
 app.include_router(subjects_router)
 app.include_router(tasks_router)
 
-# Después de incluir todas las rutas
+##Después de incluir todas las rutas
 for route in app.routes:
-    print(f"Ruta disponible: {route.path}") 
+    print(f"Ruta disponible: {route.path}")
