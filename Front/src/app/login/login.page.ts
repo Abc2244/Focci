@@ -18,7 +18,7 @@ export class LoginPage {
     this.apiService.loginUser(loginData).subscribe(
       (response) => {
         localStorage.setItem('token', response.access_token);  // Almacenar el token
-        this.router.navigate(['/task-manager']);  // Redirigir tras un login exitoso
+        this.router.navigate(['/home']);  // Redirigir tras un login exitoso
       },
       (error) => {
         alert('Error al iniciar sesión. Verifica tus credenciales.');
