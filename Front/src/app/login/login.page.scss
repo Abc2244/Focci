@@ -47,11 +47,12 @@
       margin-bottom: 0.5rem;
     }
 
-    ion-input {
-      --padding-start: 1rem;
-      --placeholder-color: #ccc;
-      --placeholder-opacity: 0.8;
-    }
+      ion-input {
+        --color:black;
+        --padding-start: 1rem;
+        --placeholder-color: #ccc;
+        --placeholder-opacity: 0.8;
+      }
   }
 
   .login-button {
