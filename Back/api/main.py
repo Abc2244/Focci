@@ -11,10 +11,10 @@ app = FastAPI()
 ##Configurar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[""],  # En producción, especifica los orígenes permitidos
+    allow_origins=["*"],  # 🔥 Permite cualquier origen (útil en desarrollo)
     allow_credentials=True,
-    allow_methods=[""],
-    allow_headers=["*"],
+    allow_methods=["*"],  # 🔥 Permite cualquier método (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # 🔥 Permite cualquier encabezado
 )
 
 ##Incluir todos los routers
