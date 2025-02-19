@@ -1,84 +1,127 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../api.service';
-import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
+import { AlertController, AlertInput } from '@ionic/angular';
 
 @Component({
   selector: 'app-task-manager',
   templateUrl: './task-manager.page.html',
   styleUrls: ['./task-manager.page.scss'],
 })
-export class TaskManagerPage {
-  subjectId: string = ''; // Para la selección de materia
-  taskDescription: string = ''; // Para la descripción de la tarea
-  dueDate: string = ''; // Para la fecha de entrega
-  taskId: string = ''; // Para completar una tarea
+export class TaskManagerPage implements OnInit {
+  tasks: any[] = [];
+  subjects: any[] = [];
+  subjectMap: Map<string, string> = new Map();
 
-  subjects: any[] = []; // Lista de materias del usuario
+  constructor(
+    private apiService: ApiService,
+    private authService: AuthService,
+    private alertController: AlertController
+  ) {}
 
-  constructor(private apiService: ApiService, private router: Router) {}
-
-  // Obtener materias al iniciar
   ngOnInit() {
-    const user_id = localStorage.getItem('user_id');
-    if (user_id) {
-      this.apiService.getUserSubjects(user_id).subscribe(
+    this.loadSubjects();
+    this.loadTasks();
+  }
+
+  loadSubjects() {
+    const userId = this.authService.getCurrentUserId();
+    if (userId) {
+      this.apiService.getUserSubjects(userId).subscribe(
         (subjects) => {
           this.subjects = subjects;
+          // Crear un mapa de ID de materia a nombre para referencia rápida
+          subjects.forEach((subject: any) => {
+            this.subjectMap.set(subject._id, subject.name);
+          });
         },
         (error) => {
-          console.error('Error obteniendo materias:', error);
+          console.error('Error al cargar las materias:', error);
         }
       );
     }
   }
 
-  // Crear una nueva tarea
-  crearNuevaTarea() {
-    const user_id = localStorage.getItem('user_id');
-    if (!user_id) {
-      alert('Usuario no autenticado.');
-      return;
+  loadTasks() {
+    const userId = this.authService.getCurrentUserId();
+    if (userId) {
+      this.apiService.getUserTasks(userId).subscribe(
+        (tasks) => {
+          this.tasks = tasks;
+        },
+        (error) => {
+          console.error('Error al cargar las tareas:', error);
+        }
+      );
     }
-
-    if (!this.subjectId || !this.taskDescription || !this.dueDate) {
-      alert('Por favor, llena todos los campos.');
-      return;
-    }
-
-    const nuevaTarea = {
-      user_id: user_id,
-      subject_id: this.subjectId,
-      description: this.taskDescription,
-      due_date: this.dueDate,
-    };
-
-    this.apiService.createTask(nuevaTarea).subscribe(
-      (response) => {
-        alert('Tarea creada con éxito');
-        this.taskDescription = '';
-        this.dueDate = '';
-      },
-      (error) => {
-        console.error('Error al crear tarea:', error);
-      }
-    );
   }
 
-  // Completar una tarea
-  completarTarea() {
-    if (!this.taskId) {
-      alert('Por favor, ingresa un ID de tarea válido.');
-      return;
-    }
+  getSubjectName(subjectId: string): string {
+    return this.subjectMap.get(subjectId) || 'Materia no encontrada';
+  }
 
-    this.apiService.completeTask(this.taskId).subscribe(
-      (response) => {
-        alert('Tarea completada con éxito');
-        this.taskId = '';
-      },
-      (error) => {
-        console.error('Error al completar tarea:', error);
-      }
-    );
+  async addTask() {
+    // Crear inputs para las materias usando radio buttons
+    const subjectInputs: AlertInput[] = this.subjects.map((subject) => ({
+      type: 'radio' as const,
+      label: subject.name,
+      value: subject._id,
+      name: 'subject_id',
+    }));
+
+    const alert = await this.alertController.create({
+      header: 'Nueva Tarea',
+      inputs: [
+        {
+          name: 'description',
+          type: 'text' as const,
+          placeholder: 'Descripción de la tarea',
+        },
+        ...subjectInputs,
+        {
+          name: 'due_date',
+          type: 'datetime-local' as const,
+          placeholder: 'Fecha de entrega',
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            return true;
+          },
+        },
+        {
+          text: 'Agregar',
+          handler: (data) => {
+            if (data.description && data.subject_id && data.due_date) {
+              const userId = this.authService.getCurrentUserId();
+              if (userId) {
+                const newTask = {
+                  user_id: userId,
+                  subject_id: data.subject_id,
+                  description: data.description,
+                  due_date: data.due_date,
+                };
+
+                this.apiService.createTask(newTask).subscribe(
+                  () => {
+                    this.loadTasks();
+                  },
+                  (error) => {
+                    console.error('Error al crear la tarea:', error);
+                  }
+                );
+                return true;
+              }
+            }
+            return false;
+          },
+        },
+      ],
+    });
+
+    await alert.present();
   }
 }

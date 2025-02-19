@@ -4,32 +4,43 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'home',
-    /*redirectTo: 'login',*/
-    pathMatch: 'full'
+    redirectTo: 'login',
+    pathMatch: 'full',
   },
   {
     path: 'home', // Aseguramos que Home está registrado aquí
-    loadChildren: () => import('./home/home.module').then(m => m.HomePageModule)
+    loadChildren: () =>
+      import('./home/home.module').then((m) => m.HomePageModule),
   },
   {
     path: 'login',
-    loadChildren: () => import('./login/login.module').then(m => m.LoginPageModule)
+    loadChildren: () =>
+      import('./login/login.module').then((m) => m.LoginPageModule),
   },
   {
-    path: 'register',
-    loadChildren: () => import('./register/register.module').then(m => m.RegisterPageModule)
+    path: 'home',
+    loadChildren: () =>
+      import('./home/home.module').then((m) => m.HomePageModule),
   },
   {
     path: 'task-manager',
-    loadChildren: () => import('./task-manager/task-manager.module').then(m => m.TaskManagerPageModule)
-  }
+    loadChildren: () =>
+      import('./task-manager/task-manager.module').then(
+        (m) => m.TaskManagerPageModule
+      ),
+  },
+  {
+    path: 'subjects',
+    loadChildren: () =>
+      import('./subjects/subjects.module').then((m) => m.SubjectsPageModule),
+  },
+  // otras rutas...
 ];
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })
+    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
   ],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

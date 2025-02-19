@@ -1,7 +1,7 @@
-.tasks-content {
+.subjects-content {
   --background: linear-gradient(135deg, #fff5e6 0%, #fff 100%);
 
-  .tasks-container {
+  .subjects-container {
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -27,7 +27,7 @@
     }
   }
 
-  .task-list {
+  .subject-list {
     width: 100%;
     max-width: 400px;
   }
@@ -40,40 +40,46 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
-  .task-content {
+  .subject-content {
     display: flex;
     align-items: center;
     width: 100%;
     padding: 0.5rem;
   }
 
-  .task-icon {
+  .subject-icon {
     font-size: 24px;
     color: #ff8c00;
     margin-right: 1rem;
   }
 
-  .task-info {
+  .subject-info {
     flex: 1;
 
-    .task-title {
+    .subject-title {
       color: #8b4513;
       font-weight: 500;
       margin: 0;
       font-size: 1.1rem;
     }
 
-    .task-subject {
+    .subject-credits {
       color: #666;
       margin: 0.25rem 0 0 0;
       font-size: 0.9rem;
     }
 
-    .task-date {
+    .subject-schedule {
       color: #666;
       margin: 0.25rem 0 0 0;
       font-size: 0.9rem;
     }
+  }
+
+  .subject-description {
+    color: #666;
+    margin: 0.25rem 0 0 0;
+    font-size: 0.9rem;
   }
 
   .add-button {
