@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Task, CreateTaskDTO } from './interfaces/task.interface';
+import { environment } from '../environments/environment';
 
 // Interfaces basadas en los modelos del backend
 interface Subject {
@@ -16,7 +17,7 @@ interface Subject {
   providedIn: 'root',
 })
 export class ApiService {
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
