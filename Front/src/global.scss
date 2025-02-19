@@ -35,3 +35,88 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+// Estilos para los alerts personalizados
+.custom-alert {
+  --background: #fff5e6;
+
+  .alert-wrapper {
+    background: linear-gradient(135deg, #fff5e6 0%, #fff 100%);
+    border-radius: 15px;
+  }
+
+  .alert-head {
+    text-align: center;
+    color: #8b4513;
+
+    .alert-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+  }
+
+  .alert-input-group {
+    padding: 10px;
+
+    .alert-input {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin: 5px 0;
+      --padding-start: 10px;
+      background: white;
+    }
+
+    .alert-radio-group {
+      border: none;
+
+      .alert-radio-label {
+        color: #8b4513;
+      }
+
+      .alert-radio-inner {
+        border-color: #ff8c00;
+      }
+    }
+  }
+
+  .alert-button-group {
+    padding: 10px;
+
+    .alert-button {
+      border-radius: 8px;
+      margin: 0 5px;
+    }
+
+    .submit-button {
+      --background: #ff8c00;
+      --color: white;
+      font-weight: 600;
+    }
+
+    .cancel-button {
+      --background: #f4f4f4;
+      --color: #666;
+    }
+  }
+}
+
+// Estilos comunes para las barras de herramientas
+ion-toolbar {
+  --background: transparent;
+  --border-style: none;
+
+  ion-title {
+    color: #8b4513;
+    font-weight: 600;
+  }
+
+  ion-menu-button {
+    color: #8b4513;
+  }
+}
+
+// Estilos para el contenido
+.subjects-content,
+.tasks-content {
+  --background: linear-gradient(135deg, #fff5e6 0%, #fff 100%);
+}

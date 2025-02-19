@@ -1,6 +1,16 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { Task, CreateTaskDTO } from './interfaces/task.interface';
+
+// Interfaces basadas en los modelos del backend
+interface Subject {
+  _id?: string;
+  user_id: string;
+  name: string;
+  credits: number;
+  schedule: string[];
+}
 
 @Injectable({
   providedIn: 'root',
@@ -46,67 +56,67 @@ export class ApiService {
   // Tareas
   // -----------------------------------------
 
-  // Crear nueva tarea
-  createTask(task: {
-    user_id: string;
-    subject_id: string;
-    description: string;
-    due_date: string;
-  }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/tasks/`, task);
+  createTask(task: CreateTaskDTO): Observable<any> {
+    const taskData = {
+      ...task,
+      completed: false,
+    };
+    return this.http.post(`${this.apiUrl}/tasks/`, taskData);
   }
 
-  // Obtener tareas de un usuario
-  getUserTasks(user_id: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/${user_id}/tasks/`);
+  getUserTasks(user_id: string): Observable<Task[]> {
+    return this.http.get<Task[]>(`${this.apiUrl}/users/${user_id}/tasks/`);
   }
 
-  // Obtener tareas pendientes de un usuario
-  getPendingTasks(user_id: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/${user_id}/tasks/pending/`);
+  getPendingTasks(user_id: string): Observable<Task[]> {
+    return this.http.get<Task[]>(
+      `${this.apiUrl}/users/${user_id}/tasks/pending/`
+    );
   }
 
-  // Obtener tareas completadas de un usuario
-  getCompletedTasks(user_id: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/${user_id}/tasks/completed/`);
+  getCompletedTasks(user_id: string): Observable<Task[]> {
+    return this.http.get<Task[]>(
+      `${this.apiUrl}/users/${user_id}/tasks/completed/`
+    );
   }
 
-  // Marcar tarea como completada
   completeTask(task_id: string): Observable<any> {
     return this.http.patch(`${this.apiUrl}/tasks/${task_id}/complete/`, {});
   }
 
-  // Actualizar tarea
-  updateTask(task_id: string, taskData: any): Observable<any> {
+  updateTask(task_id: string, taskData: Partial<Task>): Observable<any> {
     return this.http.put(`${this.apiUrl}/tasks/${task_id}/`, taskData);
   }
 
-  // Eliminar tarea
   deleteTask(task_id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/tasks/${task_id}/`);
   }
 
-  // Eliminar todas las tareas completadas de un usuario
   deleteCompletedTasks(user_id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/users/${user_id}/tasks/completed/`);
+  }
+
+  uncompleteTask(task_id: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/tasks/${task_id}/uncomplete/`, {});
   }
 
   // -----------------------------------------
   // Materias
   // -----------------------------------------
 
-  // Obtener materias de un usuario
-  getUserSubjects(user_id: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/${user_id}/subjects/`);
+  getUserSubjects(user_id: string): Observable<Subject[]> {
+    return this.http.get<Subject[]>(
+      `${this.apiUrl}/users/${user_id}/subjects/`
+    );
   }
 
-  // Obtener tareas de una materia
-  getTasksBySubject(subject_id: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/subjects/${subject_id}/tasks/`);
+  getTasksBySubject(subject_id: string): Observable<Task[]> {
+    return this.http.get<Task[]>(
+      `${this.apiUrl}/subjects/${subject_id}/tasks/`
+    );
   }
 
-  // Crear nueva materia
-  createSubject(subject: any): Observable<any> {
+  createSubject(subject: Subject): Observable<any> {
     return this.http.post(`${this.apiUrl}/subjects/`, subject);
   }
 

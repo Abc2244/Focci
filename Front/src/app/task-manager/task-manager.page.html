@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header class="custom-header">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
@@ -54,20 +54,59 @@
 
     <!-- Lista de Tareas -->
     <div class="task-list">
-      <ion-item lines="none" class="custom-item" *ngFor="let task of tasks">
-        <div class="task-content">
-          <ion-icon name="checkbox-outline" class="task-icon"></ion-icon>
-          <div class="task-info">
-            <h2 class="task-title">{{ task.description }}</h2>
-            <p class="task-subject">
-              Materia: {{ getSubjectName(task.subject_id) }}
-            </p>
-            <p class="task-date">
-              Fecha de entrega: {{ task.due_date | date }}
-            </p>
+      <!-- Sección de tareas pendientes -->
+      <div class="task-section">
+        <h2>Tareas Pendientes</h2>
+        <ion-item lines="none" class="custom-item" *ngFor="let task of tasks">
+          <div class="task-content" *ngIf="!task.completed">
+            <ion-checkbox
+              [(ngModel)]="task.completed"
+              (ionChange)="task._id && completeTask(task._id)"
+              class="task-checkbox"
+            >
+            </ion-checkbox>
+            <div class="task-info">
+              <h2 class="task-title">{{ task.description }}</h2>
+              <p class="task-subject">
+                Materia: {{ getSubjectName(task.subject_id) }}
+              </p>
+              <p class="task-date">
+                Fecha de entrega: {{ task.due_date | date:'medium' }}
+              </p>
+            </div>
+            <ion-button fill="clear" (click)="task._id && deleteTask(task._id)">
+              <ion-icon name="trash-outline" color="danger"></ion-icon>
+            </ion-button>
           </div>
-        </div>
-      </ion-item>
+        </ion-item>
+      </div>
+
+      <!-- Sección de tareas completadas -->
+      <div class="task-section completed">
+        <h2>Tareas Completadas</h2>
+        <ion-item lines="none" class="custom-item" *ngFor="let task of tasks">
+          <div class="task-content" *ngIf="task.completed">
+            <ion-checkbox
+              [(ngModel)]="task.completed"
+              (ionChange)="task._id && uncompleteTask(task._id)"
+              class="task-checkbox"
+              checked
+            >
+            </ion-checkbox>
+            <div class="task-info completed">
+              <h2 class="task-title">{{ task.description }}</h2>
+              <p class="task-subject">
+                Materia: {{ getSubjectName(task.subject_id) }}
+              </p>
+              <p class="task-date">
+                {{ task.completed_date ? ('Completada el: ' +
+                (task.completed_date | date:'medium')) : ('Fecha de entrega: ' +
+                (task.due_date | date:'medium')) }}
+              </p>
+            </div>
+          </div>
+        </ion-item>
+      </div>
 
       <!-- Botón para agregar nueva tarea -->
       <ion-button expand="block" class="add-button" (click)="addTask()">

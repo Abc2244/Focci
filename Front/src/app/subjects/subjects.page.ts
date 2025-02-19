@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
 import { AlertController } from '@ionic/angular';
+import { Subject } from '../interfaces/subject.interface';
 
 @Component({
   selector: 'app-subjects',
@@ -9,7 +10,7 @@ import { AlertController } from '@ionic/angular';
   styleUrls: ['./subjects.page.scss'],
 })
 export class SubjectsPage implements OnInit {
-  subjects: any[] = [];
+  subjects: Subject[] = [];
 
   constructor(
     private apiService: ApiService,
