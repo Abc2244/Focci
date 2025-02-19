@@ -1,26 +1,29 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api.routes import auth_router, users_router, subjects_router, tasks_router, reminders_router
+from api.routes.auth_routes import router as auth_router
+from api.routes.reminders import router as reminders_router
+from api.routes.users import router as users_router
+from api.routes.subjects import router as subjects_router
+from api.routes.tasks import router as tasks_router
 
 app = FastAPI()
 
-# Habilitar CORS
+##Configurar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],        # Permitir cualquier origen (ajusta en producción)
+    allow_origins=["*"],  # 🔥 Permite cualquier origen (útil en desarrollo)
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # 🔥 Permite cualquier método (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # 🔥 Permite cualquier encabezado
 )
 
-# Incluir cada router
+##Incluir todos los routers
 app.include_router(auth_router)
+app.include_router(reminders_router)
 app.include_router(users_router)
 app.include_router(subjects_router)
 app.include_router(tasks_router)
-app.include_router(reminders_router)
 
-# Ruta de prueba
-@app.get("/")
-async def root():
-    return {"message": "API is running!"}
+##Después de incluir todas las rutas
+for route in app.routes:
+    print(f"Ruta disponible: {route.path}")
