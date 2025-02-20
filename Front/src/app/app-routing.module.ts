@@ -8,19 +8,20 @@ const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'home', // Aseguramos que Home está registrado aquí
+    path: 'home',
     loadChildren: () =>
       import('./home/home.module').then((m) => m.HomePageModule),
   },
+
   {
     path: 'login',
     loadChildren: () =>
       import('./login/login.module').then((m) => m.LoginPageModule),
   },
   {
-    path: 'home',
+    path: 'register',
     loadChildren: () =>
-      import('./home/home.module').then((m) => m.HomePageModule),
+      import('./register/register.module').then((m) => m.RegisterPageModule),
   },
   {
     path: 'task-manager',
@@ -34,7 +35,11 @@ const routes: Routes = [
     loadChildren: () =>
       import('./subjects/subjects.module').then((m) => m.SubjectsPageModule),
   },
-  // otras rutas...
+  {
+    path: 'register',
+    loadChildren: () =>
+      import('./register/register.module').then((m) => m.RegisterPageModule),
+  },
 ];
 
 @NgModule({

@@ -41,7 +41,7 @@
 </ion-menu>
 
 <div class="ion-page" id="main-content">
-  <ion-header>
+  <ion-header class="custom-header">
     <ion-toolbar>
       <ion-buttons slot="start">
         <ion-menu-button></ion-menu-button>
@@ -50,7 +50,9 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-content class="home-content">
+  <app-side-menu></app-side-menu>
+
+  <ion-content class="home-content" id="main-content">
     <div class="logo-container">
       <img src="assets/icon/logo.png" alt="Logo" class="logo" />
       <h1>Bienvenido a tu Gestor de Tareas</h1>
