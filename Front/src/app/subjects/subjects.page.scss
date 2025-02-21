@@ -1,102 +1,100 @@
+@import "../shared/styles/common";
+
+// Botón flotante con el naranja específico (al principio del archivo)
+ion-fab {
+  ion-fab-button.custom-fab {
+    --background: #f7b46e !important;
+    --background-activated: #e5a35d !important;
+    --background-hover: #f9c28a !important;
+
+    ion-icon {
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+    }
+  }
+}
+
 .subjects-content {
-  --background: linear-gradient(135deg, #fff5e6 0%, #fff 100%);
+  @extend .page-content;
 
   .subjects-container {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem;
-  }
-
-  .logo-container {
-    margin-top: 2rem;
-    text-align: center;
-
-    .logo {
-      width: 120px;
-      height: 120px;
-      margin-bottom: 1rem;
-    }
-
-    h1 {
-      color: #8b4513;
-      font-size: 2rem;
-      margin-bottom: 2rem;
-      font-weight: 600;
-    }
+    padding: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
   }
 
   .subject-list {
-    width: 100%;
-    max-width: 400px;
+    margin-top: 1rem;
   }
 
-  .custom-item {
-    --background: rgba(255, 255, 255, 0.7);
-    border-radius: 10px;
+  .subject-card {
     margin-bottom: 1rem;
-    padding: 0.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    background: rgba(255, 255, 255, 0.9);
+
+    ion-card-header {
+      padding: 1rem;
+
+      ion-card-title {
+        color: var(--ion-color-primary);
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+
+      ion-card-subtitle {
+        color: var(--ion-color-primary-shade);
+      }
+    }
   }
 
-  .subject-content {
+  .schedule-chips {
     display: flex;
-    align-items: center;
-    width: 100%;
-    padding: 0.5rem;
-  }
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
 
-  .subject-icon {
-    font-size: 24px;
-    color: #ff8c00;
-    margin-right: 1rem;
-  }
-
-  .subject-info {
-    flex: 1;
-
-    .subject-title {
-      color: #8b4513;
-      font-weight: 500;
-      margin: 0;
-      font-size: 1.1rem;
-    }
-
-    .subject-credits {
-      color: #666;
-      margin: 0.25rem 0 0 0;
-      font-size: 0.9rem;
-    }
-
-    .subject-schedule {
-      color: #666;
-      margin: 0.25rem 0 0 0;
-      font-size: 0.9rem;
+    ion-chip {
+      --background: var(--ion-color-primary-tint);
+      --color: var(--ion-color-primary-contrast);
     }
   }
 
-  .subject-description {
-    color: #666;
-    margin: 0.25rem 0 0 0;
-    font-size: 0.9rem;
+  .subject-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
+  .empty-state {
+    @include flex-center;
+    padding: 2rem;
+    color: var(--ion-color-primary);
+
+    ion-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.2rem;
+    }
   }
 
   .add-button {
-    --background: #ff8c00;
-    --background-hover: #ffa500;
-    --border-radius: 10px;
-    --color: white;
-    margin-top: 1.5rem;
-    height: 48px;
-    font-weight: 600;
-    font-size: 1.1rem;
-    box-shadow: 0 4px 8px rgba(255, 140, 0, 0.2);
-
-    ion-icon {
-      margin-right: 0.5rem;
-    }
+    margin: 1rem 0;
   }
+
+  // Eliminar o comentar este estilo que podría estar interfiriendo
+  // .subjects-content {
+  //   ion-fab-button {
+  //     --background: #8b4513;
+  //     --background-activated: #7a3d11;
+  //     --background-hover: #96582b;
+  //     --color: white;
+  //   }
+  // }
 }
 
 // Animación suave para los botones
@@ -122,5 +120,116 @@ ion-header {
     ion-menu-button {
       color: #8b4513;
     }
+  }
+}
+
+// Estilos del modal
+.subject-modal {
+  --height: 100%;
+  --width: 100%;
+
+  ion-header {
+    ion-toolbar {
+      --background: var(--app-gradient); // Mantenemos el gradiente original
+      --border-style: none;
+
+      .modal-button {
+        --color: #8b4513; // Color café para los botones
+        font-size: 1.2rem;
+        font-weight: 500;
+
+        &.save-button {
+          --color: #8b4513;
+          margin-right: 8px;
+        }
+
+        .modal-icon {
+          font-size: 1.5rem;
+        }
+      }
+    }
+  }
+
+  .modal-content {
+    --background: var(--app-gradient); // Mantenemos el gradiente original
+  }
+
+  .form-container {
+    padding: 24px 20px;
+
+    .input-group {
+      .custom-input {
+        margin-bottom: 24px;
+
+        ion-label {
+          --color: #8b4513;
+          font-weight: 500;
+          font-size: 1.1rem;
+          margin-bottom: 8px;
+        }
+
+        ion-input {
+          --padding-top: 12px;
+          --padding-bottom: 12px;
+        }
+      }
+    }
+  }
+}
+
+// Estilos para el selector de días en el modal
+.schedule-selector {
+  margin-top: 1.5rem;
+  padding: 0 1rem;
+
+  ion-label {
+    color: var(--ion-color-primary);
+    font-weight: 500;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .days-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 0.8rem;
+
+    .day-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--ion-color-primary);
+      color: var(--ion-color-primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &.selected {
+        background: var(--ion-color-primary);
+        color: white;
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+  }
+}
+// Botón flotante separado con el naranja específico
+ion-fab-button.custom-fab {
+  --background: #f7b46e; // Naranja bonito específico para este botón
+  --background-activated: #e5a35d;
+  --background-hover: #f9c28a;
+
+  .fab-icon {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
   }
 }

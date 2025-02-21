@@ -1,0 +1,25 @@
+@import "src/app/shared/styles/common";
+
+.profile-content {
+  @extend .page-content !optional;
+
+  --background: linear-gradient(135deg, #fff5e6 0%, #fff 100%);
+
+  .logo-container {
+    h1 {
+      color: #8b4513;
+    }
+  }
+
+  ion-item {
+    --color: var(--ion-color-primary);
+
+    ion-label {
+      color: var(--ion-color-primary-tint);
+    }
+  }
+
+  .edit-button {
+    @extend .custom-button;
+  }
+}

@@ -1,0 +1,31 @@
+@import "src/app/shared/styles/common";
+
+.reminders-content {
+  @extend .page-content !optional;
+
+  .logo-container {
+    h1 {
+      color: #8b4513;
+    }
+  }
+
+  .reminder-item {
+    @include card-style;
+    margin-bottom: 1rem;
+
+    .reminder-title {
+      color: var(--ion-color-primary);
+      font-weight: 500;
+      font-size: 1.1rem;
+    }
+
+    .reminder-details {
+      color: var(--ion-color-primary-tint);
+      font-size: 0.9rem;
+    }
+  }
+
+  .add-button {
+    @extend .custom-button;
+  }
+}

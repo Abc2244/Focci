@@ -1,0 +1,66 @@
+ion-tab-bar {
+  --background: #f7b46e;
+  padding: 8px 0;
+  border: none;
+  box-shadow: 0 -2px 10px rgba(247, 180, 110, 0.2);
+  position: relative;
+
+  &::before {
+    display: none;
+  }
+
+  ion-tab-button {
+    --color: rgba(139, 69, 19, 0.7);
+    --color-selected: #8b4513;
+    --ripple-color: transparent;
+    background: transparent;
+
+    &::before {
+      display: none;
+    }
+
+    &.tab-selected {
+      ion-icon {
+        transform: scale(1.1);
+        color: var(--ion-color-primary);
+      }
+
+      ion-label {
+        font-weight: 600;
+        opacity: 1;
+        color: var(--ion-color-primary);
+      }
+    }
+
+    ion-icon {
+      font-size: 24px;
+      transition: all 0.2s ease;
+      color: var(--ion-color-primary);
+    }
+
+    ion-label {
+      font-size: 12px;
+      margin-top: 4px;
+      font-weight: 500;
+      opacity: 0.9;
+      transition: all 0.2s ease;
+      color: var(--ion-color-primary);
+    }
+  }
+}
+
+// Efecto de brillo suave
+ion-tab-bar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+}

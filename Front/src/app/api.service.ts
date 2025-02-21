@@ -121,6 +121,17 @@ export class ApiService {
     return this.http.post(`${this.apiUrl}/subjects/`, subject);
   }
 
+  updateSubject(
+    subject_id: string,
+    subjectData: Partial<Subject>
+  ): Observable<any> {
+    return this.http.put(`${this.apiUrl}/subjects/${subject_id}/`, subjectData);
+  }
+
+  deleteSubject(subject_id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/subjects/${subject_id}/`);
+  }
+
   // -----------------------------------------
   // Recordatorios
   // -----------------------------------------

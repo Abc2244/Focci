@@ -1,46 +1,116 @@
-<ion-header class="custom-header">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>Mis Materias</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<app-side-menu></app-side-menu>
-
-<ion-content class="subjects-content" id="main-content">
+<ion-content class="subjects-content">
   <div class="subjects-container">
-    <!-- Logo o imagen -->
-    <div class="logo-container">
-      <img src="assets/icon/logo.png" alt="Logo" class="logo" />
-      <h1>Mis Materias</h1>
-    </div>
-
     <!-- Lista de Materias -->
     <div class="subject-list">
-      <ion-item
-        lines="none"
-        class="custom-item"
-        *ngFor="let subject of subjects"
-      >
-        <div class="subject-content">
-          <ion-icon name="book-outline" class="subject-icon"></ion-icon>
-          <div class="subject-info">
-            <h2 class="subject-title">{{ subject.name }}</h2>
-            <p class="subject-credits">Créditos: {{ subject.credits }}</p>
-            <p class="subject-schedule">
-              Horario: {{ subject.schedule.join(', ') }}
-            </p>
-          </div>
-        </div>
-      </ion-item>
+      <ion-card class="subject-card" *ngFor="let subject of subjects">
+        <ion-card-header>
+          <ion-card-title>{{ subject.name }}</ion-card-title>
+          <ion-card-subtitle>{{ subject.credits }} Créditos</ion-card-subtitle>
+        </ion-card-header>
 
-      <!-- Botón para agregar nueva materia -->
-      <ion-button expand="block" class="add-button" (click)="addSubject()">
-        <ion-icon name="add-outline" slot="start"></ion-icon>
-        Agregar Materia
-      </ion-button>
+        <ion-card-content>
+          <div class="schedule-chips">
+            <ion-chip *ngFor="let day of subject.schedule" color="primary">
+              {{ day }}
+            </ion-chip>
+          </div>
+
+          <div class="subject-actions">
+            <ion-button fill="clear" (click)="editSubject(subject)">
+              <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+            <ion-button
+              fill="clear"
+              color="danger"
+              (click)="deleteSubject(subject)"
+            >
+              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Mensaje cuando no hay materias -->
+      <div class="empty-state" *ngIf="subjects.length === 0">
+        <ion-icon name="book-outline"></ion-icon>
+        <p>No tienes materias registradas</p>
+      </div>
     </div>
   </div>
+
+  <!-- Botón flotante para agregar con el evento click -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button class="custom-fab" (click)="addSubject()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
+
+<!-- Modal actualizado sin título en la navbar -->
+<ion-modal
+  [isOpen]="showModal"
+  [breakpoints]="[0, 1.0]"
+  [initialBreakpoint]="1.0"
+  class="subject-modal"
+>
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button (click)="dismissModal()" class="modal-button">
+            <ion-icon name="close-outline" class="modal-icon"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-buttons slot="end">
+          <ion-button
+            (click)="saveSubject()"
+            class="modal-button save-button"
+            [disabled]="!subjectForm.valid"
+          >
+            {{ isEditing ? 'Actualizar' : 'Crear' }}
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="modal-content">
+      <form [formGroup]="subjectForm">
+        <div class="form-container">
+          <div class="input-group">
+            <ion-item class="custom-input">
+              <ion-label position="floating">Nombre de la materia</ion-label>
+              <ion-input
+                formControlName="name"
+                placeholder="Ej: Matemáticas"
+                autofocus="true"
+              ></ion-input>
+            </ion-item>
+
+            <ion-item class="custom-input">
+              <ion-label position="floating">Créditos</ion-label>
+              <ion-input
+                type="number"
+                formControlName="credits"
+                placeholder="Ej: 4"
+              ></ion-input>
+            </ion-item>
+
+            <div class="schedule-selector">
+              <ion-label>Días de clase</ion-label>
+              <div class="days-container">
+                <div
+                  *ngFor="let day of availableDays"
+                  class="day-box"
+                  [class.selected]="isDaySelected(day.value)"
+                  (click)="toggleDay(day.value)"
+                >
+                  {{ day.short }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </ion-content>
+  </ng-template>
+</ion-modal>
