@@ -157,6 +157,7 @@ ion-toolbar {
   color: var(--ion-color-primary-tint);
 }
 
+// Estilos para el toast grande y personalizado
 .large-toast {
   --width: 90% !important;
   --min-height: 300px !important;
@@ -176,24 +177,20 @@ ion-toolbar {
     font-size: 2em;
     font-weight: bold;
   }
-}
 
-// Estilo para el check verde
-ion-toast.large-toast::part(message) {
-  &:contains("✓") {
+  // Estilo para el check verde
+  &::part(message):contains("✓") {
     &::before {
       content: "✓";
       display: block;
       font-size: 8em;
-      color: #2dd36f !important;
+      color: #8b4513 !important;
       line-height: 1;
     }
   }
-}
 
-// Estilo para el error
-ion-toast.large-toast::part(message) {
-  &:contains("❌") {
+  // Estilo para el error
+  &::part(message):contains("❌") {
     &::before {
       content: "❌";
       display: block;
@@ -215,6 +212,73 @@ ion-toast.large-toast::part(message) {
       &::before {
         font-size: 6em;
       }
+    }
+  }
+}
+
+// Estilos para las tabs - versión corregida
+ion-tab-bar {
+  --background: #fff;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: env(safe-area-inset-bottom);
+  position: relative;
+  z-index: 1000;
+
+  ion-tab-button {
+    --color: #666;
+    --color-selected: var(--ion-color-primary);
+    --ripple-color: var(--ion-color-primary);
+    position: relative;
+    overflow: visible;
+
+    &::before {
+      display: none;
+    }
+
+    ion-icon {
+      font-size: 24px;
+    }
+
+    ion-label {
+      font-size: 12px;
+      font-weight: 500;
+    }
+  }
+}
+
+// Eliminar la regla que fija las tabs
+ion-tabs {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  ion-router-outlet {
+    flex: 1;
+  }
+
+  ion-tab-bar {
+    flex-shrink: 0;
+  }
+}
+
+// Asegurarse de que el contenido principal no tape las tabs
+ion-content {
+  --padding-bottom: 56px; // altura de las tabs
+}
+
+// Actualizar los estilos del toast personalizado
+.custom-toast {
+  @extend .large-toast;
+
+  &.toast-success::part(message) {
+    &::before {
+      content: "✓";
+    }
+  }
+
+  &.toast-danger::part(message) {
+    &::before {
+      content: "❌";
     }
   }
 }

@@ -262,33 +262,6 @@ ion-fab-button.custom-fab {
   }
 }
 
-// Estilos para el toast personalizado
-::ng-deep .custom-toast {
-  text-align: center !important;
-  margin-top: 60px !important;
-  border-radius: 15px !important;
-  --min-width: 300px !important;
-  --max-width: 400px !important;
-  --background: #f7b46e !important; // Naranja
-  --color: #8b4513 !important; // Café
-  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  font-weight: 600;
-
-  &::part(message) {
-    text-align: center !important;
-  }
-
-  &.toast-success {
-    --background: #f7b46e !important; // Naranja
-    --color: #8b4513 !important; // Café
-  }
-
-  &.toast-danger {
-    --background: #f7b46e !important; // Naranja
-    --color: #8b4513 !important; // Café
-  }
-}
-
 // Estilos para el alert personalizado
 ::ng-deep .custom-alert {
   --background: var(--app-gradient);
