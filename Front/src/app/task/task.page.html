@@ -1,0 +1,160 @@
+<ion-content class="tasks-content">
+  <div class="tasks-container">
+    <!-- Logo o imagen -->
+    <div class="logo-container">
+      <img src="assets/icon/logo.png" alt="Logo" class="logo" />
+    </div>
+
+    <!-- Lista de Tareas -->
+    <div class="task-list">
+      <!-- Tareas Pendientes -->
+      <ion-card class="task-card" *ngFor="let task of incompleteTasks">
+        <ion-card-header>
+          <ion-card-title>{{ task.description }}</ion-card-title>
+          <ion-card-subtitle
+            >{{ getSubjectName(task.subject_id) }}</ion-card-subtitle
+          >
+        </ion-card-header>
+
+        <ion-card-content>
+          <div class="task-info">
+            <ion-chip color="primary">
+              {{ task.due_date | date:'medium' }}
+            </ion-chip>
+          </div>
+
+          <div class="task-actions">
+            <ion-button fill="clear" (click)="completeTask(task._id)">
+              <ion-icon
+                name="checkmark-circle-outline"
+                slot="icon-only"
+              ></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" (click)="editTask(task)">
+              <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+            <ion-button
+              fill="clear"
+              color="danger"
+              (click)="deleteTask(task._id)"
+            >
+              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Tareas Completadas -->
+      <div class="completed-tasks-section" *ngIf="completedTasks.length > 0">
+        <h2>Tareas Completadas</h2>
+        <ion-card
+          class="task-card completed"
+          *ngFor="let task of completedTasks"
+        >
+          <ion-card-header>
+            <ion-card-title>{{ task.description }}</ion-card-title>
+            <ion-card-subtitle
+              >{{ getSubjectName(task.subject_id) }}</ion-card-subtitle
+            >
+          </ion-card-header>
+
+          <ion-card-content>
+            <div class="task-info">
+              <ion-chip color="success">
+                Completada: {{ task.completed_date | date:'medium' }}
+              </ion-chip>
+            </div>
+
+            <div class="task-actions">
+              <ion-button fill="clear" (click)="uncompleteTask(task._id)">
+                <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <!-- Estado vacío -->
+      <div class="empty-state" *ngIf="tasks.length === 0">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <p>No tienes tareas registradas</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botón flotante para agregar -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button class="custom-fab" (click)="addTask()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
+
+<!-- Modal para agregar/editar tarea -->
+<ion-modal
+  [isOpen]="showModal"
+  [breakpoints]="[0, 1.0]"
+  [initialBreakpoint]="1.0"
+  class="task-modal"
+>
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button (click)="dismissModal()" class="modal-button">
+            <ion-icon name="close-outline" class="modal-icon"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-buttons slot="end">
+          <ion-button
+            (click)="saveTask()"
+            class="modal-button save-button"
+            [disabled]="!taskForm.valid"
+          >
+            {{ isEditing ? 'Actualizar' : 'Crear' }}
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="modal-content">
+      <form [formGroup]="taskForm">
+        <div class="form-container">
+          <div class="input-group">
+            <ion-item class="custom-input">
+              <ion-label position="floating">Descripción</ion-label>
+              <ion-input formControlName="description" type="text"></ion-input>
+            </ion-item>
+
+            <ion-item class="custom-input">
+              <ion-label position="floating">Fecha de entrega</ion-label>
+              <ion-datetime-button datetime="due-date"></ion-datetime-button>
+              <ion-modal [keepContentsMounted]="true">
+                <ng-template>
+                  <ion-datetime
+                    id="due-date"
+                    formControlName="due_date"
+                    presentation="date-time"
+                    [showDefaultButtons]="true"
+                  ></ion-datetime>
+                </ng-template>
+              </ion-modal>
+            </ion-item>
+
+            <ion-item class="custom-input">
+              <ion-label position="floating">Materia</ion-label>
+              <ion-select formControlName="subject_id">
+                <ion-select-option
+                  *ngFor="let subject of subjects"
+                  [value]="subject._id"
+                >
+                  {{ subject.name }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+          </div>
+        </div>
+      </form>
+    </ion-content>
+  </ng-template>
+</ion-modal>

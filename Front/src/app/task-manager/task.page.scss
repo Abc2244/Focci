@@ -7,7 +7,7 @@
 }
 
 .tasks-content {
-  @extend .page-content !optional;
+  @extend .page-content;
 
   .logo-container {
     h1 {
@@ -16,9 +16,71 @@
   }
 
   .tasks-container {
+    padding: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .task-list {
+    margin-top: 1rem;
+  }
+
+  .task-card {
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    background: rgba(255, 255, 255, 0.9);
+
+    &.completed {
+      opacity: 0.7;
+    }
+
+    ion-card-header {
+      padding: 1rem;
+
+      ion-card-title {
+        color: var(--ion-color-primary);
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+
+      ion-card-subtitle {
+        color: var(--ion-color-primary-shade);
+      }
+    }
+  }
+
+  .task-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+
+    ion-chip {
+      --background: var(--ion-color-primary-tint);
+      --color: var(--ion-color-primary-contrast);
+    }
+  }
+
+  .task-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
+  .empty-state {
     @include flex-center;
-    height: 100%;
     padding: 2rem;
+    color: var(--ion-color-primary);
+
+    ion-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.2rem;
+    }
   }
 
   .task-section {
@@ -74,10 +136,6 @@
     --border-color: var(--ion-color-primary);
     --border-color-checked: var(--ion-color-primary);
     --checkmark-color: var(--ion-color-primary);
-  }
-
-  &.completed {
-    opacity: 0.7;
   }
 
   .add-button {
@@ -330,4 +388,57 @@ ion-header {
   font-size: 1.2em;
   font-weight: bold;
   margin-bottom: 1rem;
+}
+
+// Estilos del modal
+.task-modal {
+  --height: 100%;
+  --width: 100%;
+
+  ion-header {
+    ion-toolbar {
+      --background: var(--app-gradient);
+      --border-style: none;
+
+      .modal-button {
+        --color: var(--ion-color-primary);
+        font-size: 1.2rem;
+        font-weight: 500;
+
+        &.save-button {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+
+  .form-container {
+    padding: 1rem;
+
+    .input-group {
+      .custom-input {
+        margin-bottom: 1rem;
+        --background: transparent;
+
+        ion-label {
+          color: var(--ion-color-primary);
+        }
+      }
+    }
+  }
+}
+
+// Botón flotante
+ion-fab {
+  ion-fab-button.custom-fab {
+    --background: #f7b46e;
+    --background-activated: #e5a35d;
+    --background-hover: #f9c28a;
+
+    ion-icon {
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+    }
+  }
 }

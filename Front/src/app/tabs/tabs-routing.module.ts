@@ -17,9 +17,7 @@ const routes: Routes = [
       {
         path: 'tasks',
         loadChildren: () =>
-          import('../task-manager/task-manager.module').then(
-            (m) => m.TaskManagerPageModule
-          ),
+          import('../task/task.module').then((m) => m.TaskModule),
       },
       {
         path: 'reminders',

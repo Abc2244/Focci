@@ -1,13 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
-import { TaskManagerPage } from './task-manager.page';
+import { TaskManagerPage } from './task.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: TaskManagerPage
-  }
+    component: TaskManagerPage,
+  },
 ];
 
 @NgModule({

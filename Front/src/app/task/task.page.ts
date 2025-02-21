@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
 import { AlertController, AlertInput, ToastController } from '@ionic/angular';
@@ -6,21 +7,40 @@ import { Task, CreateTaskDTO } from '../interfaces/task.interface';
 import { Subject } from '../interfaces/subject.interface';
 
 @Component({
-  selector: 'app-task-manager',
-  templateUrl: './task-manager.page.html',
-  styleUrls: ['./task-manager.page.scss'],
+  selector: 'app-task',
+  templateUrl: './task.page.html',
+  styleUrls: ['./task.page.scss'],
 })
-export class TaskManagerPage implements OnInit {
+export class TaskPage implements OnInit {
   tasks: Task[] = [];
   subjects: Subject[] = [];
   subjectMap: Map<string, string> = new Map();
+  showModal = false;
+  isEditing = false;
+  taskForm: FormGroup;
+  currentTaskId: string | null = null;
+
+  get incompleteTasks() {
+    return this.tasks.filter((task) => !task.completed);
+  }
+
+  get completedTasks() {
+    return this.tasks.filter((task) => task.completed);
+  }
 
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
     private alertController: AlertController,
-    private toastController: ToastController
-  ) {}
+    private toastController: ToastController,
+    private fb: FormBuilder
+  ) {
+    this.taskForm = this.fb.group({
+      description: ['', Validators.required],
+      due_date: ['', Validators.required],
+      subject_id: ['', Validators.required],
+    });
+  }
 
   ngOnInit() {
     this.loadSubjects();
@@ -222,15 +242,66 @@ export class TaskManagerPage implements OnInit {
     await alert.present();
   }
 
+  async saveTask() {
+    if (this.taskForm.valid) {
+      const userId = this.authService.getCurrentUserId();
+      if (!userId) return;
+
+      const formData = this.taskForm.value;
+      const taskData: CreateTaskDTO = {
+        user_id: userId,
+        ...formData,
+        completed: false,
+      };
+
+      try {
+        if (this.isEditing && this.currentTaskId) {
+          await this.apiService
+            .updateTask(this.currentTaskId, taskData)
+            .toPromise();
+          this.presentToast('✓ Tarea actualizada con éxito', 'success');
+        } else {
+          await this.apiService.createTask(taskData).toPromise();
+          this.presentToast('✓ Tarea creada con éxito', 'success');
+        }
+
+        this.dismissModal();
+        await this.loadTasks();
+      } catch (error) {
+        this.presentToast('❌ Error al guardar la tarea', 'danger');
+        console.error('Error:', error);
+      }
+    }
+  }
+
   // Método auxiliar para mostrar mensajes
-  async presentToast(message: string) {
+  async presentToast(message: string, color: string = 'dark') {
     const toast = await this.toastController.create({
       message: message,
       duration: 2000,
       position: 'bottom',
-      color: 'dark',
+      color: color,
       cssClass: 'custom-toast',
     });
     toast.present();
+  }
+
+  dismissModal() {
+    this.showModal = false;
+    this.taskForm.reset();
+    this.currentTaskId = null;
+  }
+
+  editTask(task: Task) {
+    this.isEditing = true;
+    this.currentTaskId = task._id || null;
+
+    this.taskForm.patchValue({
+      description: task.description,
+      due_date: task.due_date,
+      subject_id: task.subject_id,
+    });
+
+    this.showModal = true;
   }
 }
