@@ -5,6 +5,16 @@ import { AuthService } from '../services/auth.service';
 import { AlertController, ToastController } from '@ionic/angular';
 import { Subject } from '../interfaces/subject.interface';
 
+// Definimos un tipo para los días de la semana
+type DayOfWeek =
+  | 'Domingo'
+  | 'Lunes'
+  | 'Martes'
+  | 'Miércoles'
+  | 'Jueves'
+  | 'Viernes'
+  | 'Sábado';
+
 @Component({
   selector: 'app-subjects',
   templateUrl: './subjects.page.html',
@@ -69,11 +79,11 @@ export class SubjectsPage implements OnInit {
 
   editSubject(subject: Subject) {
     this.isEditing = true;
-    this.currentSubjectId = subject._id || null;
+
     this.subjectForm.patchValue({
       name: subject.name,
       credits: subject.credits,
-      schedule: subject.schedule,
+      schedule: this.orderDays([...subject.schedule]),
     });
     this.showModal = true;
   }
@@ -85,12 +95,15 @@ export class SubjectsPage implements OnInit {
 
   async saveSubject() {
     if (this.subjectForm.valid) {
+      const formData = this.subjectForm.value;
+      formData.schedule = this.orderDays(formData.schedule);
+
       const userId = this.authService.getCurrentUserId();
       if (!userId) return;
 
       const subjectData = {
         user_id: userId,
-        ...this.subjectForm.value,
+        ...formData,
       };
 
       try {
@@ -171,5 +184,23 @@ export class SubjectsPage implements OnInit {
       schedule.add(day);
     }
     this.subjectForm.patchValue({ schedule: Array.from(schedule) });
+  }
+
+  private orderDays(days: string[]): string[] {
+    const orderMap: Record<DayOfWeek, number> = {
+      Domingo: 0,
+      Lunes: 1,
+      Martes: 2,
+      Miércoles: 3,
+      Jueves: 4,
+      Viernes: 5,
+      Sábado: 6,
+    };
+
+    return days.sort((a, b) => {
+      const dayA = a as DayOfWeek;
+      const dayB = b as DayOfWeek;
+      return orderMap[dayA] - orderMap[dayB];
+    });
   }
 }

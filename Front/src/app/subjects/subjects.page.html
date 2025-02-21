@@ -77,14 +77,15 @@
       <form [formGroup]="subjectForm">
         <div class="form-container">
           <div class="input-group">
-            <ion-item class="custom-input">
-              <ion-label position="floating">Nombre de la materia</ion-label>
+            <div class="name-input-container">
               <ion-input
+                class="name-input"
                 formControlName="name"
-                placeholder="Ej: Matemáticas"
+                placeholder="Nombre de materia"
                 autofocus="true"
+                type="text"
               ></ion-input>
-            </ion-item>
+            </div>
 
             <ion-item class="custom-input">
               <ion-label position="floating">Créditos</ion-label>
