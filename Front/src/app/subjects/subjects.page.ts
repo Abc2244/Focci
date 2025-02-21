@@ -111,15 +111,15 @@ export class SubjectsPage implements OnInit {
           await this.apiService
             .updateSubject(this.currentSubjectId, subjectData)
             .toPromise();
-          this.presentToast('Materia actualizada con éxito', 'success');
+          this.presentToast('✨ Materia actualizada con éxito', 'success');
         } else {
           await this.apiService.createSubject(subjectData).toPromise();
-          this.presentToast('Materia creada con éxito', 'success');
+          this.presentToast('✨ Materia creada con éxito', 'success');
         }
         this.dismissModal();
         this.loadSubjects();
       } catch (error) {
-        this.presentToast('Error al guardar la materia', 'danger');
+        this.presentToast('❌ Error al guardar la materia', 'danger');
         console.error('Error:', error);
       }
     }
@@ -127,25 +127,34 @@ export class SubjectsPage implements OnInit {
 
   async deleteSubject(subject: Subject) {
     const alert = await this.alertController.create({
-      header: 'Confirmar eliminación',
+      header: '¿Eliminar materia?',
       message: `¿Estás seguro de que deseas eliminar la materia "${subject.name}"?`,
+      cssClass: 'custom-alert',
       buttons: [
         {
           text: 'Cancelar',
           role: 'cancel',
+          cssClass: 'cancel-button',
         },
         {
           text: 'Eliminar',
           role: 'destructive',
+          cssClass: 'delete-button',
           handler: () => {
             if (subject._id) {
               this.apiService.deleteSubject(subject._id).subscribe({
                 next: () => {
                   this.loadSubjects();
-                  this.presentToast('Materia eliminada con éxito', 'success');
+                  this.presentToast(
+                    '✨ Materia eliminada con éxito',
+                    'success'
+                  );
                 },
                 error: (error) => {
-                  this.presentToast('Error al eliminar la materia', 'danger');
+                  this.presentToast(
+                    '❌ Error al eliminar la materia',
+                    'danger'
+                  );
                   console.error('Error:', error);
                 },
               });
@@ -164,9 +173,10 @@ export class SubjectsPage implements OnInit {
   ) {
     const toast = await this.toastController.create({
       message,
-      duration: 2000,
+      duration: 2500,
       color,
-      position: 'bottom',
+      position: 'top',
+      cssClass: 'custom-toast',
     });
     await toast.present();
   }

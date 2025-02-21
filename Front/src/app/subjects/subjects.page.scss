@@ -259,3 +259,70 @@ ion-fab-button.custom-fab {
     font-weight: bold;
   }
 }
+
+// Estilos para el toast personalizado
+::ng-deep .custom-toast {
+  margin-top: 60px !important;
+  border-radius: 15px !important;
+  --background: rgba(255, 255, 255, 0.95);
+  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  font-weight: 500;
+
+  &.toast-success {
+    --background: #f7b46e;
+    color: white;
+  }
+
+  &.toast-danger {
+    --background: #ff6b6b;
+    color: white;
+  }
+}
+
+// Estilos para el alert personalizado
+::ng-deep .custom-alert {
+  --background: var(--app-gradient);
+
+  .alert-wrapper {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+  }
+
+  .alert-title {
+    color: #8b4513 !important;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .alert-sub-title {
+    color: #8b4513;
+  }
+
+  .alert-message {
+    color: #8b4513;
+    font-size: 1rem;
+    padding: 16px;
+  }
+
+  .alert-button-group {
+    padding: 8px;
+
+    .alert-button {
+      border-radius: 8px;
+      font-weight: 500;
+
+      &.delete-button {
+        color: #ff4646;
+        font-weight: 600;
+      }
+
+      &.cancel-button {
+        color: #8b4513;
+      }
+
+      .alert-button-inner {
+        justify-content: center;
+      }
+    }
+  }
+}
