@@ -79,6 +79,7 @@ export class SubjectsPage implements OnInit {
 
   editSubject(subject: Subject) {
     this.isEditing = true;
+    this.currentSubjectId = subject._id || null;
 
     this.subjectForm.patchValue({
       name: subject.name,
@@ -111,13 +112,14 @@ export class SubjectsPage implements OnInit {
           await this.apiService
             .updateSubject(this.currentSubjectId, subjectData)
             .toPromise();
-          this.presentToast('✨ Materia actualizada con éxito', 'success');
+          this.presentToast('✓ Materia actualizada con éxito', 'success');
         } else {
           await this.apiService.createSubject(subjectData).toPromise();
-          this.presentToast('✨ Materia creada con éxito', 'success');
+          this.presentToast('✓ Materia creada con éxito', 'success');
         }
+
         this.dismissModal();
-        this.loadSubjects();
+        await this.loadSubjects();
       } catch (error) {
         this.presentToast('❌ Error al guardar la materia', 'danger');
         console.error('Error:', error);
@@ -172,11 +174,10 @@ export class SubjectsPage implements OnInit {
     color: 'success' | 'danger' | 'warning'
   ) {
     const toast = await this.toastController.create({
-      message,
+      message: message.replace('✨', '✓'),
       duration: 2500,
-      color,
-      position: 'top',
-      cssClass: 'custom-toast',
+      position: 'middle',
+      cssClass: 'large-toast',
     });
     await toast.present();
   }

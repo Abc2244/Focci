@@ -167,7 +167,9 @@ ion-header {
           font-weight: 500;
           color: #8b4513;
           text-align: center;
-          --highlight-color-focused: #f89e3e;
+          --highlight-color-focused: #f7b46e !important;
+          --highlight-color-valid: #f7b46e !important;
+          --highlight-color-invalid: #f7b46e !important;
 
           &::part(native) {
             text-align: center;
@@ -262,20 +264,28 @@ ion-fab-button.custom-fab {
 
 // Estilos para el toast personalizado
 ::ng-deep .custom-toast {
+  text-align: center !important;
   margin-top: 60px !important;
   border-radius: 15px !important;
-  --background: rgba(255, 255, 255, 0.95);
+  --min-width: 300px !important;
+  --max-width: 400px !important;
+  --background: #f7b46e !important; // Naranja
+  --color: #8b4513 !important; // Café
   --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  font-weight: 500;
+  font-weight: 600;
+
+  &::part(message) {
+    text-align: center !important;
+  }
 
   &.toast-success {
-    --background: #f7b46e;
-    color: white;
+    --background: #f7b46e !important; // Naranja
+    --color: #8b4513 !important; // Café
   }
 
   &.toast-danger {
-    --background: #ff6b6b;
-    color: white;
+    --background: #f7b46e !important; // Naranja
+    --color: #8b4513 !important; // Café
   }
 }
 

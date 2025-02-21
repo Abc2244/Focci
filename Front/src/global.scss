@@ -156,3 +156,65 @@ ion-toolbar {
 .item-subtitle {
   color: var(--ion-color-primary-tint);
 }
+
+.large-toast {
+  --width: 90% !important;
+  --min-height: 300px !important;
+  --background: #f7b46e !important;
+  text-align: center;
+  margin: 20px auto !important;
+
+  &::part(message) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    height: 100%;
+    padding: 2rem;
+    color: #8b4513 !important;
+    font-size: 2em;
+    font-weight: bold;
+  }
+}
+
+// Estilo para el check verde
+ion-toast.large-toast::part(message) {
+  &:contains("✓") {
+    &::before {
+      content: "✓";
+      display: block;
+      font-size: 8em;
+      color: #2dd36f !important;
+      line-height: 1;
+    }
+  }
+}
+
+// Estilo para el error
+ion-toast.large-toast::part(message) {
+  &:contains("❌") {
+    &::before {
+      content: "❌";
+      display: block;
+      font-size: 8em;
+      line-height: 1;
+    }
+  }
+}
+
+// Responsive para móviles
+@media (max-width: 768px) {
+  .large-toast {
+    --width: 95% !important;
+    --min-height: 250px !important;
+
+    &::part(message) {
+      font-size: 1.5em;
+
+      &::before {
+        font-size: 6em;
+      }
+    }
+  }
+}
