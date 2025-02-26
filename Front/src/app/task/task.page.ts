@@ -96,7 +96,6 @@ export class TaskPage implements OnInit {
   }
 
   uncompleteTask(taskId: string) {
-    // Asumiendo que tienes este método en tu API
     this.apiService.uncompleteTask(taskId).subscribe(
       () => {
         this.loadTasks();
@@ -275,7 +274,7 @@ export class TaskPage implements OnInit {
   }
 
   // Método auxiliar para mostrar mensajes
-  async presentToast(message: string, color: string = 'dark') {
+  async presentToast(message: string, color: string = 'warning') {
     const toast = await this.toastController.create({
       message: message,
       duration: 2000,
