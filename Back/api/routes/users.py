@@ -52,3 +52,10 @@ async def update_password(user_id: str, data: UpdatePassword):
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return {"message": "Contraseña actualizada correctamente"}
+
+@router.get("/users/{user_id}/profile/")
+async def get_user_profile(user_id: str):
+    user = await mongodb.get_collection("users").find_one({"_id": ObjectId(user_id)})
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return serialize_mongo_document(user)

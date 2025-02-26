@@ -174,6 +174,33 @@ ion-header {
   }
 }
 
+// Estilos del modal
+.subject-modal {
+  --height: 100%;
+  --width: 100%;
+
+  ion-header {
+    ion-toolbar {
+      --background: var(--app-gradient); // Mantenemos el gradiente original
+      --border-style: none;
+
+      .modal-button {
+        --color: #8b4513; // Color café para los botones
+        font-size: 1.2rem;
+        font-weight: 500;
+
+        &.save-button {
+          --color: #8b4513;
+          margin-right: 8px;
+        }
+
+        .modal-icon {
+          font-size: 1.5rem;
+        }
+      }
+    }
+  }
+}
 // Estilos específicos para el alert de nueva tarea
 ::ng-deep .task-form-alert {
   .alert-wrapper {
@@ -397,23 +424,34 @@ ion-header {
 
   ion-header {
     ion-toolbar {
-      --background: var(--app-gradient);
+      --background: #fff5e6; // Cream color for the navbar
       --border-style: none;
 
       .modal-button {
-        --color: var(--ion-color-primary);
+        --color: #8b4513; // Coffee color for the icons
         font-size: 1.2rem;
         font-weight: 500;
 
         &.save-button {
           margin-right: 8px;
+          --color: #f7b46e; // Orange color for the save button
+        }
+
+        .modal-icon {
+          font-size: 1.5rem;
+          color: #8b4513; // Coffee color for the icons
         }
       }
     }
   }
 
+  .modal-content {
+    --background: white; // Ensure the modal content background is white or desired color
+  }
+
   .form-container {
     padding: 1rem;
+    background: white; // Ensure the form background is white or desired color
 
     .input-group {
       .custom-input {

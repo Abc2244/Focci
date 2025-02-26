@@ -6,13 +6,19 @@
 
 <ion-content>
   <div class="profile-container">
-    <div class="logo-container">
-      <img src="assets/icon/logo.png" alt="Logo" class="logo" />
-      <h1>Mi Perfil</h1>
+    <div class="user-icon-container">
+      <ion-icon name="person-circle-outline" class="user-icon"></ion-icon>
     </div>
 
     <ion-list>
-      <!-- Contenido del perfil irá aquí -->
+      <ion-item>
+        <ion-label>Nombre de usuario</ion-label>
+        <ion-text>{{ userProfile.username }}</ion-text>
+      </ion-item>
+      <ion-item>
+        <ion-label>Email</ion-label>
+        <ion-text>{{ userProfile.email }}</ion-text>
+      </ion-item>
     </ion-list>
   </div>
 </ion-content>

@@ -47,3 +47,10 @@ async def get_reminders_by_priority(user_id: str, level: int):
     if not reminders:
         raise HTTPException(status_code=404, detail="No se encontraron recordatorios con esta prioridad")
     return [serialize_mongo_document(reminder) for reminder in reminders]
+
+@router.get("/users/{user_id}/tasks/")
+async def get_tasks(user_id: str):
+    tasks = await mongodb.get_collection("tasks").find({"user_id": user_id}).to_list(length=100)
+    if not tasks:
+        raise HTTPException(status_code=404, detail="No se encontraron tareas para este usuario")
+    return [serialize_mongo_document(task) for task in tasks]

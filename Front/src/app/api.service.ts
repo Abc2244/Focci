@@ -147,8 +147,10 @@ export class ApiService {
   }
 
   // Obtener recordatorios próximos de un usuario
-  getUpcomingReminders(user_id: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/${user_id}/reminders/upcoming/`);
+  getUpcomingReminders(userId: string): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${this.apiUrl}/users/${userId}/reminders/upcoming`
+    );
   }
 
   // Obtener recordatorios por prioridad
@@ -169,5 +171,14 @@ export class ApiService {
   // Eliminar un recordatorio
   deleteReminder(reminder_id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/reminders/${reminder_id}/`);
+  }
+
+  // Add this method to fetch tasks
+  getTasks(userId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/users/${userId}/tasks`);
+  }
+
+  getUserProfile(user_id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/users/${user_id}/profile/`);
   }
 }
