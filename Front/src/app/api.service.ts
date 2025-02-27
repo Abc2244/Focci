@@ -148,9 +148,9 @@ export class ApiService {
 
   // Obtener recordatorios próximos de un usuario
   getUpcomingReminders(userId: string): Observable<any[]> {
-    return this.http.get<any[]>(
-      `${this.apiUrl}/users/${userId}/reminders/upcoming`
-    );
+    const url = `${this.apiUrl}/users/${userId}/reminders/upcoming/`;
+    console.log('Calling API URL:', url);
+    return this.http.get<any[]>(url);
   }
 
   // Obtener recordatorios por prioridad

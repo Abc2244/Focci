@@ -80,9 +80,10 @@ export class AuthService {
     if (token) {
       try {
         const decoded: any = jwtDecode(token);
+        console.log('Decoded Token:', decoded); // Debugging log
         return decoded.user_id;
       } catch (error) {
-        console.error('Error al decodificar el token:', error);
+        console.error('Error decoding token:', error);
         return null;
       }
     }

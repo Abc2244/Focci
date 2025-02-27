@@ -31,15 +31,21 @@ export class RemindersPage implements OnInit {
   }
 
   ngOnInit() {
+    console.log('RemindersPage initialized');
     this.loadReminders();
     this.loadTasks();
   }
 
   loadReminders(): void {
     const userId = this.authService.getCurrentUserId();
+    console.log('Current User ID:', userId);
     if (userId) {
       this.apiService.getUpcomingReminders(userId).subscribe(
         (data: any) => {
+          console.log(
+            'Reminders Data Structure:',
+            JSON.stringify(data, null, 2)
+          );
           this.reminders = data;
         },
         (error: any) => {
