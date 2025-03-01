@@ -52,7 +52,7 @@ export class TaskPage implements OnInit {
     if (userId) {
       this.apiService.getUserSubjects(userId).subscribe(
         (subjects) => {
-          this.subjects = subjects;
+          this.subjects = subjects as Subject[];
           // Crear un mapa de ID de materia a nombre para referencia rápida
           subjects.forEach((subject: any) => {
             this.subjectMap.set(subject._id, subject.name);

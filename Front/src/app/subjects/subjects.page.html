@@ -10,8 +10,8 @@
 
         <ion-card-content>
           <div class="schedule-chips">
-            <ion-chip *ngFor="let day of subject.schedule" color="primary">
-              {{ day }}
+            <ion-chip *ngFor="let item of subject.schedule" color="primary">
+              {{ item.day }} - {{ item.time }}
             </ion-chip>
           </div>
 
@@ -97,17 +97,61 @@
             </ion-item>
 
             <div class="schedule-selector">
-              <ion-label>Días de clase</ion-label>
-              <div class="days-container">
+              <ion-label>Horarios de clase</ion-label>
+
+              <div class="schedule-items">
                 <div
-                  *ngFor="let day of availableDays"
-                  class="day-box"
-                  [class.selected]="isDaySelected(day.value)"
-                  (click)="toggleDay(day.value)"
+                  *ngFor="let item of selectedScheduleItems; let i = index"
+                  class="schedule-item"
                 >
-                  {{ day.short }}
+                  <ion-select
+                    [value]="item.day"
+                    (ionChange)="updateScheduleDay(i, $event.detail.value)"
+                    placeholder="Día"
+                    interface="popover"
+                    class="day-select"
+                  >
+                    <ion-select-option
+                      *ngFor="let day of availableDays"
+                      [value]="day.value"
+                    >
+                      {{ day.value }}
+                    </ion-select-option>
+                  </ion-select>
+
+                  <ion-select
+                    [value]="item.time"
+                    (ionChange)="updateScheduleTime(i, $event.detail.value)"
+                    placeholder="Hora"
+                    interface="popover"
+                    class="time-select"
+                  >
+                    <ion-select-option
+                      *ngFor="let time of availableTimes"
+                      [value]="time"
+                    >
+                      {{ time }}
+                    </ion-select-option>
+                  </ion-select>
+
+                  <ion-button
+                    fill="clear"
+                    color="danger"
+                    (click)="removeScheduleItem(i)"
+                  >
+                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
                 </div>
               </div>
+
+              <ion-button
+                expand="block"
+                (click)="addScheduleItem()"
+                class="add-schedule-btn"
+              >
+                <ion-icon name="add-outline" slot="start"></ion-icon>
+                Agregar horario
+              </ion-button>
             </div>
           </div>
         </div>

@@ -217,38 +217,49 @@ ion-header {
     display: block;
   }
 
-  .days-container {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    margin-top: 0.8rem;
+  .schedule-items {
+    margin-bottom: 1rem;
 
-    .day-box {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
+    .schedule-item {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
-      font-weight: 500;
+      margin-bottom: 0.8rem;
       background: rgba(255, 255, 255, 0.9);
-      border: 1px solid var(--ion-color-primary);
-      color: var(--ion-color-primary);
-      cursor: pointer;
-      transition: all 0.2s ease;
+      border-radius: 8px;
+      padding: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
-      &.selected {
-        background: var(--ion-color-primary);
-        color: white;
+      .day-select,
+      .time-select {
+        flex: 1;
+        --padding-start: 8px;
+        font-weight: 500;
       }
 
-      &:active {
-        transform: scale(0.95);
+      .day-select {
+        max-width: 45%;
+        color: #8b4513;
+      }
+
+      .time-select {
+        max-width: 45%;
+        color: #8b4513;
+      }
+
+      ion-button {
+        margin: 0;
       }
     }
   }
+
+  .add-schedule-btn {
+    margin-top: 1rem;
+    --background: #f7b46e;
+    --color: white;
+    font-weight: 500;
+  }
 }
+
 // Botón flotante separado con el naranja específico
 ion-fab-button.custom-fab {
   --background: #f7b46e; // Naranja bonito específico para este botón

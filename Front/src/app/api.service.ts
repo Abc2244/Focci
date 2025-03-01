@@ -2,16 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Task, CreateTaskDTO } from './interfaces/task.interface';
+import { Subject, ScheduleItem } from './interfaces/subject.interface';
 import { environment } from '../environments/environment';
-
-// Interfaces basadas en los modelos del backend
-interface Subject {
-  _id?: string;
-  user_id: string;
-  name: string;
-  credits: number;
-  schedule: string[];
-}
 
 @Injectable({
   providedIn: 'root',

@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
 import { AlertController, ToastController } from '@ionic/angular';
-import { Subject } from '../interfaces/subject.interface';
+import { Subject, ScheduleItem } from '../interfaces/subject.interface';
 
 // Definimos un tipo para los días de la semana
 type DayOfWeek =
@@ -26,6 +26,7 @@ export class SubjectsPage implements OnInit {
   isEditing = false;
   subjectForm: FormGroup;
   currentSubjectId: string | null = null;
+  selectedScheduleItems: ScheduleItem[] = [];
 
   availableDays = [
     { short: 'D', value: 'Domingo' },
@@ -35,6 +36,25 @@ export class SubjectsPage implements OnInit {
     { short: 'J', value: 'Jueves' },
     { short: 'V', value: 'Viernes' },
     { short: 'S', value: 'Sábado' },
+  ];
+
+  // Lista de horas predefinidas para evitar errores de formato
+  availableTimes = [
+    '7:00 AM',
+    '8:00 AM',
+    '9:00 AM',
+    '10:00 AM',
+    '11:00 AM',
+    '12:00 PM',
+    '1:00 PM',
+    '2:00 PM',
+    '3:00 PM',
+    '4:00 PM',
+    '5:00 PM',
+    '6:00 PM',
+    '7:00 PM',
+    '8:00 PM',
+    '9:00 PM',
   ];
 
   constructor(
@@ -47,7 +67,6 @@ export class SubjectsPage implements OnInit {
     this.subjectForm = this.fb.group({
       name: ['', Validators.required],
       credits: ['', [Validators.required, Validators.min(1)]],
-      schedule: [[], Validators.required],
     });
   }
 
@@ -74,6 +93,7 @@ export class SubjectsPage implements OnInit {
     this.isEditing = false;
     this.currentSubjectId = null;
     this.subjectForm.reset();
+    this.selectedScheduleItems = [];
     this.showModal = true;
   }
 
@@ -84,8 +104,9 @@ export class SubjectsPage implements OnInit {
     this.subjectForm.patchValue({
       name: subject.name,
       credits: subject.credits,
-      schedule: this.orderDays([...subject.schedule]),
     });
+
+    this.selectedScheduleItems = [...subject.schedule];
     this.showModal = true;
   }
 
@@ -97,14 +118,15 @@ export class SubjectsPage implements OnInit {
   async saveSubject() {
     if (this.subjectForm.valid) {
       const formData = this.subjectForm.value;
-      formData.schedule = this.orderDays(formData.schedule);
 
       const userId = this.authService.getCurrentUserId();
       if (!userId) return;
 
       const subjectData = {
         user_id: userId,
-        ...formData,
+        name: formData.name,
+        credits: formData.credits,
+        schedule: this.selectedScheduleItems,
       };
 
       try {
@@ -182,36 +204,27 @@ export class SubjectsPage implements OnInit {
     await toast.present();
   }
 
-  isDaySelected(day: string): boolean {
-    const schedule = this.subjectForm.get('schedule')?.value || [];
-    return schedule.includes(day);
-  }
-
-  toggleDay(day: string) {
-    const schedule = new Set(this.subjectForm.get('schedule')?.value || []);
-    if (schedule.has(day)) {
-      schedule.delete(day);
-    } else {
-      schedule.add(day);
-    }
-    this.subjectForm.patchValue({ schedule: Array.from(schedule) });
-  }
-
-  private orderDays(days: string[]): string[] {
-    const orderMap: Record<DayOfWeek, number> = {
-      Domingo: 0,
-      Lunes: 1,
-      Martes: 2,
-      Miércoles: 3,
-      Jueves: 4,
-      Viernes: 5,
-      Sábado: 6,
-    };
-
-    return days.sort((a, b) => {
-      const dayA = a as DayOfWeek;
-      const dayB = b as DayOfWeek;
-      return orderMap[dayA] - orderMap[dayB];
+  addScheduleItem() {
+    // Inicializar con valores predeterminados
+    this.selectedScheduleItems.push({
+      day: this.availableDays[1].value, // Lunes por defecto
+      time: this.availableTimes[1], // 8:00 AM por defecto
     });
+  }
+
+  removeScheduleItem(index: number) {
+    this.selectedScheduleItems.splice(index, 1);
+  }
+
+  updateScheduleTime(index: number, time: string | null | undefined) {
+    if (time !== null && time !== undefined) {
+      this.selectedScheduleItems[index].time = time;
+    }
+  }
+
+  updateScheduleDay(index: number, day: string | null | undefined) {
+    if (day !== null && day !== undefined) {
+      this.selectedScheduleItems[index].day = day;
+    }
   }
 }
