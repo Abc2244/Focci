@@ -21,9 +21,15 @@
 
         <ion-card-content>
           <div class="schedule-chips">
-            <ion-chip *ngFor="let item of subject.schedule" color="primary">
-              <ion-icon name="time-outline"></ion-icon>
-              {{ item.day }} - {{ formatTime(item.time) }}
+            <ion-chip
+              *ngFor="let item of subject.schedule"
+              color="primary"
+              class="schedule-chip"
+            >
+              <ion-icon name="time-outline" class="schedule-icon"></ion-icon>
+              <span class="schedule-text"
+                >{{ item.day }} - {{ formatTime(item.time) }}</span
+              >
             </ion-chip>
           </div>
 

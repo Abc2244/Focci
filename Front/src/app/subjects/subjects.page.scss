@@ -6,18 +6,48 @@ ion-fab {
     --background: var(--ion-color-primary) !important;
     --background-activated: var(--ion-color-primary-shade) !important;
     --background-hover: var(--ion-color-primary-tint) !important;
+    position: relative;
+    overflow: hidden;
+    border-radius: 50% !important;
+
+    // Efecto de brillo
+    &::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(30deg);
+      animation: shimmer 3s infinite;
+      z-index: 1;
+      pointer-events: none;
+      border-radius: 50%;
+    }
 
     ion-icon {
       color: white;
       font-size: 24px;
       font-weight: bold;
+      position: relative;
+      z-index: 2;
     }
   }
 }
 
 .subjects-content {
   @extend .page-content;
-  --background: linear-gradient(135deg, #f5f7fa 0%, #e4ecfb 100%);
+  --background: linear-gradient(
+    135deg,
+    #f5f7fa 0%,
+    var(--ion-color-primary-tint) 100%
+  ); // Fondo con toque azul
 
   &::before {
     content: "";
@@ -26,7 +56,7 @@ ion-fab {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(56, 128, 255, 0.05)" stroke-width="2"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(30, 136, 229, 0.05)" stroke-width="2"/></svg>');
     background-size: 300px 300px;
     opacity: 0.5;
     pointer-events: none;
@@ -35,7 +65,7 @@ ion-fab {
 
   .subjects-container {
     padding: 1rem;
-    max-width: 800px;
+    max-width: 600px;
     margin: 0 auto;
     position: relative;
 
@@ -55,8 +85,8 @@ ion-fab {
       right: -50px;
       background: radial-gradient(
         circle,
-        rgba(56, 128, 255, 0.1) 0%,
-        rgba(56, 128, 255, 0) 70%
+        rgba(30, 136, 229, 0.1) 0%,
+        rgba(30, 136, 229, 0) 70%
       );
     }
 
@@ -65,8 +95,8 @@ ion-fab {
       left: -50px;
       background: radial-gradient(
         circle,
-        rgba(56, 128, 255, 0.1) 0%,
-        rgba(56, 128, 255, 0) 70%
+        rgba(30, 136, 229, 0.1) 0%,
+        rgba(30, 136, 229, 0) 70%
       );
     }
   }
@@ -93,21 +123,6 @@ ion-fab {
       padding: 1.2rem 1.2rem 0.8rem;
       position: relative;
 
-      .card-header-content {
-        display: flex;
-        align-items: center;
-
-        .subject-icon {
-          font-size: 2rem;
-          color: var(--ion-color-primary);
-          margin-right: 1rem;
-        }
-
-        .card-title-container {
-          flex: 1;
-        }
-      }
-
       &::after {
         content: "";
         position: absolute;
@@ -123,6 +138,21 @@ ion-fab {
         );
       }
 
+      .card-header-content {
+        display: flex;
+        align-items: center;
+
+        .subject-icon {
+          font-size: 2rem;
+          color: var(--ion-color-primary);
+          margin-right: 1rem;
+        }
+
+        .card-title-container {
+          flex: 1;
+        }
+      }
+
       ion-card-title {
         color: var(--ion-color-primary);
         font-size: 1.3rem;
@@ -133,13 +163,6 @@ ion-fab {
       ion-card-subtitle {
         color: var(--app-text-color);
         font-weight: 500;
-        display: flex;
-        align-items: center;
-
-        .subtitle-icon {
-          margin-right: 0.5rem;
-          font-size: 1rem;
-        }
       }
     }
 
@@ -163,10 +186,6 @@ ion-fab {
       font-weight: 500;
       transition: all 0.2s ease;
 
-      ion-icon {
-        margin-right: 4px;
-      }
-
       &:hover {
         --background: rgba(56, 128, 255, 0.2);
         transform: scale(1.05);
@@ -177,21 +196,7 @@ ion-fab {
   .subject-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 0.5rem;
-
-    .action-button {
-      --border-radius: 50%;
-      --padding-start: 0;
-      --padding-end: 0;
-      width: 40px;
-      height: 40px;
-      margin: 0;
-
-      ion-icon {
-        font-size: 1.2rem;
-      }
-    }
+    gap: 0.5rem;
   }
 
   .empty-state {
@@ -697,5 +702,75 @@ ion-icon[name="trash-outline"] {
     --color: var(--ion-color-primary) !important; // Cambiado a azul
     font-weight: 500;
     --padding-top: 12px; // Añadimos padding superior para separar del label
+  }
+}
+
+// Estilo para el botón de agregar horario con efecto de brillo
+.add-schedule-btn {
+  --background: linear-gradient(135deg, #e8f8ef 0%, #d0f5e2 100%);
+  --background-hover: linear-gradient(135deg, #d0f5e2 0%, #c0f0d8 100%);
+  --background-activated: linear-gradient(135deg, #c0f0d8 0%, #b0ebd0 100%);
+  --color: #2dd36f;
+  --border-radius: 12px;
+  --box-shadow: 0 4px 12px rgba(45, 211, 111, 0.2);
+  margin: 1rem 0;
+  height: 48px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  // Efecto de brillo
+  &::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(30deg);
+    animation: shimmer 3s infinite;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  &:hover {
+    --box-shadow: 0 6px 16px rgba(45, 211, 111, 0.3);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    --box-shadow: 0 2px 8px rgba(45, 211, 111, 0.2);
+    transform: translateY(1px);
+  }
+
+  ion-icon {
+    margin-right: 8px;
+    font-size: 1.2rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  // Aseguramos que el texto esté por encima del efecto de brillo
+  ::ng-deep .button-native {
+    position: relative;
+    z-index: 2;
+  }
+}
+
+// Animación de brillo
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) rotate(30deg);
+  }
+  100% {
+    transform: translateX(100%) rotate(30deg);
   }
 }

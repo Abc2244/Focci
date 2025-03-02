@@ -19,13 +19,17 @@
 
         <ion-card-content>
           <div class="task-info">
-            <ion-chip color="primary">
-              <ion-icon name="calendar-outline"></ion-icon>
-              {{ task.due_date | date:'mediumDate' }}
+            <ion-chip class="date-chip">
+              <ion-icon name="calendar-outline" class="chip-icon"></ion-icon>
+              <span class="chip-text"
+                >{{ task.due_date | date:'mediumDate' }}</span
+              >
             </ion-chip>
-            <ion-chip color="primary">
-              <ion-icon name="time-outline"></ion-icon>
-              {{ task.due_date | date:'shortTime' }}
+            <ion-chip class="time-chip">
+              <ion-icon name="time-outline" class="chip-icon"></ion-icon>
+              <span class="chip-text"
+                >{{ task.due_date | date:'shortTime' }}</span
+              >
             </ion-chip>
           </div>
 
@@ -119,7 +123,7 @@
 
   <!-- Botón flotante para agregar -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button class="custom-fab" (click)="addTask()">
+    <ion-fab-button class="custom-fab" (click)="addTask()" color="secondary">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
@@ -145,8 +149,11 @@
             (click)="saveTask()"
             class="modal-button save-button"
             [disabled]="!taskForm.valid"
+            color="secondary"
           >
-            {{ isEditing ? 'Actualizar' : 'Crear' }}
+            <span class="save-button-text"
+              >{{ isEditing ? 'Actualizar' : 'Crear' }}</span
+            >
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -157,12 +164,16 @@
         <div class="form-container">
           <div class="input-group">
             <ion-item class="custom-input">
-              <ion-label position="floating">Descripción</ion-label>
+              <ion-label position="floating" class="form-label"
+                >Descripción</ion-label
+              >
               <ion-input formControlName="description" type="text"></ion-input>
             </ion-item>
 
             <ion-item class="custom-input">
-              <ion-label position="floating">Materia</ion-label>
+              <ion-label position="floating" class="form-label"
+                >Materia</ion-label
+              >
               <ion-select formControlName="subject_id" interface="action-sheet">
                 <ion-select-option
                   *ngFor="let subject of subjects"
@@ -174,7 +185,9 @@
             </ion-item>
 
             <ion-item class="custom-input">
-              <ion-label position="floating">Fecha de entrega</ion-label>
+              <ion-label position="floating" class="form-label"
+                >Fecha de entrega</ion-label
+              >
               <ion-datetime
                 formControlName="due_date"
                 displayFormat="DD/MM/YYYY HH:mm"
