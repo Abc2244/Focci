@@ -48,10 +48,10 @@
     }
 
     ion-input {
-      --color: black;
+      --color: var(--app-text-color);
       --padding-start: 1rem;
-      --placeholder-color: #ccc;
-      --placeholder-opacity: 0.8;
+      --placeholder-color: var(--app-color-medium);
+      --placeholder-opacity: 0.7;
     }
   }
 
@@ -81,7 +81,7 @@
 
 // Estilos para los items de ion-input cuando están enfocados
 ion-item.item-has-focus {
-  --highlight-background: #ff8c00;
+  --highlight-background: var(--ion-color-primary-tint);
 }
 
 // Animación suave para los botones

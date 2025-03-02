@@ -19,6 +19,7 @@ export class TaskPage implements OnInit {
   isEditing = false;
   taskForm: FormGroup;
   currentTaskId: string | null = null;
+  minDate: string;
 
   get incompleteTasks() {
     return this.tasks.filter((task) => !task.completed);
@@ -40,6 +41,8 @@ export class TaskPage implements OnInit {
       due_date: ['', Validators.required],
       subject_id: ['', Validators.required],
     });
+
+    this.minDate = new Date().toISOString();
   }
 
   ngOnInit() {

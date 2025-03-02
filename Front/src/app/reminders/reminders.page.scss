@@ -3,9 +3,43 @@
 .reminders-content {
   @extend .page-content !optional;
 
+  .reminders-container {
+    padding: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
   .logo-container {
     h1 {
-      color: #8b4513;
+      color: var(--ion-color-primary);
+    }
+  }
+
+  ion-list {
+    background: transparent;
+    padding: 0;
+
+    ion-item {
+      --background: white;
+      --border-radius: 10px;
+      margin-bottom: 1rem;
+      --padding-start: 16px;
+      --padding-end: 8px;
+      --padding-top: 12px;
+      --padding-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      h2 {
+        color: var(--ion-color-primary);
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+      }
+
+      p {
+        color: var(--app-text-color);
+        margin: 4px 0;
+      }
     }
   }
 
@@ -27,5 +61,81 @@
 
   .add-button {
     @extend .custom-button;
+  }
+
+  // Cambiar el color del icono de basura a azul eléctrico (color primario)
+  ion-button[color="danger"] {
+    --color: var(--ion-color-primary);
+
+    ion-icon[name="trash-outline"] {
+      color: var(--ion-color-primary);
+    }
+  }
+
+  // Asegurarse de que el icono de basura siempre tenga el color azul
+  ion-icon[name="trash-outline"] {
+    color: var(--ion-color-primary);
+  }
+
+  // Estilos para el botón flotante
+  ion-fab {
+    ion-fab-button.custom-fab {
+      --background: var(--ion-color-primary);
+      --background-activated: var(--ion-color-primary-shade);
+      --background-hover: var(--ion-color-primary-tint);
+
+      ion-icon {
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+      }
+    }
+  }
+
+  // Estilos para el modal
+  .reminder-modal {
+    --height: 100%;
+    --width: 100%;
+
+    ion-header {
+      ion-toolbar {
+        --background: white;
+        --border-style: none;
+
+        .modal-button {
+          --color: var(--ion-color-primary);
+          font-size: 1.2rem;
+          font-weight: 500;
+
+          &.save-button {
+            margin-right: 8px;
+            --color: var(--ion-color-primary);
+          }
+
+          .modal-icon {
+            font-size: 1.5rem;
+            color: var(--ion-color-primary);
+          }
+        }
+      }
+    }
+
+    .modal-content {
+      --background: var(--app-background-light);
+    }
+
+    .form-container {
+      padding: 1rem;
+      background: white;
+
+      .custom-input {
+        margin-bottom: 1rem;
+        --background: transparent;
+
+        ion-label {
+          color: var(--ion-color-primary);
+        }
+      }
+    }
   }
 }

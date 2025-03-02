@@ -1,41 +1,96 @@
 ion-tab-bar {
-  --background: #f7b46e;
+  --background: white;
   padding: 8px 0;
   border: none;
-  box-shadow: 0 -2px 10px rgba(247, 180, 110, 0.2);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
   position: relative;
+  transition: all 0.3s ease;
 
   &::before {
     display: none;
   }
 
+  // Efecto de brillo suave en la parte superior
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(30, 136, 229, 0.3),
+      transparent
+    );
+  }
+
   ion-tab-button {
-    --color: rgba(139, 69, 19, 0.7);
-    --color-selected: #8b4513;
+    --color: var(--app-color-medium);
+    --color-selected: var(--ion-color-primary);
     --ripple-color: transparent;
     background: transparent;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
 
     &::before {
       display: none;
     }
 
+    // Efecto de onda al hacer clic
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 5px;
+      height: 5px;
+      background: rgba(56, 128, 255, 0.3);
+      opacity: 0;
+      border-radius: 100%;
+      transform: scale(1, 1) translate(-50%, -50%);
+      transform-origin: 50% 50%;
+    }
+
+    &:active::after {
+      animation: ripple 0.6s ease-out;
+    }
+
     &.tab-selected {
       ion-icon {
-        transform: scale(1.1);
+        transform: translateY(-2px) scale(1.1);
         color: var(--ion-color-primary);
+        filter: drop-shadow(0 2px 4px rgba(56, 128, 255, 0.3));
       }
 
       ion-label {
         font-weight: 600;
         opacity: 1;
         color: var(--ion-color-primary);
+        transform: translateY(2px);
+      }
+
+      // Indicador de pestaña seleccionada
+      &::before {
+        content: "";
+        display: block;
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: var(--ion-color-primary);
+        box-shadow: 0 0 8px rgba(56, 128, 255, 0.5);
       }
     }
 
     ion-icon {
       font-size: 24px;
-      transition: all 0.2s ease;
-      color: var(--ion-color-primary);
+      transition: all 0.3s ease;
     }
 
     ion-label {
@@ -43,24 +98,23 @@ ion-tab-bar {
       margin-top: 4px;
       font-weight: 500;
       opacity: 0.9;
-      transition: all 0.2s ease;
-      color: var(--ion-color-primary);
+      transition: all 0.3s ease;
     }
   }
 }
 
-// Efecto de brillo suave
-ion-tab-bar::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
+// Animación de onda
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 1;
+  }
+  20% {
+    transform: scale(25, 25);
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(40, 40);
+  }
 }

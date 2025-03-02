@@ -1,11 +1,11 @@
 @import "../shared/styles/common";
 
-// Botón flotante con el naranja específico (al principio del archivo)
+// Botón flotante con el color primario
 ion-fab {
   ion-fab-button.custom-fab {
-    --background: #f7b46e !important;
-    --background-activated: #e5a35d !important;
-    --background-hover: #f9c28a !important;
+    --background: var(--ion-color-primary) !important;
+    --background-activated: var(--ion-color-primary-shade) !important;
+    --background-hover: var(--ion-color-primary-tint) !important;
 
     ion-icon {
       color: white;
@@ -17,11 +17,58 @@ ion-fab {
 
 .subjects-content {
   @extend .page-content;
+  --background: linear-gradient(135deg, #f5f7fa 0%, #e4ecfb 100%);
+
+  &::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(56, 128, 255, 0.05)" stroke-width="2"/></svg>');
+    background-size: 300px 300px;
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: -1;
+  }
 
   .subjects-container {
     padding: 1rem;
     max-width: 800px;
     margin: 0 auto;
+    position: relative;
+
+    // Añadimos elementos decorativos
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      z-index: -1;
+    }
+
+    &::before {
+      top: -50px;
+      right: -50px;
+      background: radial-gradient(
+        circle,
+        rgba(56, 128, 255, 0.1) 0%,
+        rgba(56, 128, 255, 0) 70%
+      );
+    }
+
+    &::after {
+      bottom: -50px;
+      left: -50px;
+      background: radial-gradient(
+        circle,
+        rgba(56, 128, 255, 0.1) 0%,
+        rgba(56, 128, 255, 0) 70%
+      );
+    }
   }
 
   .subject-list {
@@ -29,23 +76,75 @@ ion-fab {
   }
 
   .subject-card {
-    margin-bottom: 1rem;
-    border-radius: 12px;
-    box-shadow: var(--card-shadow);
-    background: rgba(255, 255, 255, 0.9);
+    margin-bottom: 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    background: white;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-top: 3px solid var(--ion-color-primary);
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
+    }
 
     ion-card-header {
-      padding: 1rem;
+      padding: 1.2rem 1.2rem 0.8rem;
+      position: relative;
+
+      .card-header-content {
+        display: flex;
+        align-items: center;
+
+        .subject-icon {
+          font-size: 2rem;
+          color: var(--ion-color-primary);
+          margin-right: 1rem;
+        }
+
+        .card-title-container {
+          flex: 1;
+        }
+      }
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 10%;
+        width: 80%;
+        height: 1px;
+        background: linear-gradient(
+          to right,
+          transparent,
+          rgba(56, 128, 255, 0.2),
+          transparent
+        );
+      }
 
       ion-card-title {
         color: var(--ion-color-primary);
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         font-weight: 600;
+        margin-bottom: 0.3rem;
       }
 
       ion-card-subtitle {
-        color: var(--ion-color-primary-shade);
+        color: var(--app-text-color);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+
+        .subtitle-icon {
+          margin-right: 0.5rem;
+          font-size: 1rem;
+        }
       }
+    }
+
+    ion-card-content {
+      padding: 1rem 1.2rem;
     }
   }
 
@@ -56,29 +155,69 @@ ion-fab {
     margin-bottom: 1rem;
 
     ion-chip {
-      --background: var(--ion-color-primary-tint);
-      --color: var(--ion-color-primary-contrast);
+      --background: rgba(56, 128, 255, 0.1);
+      --color: var(--ion-color-primary);
+      border: 1px solid rgba(56, 128, 255, 0.2);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+
+      ion-icon {
+        margin-right: 4px;
+      }
+
+      &:hover {
+        --background: rgba(56, 128, 255, 0.2);
+        transform: scale(1.05);
+      }
     }
   }
 
   .subject-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 0.5rem;
+    gap: 1rem;
+    margin-top: 0.5rem;
+
+    .action-button {
+      --border-radius: 50%;
+      --padding-start: 0;
+      --padding-end: 0;
+      width: 40px;
+      height: 40px;
+      margin: 0;
+
+      ion-icon {
+        font-size: 1.2rem;
+      }
+    }
   }
 
   .empty-state {
-    @include flex-center;
-    padding: 2rem;
-    color: var(--ion-color-primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1rem;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
 
     ion-icon {
-      font-size: 4rem;
-      margin-bottom: 1rem;
+      font-size: 6rem;
+      color: var(--ion-color-primary);
+      margin-bottom: 1.5rem;
+      opacity: 0.7;
     }
 
     p {
-      font-size: 1.2rem;
+      color: var(--ion-color-primary);
+      font-size: 1.3rem;
+      font-weight: 500;
     }
   }
 
@@ -120,101 +259,126 @@ ion-header {
   }
 }
 
-// Estilos del modal
+// Estilos para el modal
 .subject-modal {
   --height: 100%;
   --width: 100%;
+  --backdrop-opacity: 0.8;
 
   ion-header {
     ion-toolbar {
-      --background: var(--app-gradient); // Mantenemos el gradiente original
+      --background: linear-gradient(135deg, #f5f7fa 0%, #e4ecfb 100%);
       --border-style: none;
 
       .modal-button {
-        --color: #8b4513; // Color café para los botones
+        --color: var(--ion-color-primary);
         font-size: 1.2rem;
-        font-weight: 500;
 
         &.save-button {
-          --color: #8b4513;
           margin-right: 8px;
+          font-weight: 600;
         }
 
         .modal-icon {
           font-size: 1.5rem;
+          color: var(--ion-color-primary);
         }
       }
     }
   }
 
   .modal-content {
-    --background: var(--app-gradient); // Mantenemos el gradiente original
-  }
+    --background: linear-gradient(135deg, #f5f7fa 0%, #e4ecfb 100%);
 
-  .form-container {
-    padding: 24px 20px;
+    &::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(56, 128, 255, 0.05)" stroke-width="2"/></svg>');
+      background-size: 300px 300px;
+      opacity: 0.5;
+      pointer-events: none;
+      z-index: -1;
+    }
 
-    .input-group {
-      .name-input-container {
-        margin: 20px 0 40px;
-        text-align: center;
-
-        .name-input {
-          --padding-top: 20px;
-          --padding-bottom: 20px;
-          --background: transparent;
-          font-size: 24px;
-          font-weight: 500;
-          color: #8b4513;
-          text-align: center;
-          --highlight-color-focused: #f7b46e !important;
-          --highlight-color-valid: #f7b46e !important;
-          --highlight-color-invalid: #f7b46e !important;
-
-          &::part(native) {
-            text-align: center;
-          }
-
-          &::placeholder {
-            color: #8b4513;
-            opacity: 0.7;
-            font-weight: 500;
-          }
-        }
-      }
-
-      .custom-input {
-        margin-bottom: 24px;
-        --background: transparent;
-        --highlight-color-focused: #f7b46e;
-
-        ion-label {
-          --color: #8b4513;
-          font-weight: 500;
-          font-size: 1.1rem;
-          margin-bottom: 8px;
-        }
-
-        ion-input {
-          --padding-top: 12px;
-          --padding-bottom: 12px;
-          --background: transparent;
-        }
-      }
+    .form-container {
+      padding: 1.5rem 1rem;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 20px;
+      margin: 1rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
     }
   }
 }
 
-// Estilos para el selector de días en el modal
+// Mejoramos los estilos para el selector de días y hacerlo más visible
+::ng-deep .action-sheet-group {
+  background: #f5f9ff !important; // Azul muy claro
+
+  .action-sheet-button {
+    color: var(--ion-color-primary) !important;
+    font-weight: 500 !important;
+    font-size: 1rem !important;
+    padding: 12px !important;
+  }
+
+  .action-sheet-selected {
+    color: var(--ion-color-primary) !important;
+    font-weight: bold !important;
+    background: #e6f0ff !important; // Azul claro para el seleccionado
+    position: relative !important;
+
+    &::after {
+      content: "✓" !important;
+      position: absolute !important;
+      right: 16px !important;
+      color: var(--ion-color-primary) !important;
+    }
+  }
+
+  .action-sheet-title {
+    color: var(--ion-color-primary) !important;
+    font-weight: 600 !important;
+    font-size: 1.1rem !important;
+  }
+}
+
+// Mejoramos el selector de horarios para hacerlo responsive
 .schedule-selector {
   margin-top: 1.5rem;
-  padding: 0 1rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.8);
 
   ion-label {
     color: var(--ion-color-primary);
-    font-weight: 500;
+    font-weight: 600;
     margin-bottom: 1rem;
     display: block;
+    text-align: center;
+    font-size: 1.1rem;
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -5px;
+      left: 35%;
+      width: 30%;
+      height: 1px;
+      background: linear-gradient(
+        to right,
+        transparent,
+        rgba(56, 128, 255, 0.3),
+        transparent
+      );
+    }
   }
 
   .schedule-items {
@@ -222,47 +386,116 @@ ion-header {
 
     .schedule-item {
       display: flex;
+      flex-direction: row;
       align-items: center;
-      margin-bottom: 0.8rem;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 8px;
-      padding: 0.5rem;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 0.75rem;
+      background: white;
+      border-radius: 12px;
+      padding: 0.7rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+      transition: transform 0.2s ease;
 
-      .day-select,
-      .time-select {
+      @media (max-width: 576px) {
+        flex-direction: column;
+        padding: 0.8rem;
+        gap: 0.5rem;
+      }
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+
+      ion-select {
         flex: 1;
+        max-width: 40%;
         --padding-start: 8px;
         font-weight: 500;
+        color: var(--ion-color-primary);
+        border-right: 1px solid rgba(0, 0, 0, 0.05);
+        padding-right: 8px;
+
+        @media (max-width: 576px) {
+          max-width: 100%;
+          width: 100%;
+          border-right: none;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+          padding-right: 0;
+          padding-bottom: 8px;
+          margin-bottom: 8px;
+          text-align: center;
+        }
       }
 
-      .day-select {
-        max-width: 45%;
-        color: #8b4513;
-      }
+      ion-datetime {
+        flex: 1;
+        max-width: 50%;
+        margin-left: 8px;
 
-      .time-select {
-        max-width: 45%;
-        color: #8b4513;
+        @media (max-width: 576px) {
+          max-width: 100%;
+          width: 100%;
+          margin-left: 0;
+          margin-bottom: 8px;
+        }
       }
 
       ion-button {
-        margin: 0;
+        @media (max-width: 576px) {
+          margin: 0 auto;
+        }
       }
     }
   }
 
   .add-schedule-btn {
-    margin-top: 1rem;
-    --background: #f7b46e;
+    margin-top: 0.5rem;
+    --background: var(--ion-color-primary);
     --color: white;
     font-weight: 500;
+    border-radius: 10px;
+    --box-shadow: 0 4px 10px rgba(30, 136, 229, 0.2);
+    height: 40px;
+    font-size: 0.95rem;
+  }
+}
+
+// Ajustes para el datetime en dispositivos móviles
+::ng-deep ion-datetime {
+  --background: #ffffff !important;
+  --ion-color-primary: var(--ion-color-primary) !important;
+  --ion-color-primary-contrast: white !important;
+  --ion-text-color: var(--ion-color-primary) !important;
+  --ion-toolbar-background: #f0f7ff !important;
+  --ion-toolbar-color: var(--ion-color-primary) !important;
+  --ion-item-background: #ffffff !important;
+  --wheel-highlight-background: rgba(56, 128, 255, 0.2) !important;
+  --wheel-fade-background-rgb: 255, 255, 255 !important;
+
+  @media (max-width: 576px) {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
+
+  .datetime-header {
+    background: #f0f7ff !important;
+    color: var(--ion-color-primary) !important;
+    padding: 8px !important;
+  }
+
+  .datetime-buttons {
+    background: #f0f7ff !important;
+
+    ion-button {
+      --color: var(--ion-color-primary) !important;
+      font-weight: 500 !important;
+    }
   }
 }
 
 // Botón flotante separado con el naranja específico
 ion-fab-button.custom-fab {
-  --background: #f7b46e; // Naranja bonito específico para este botón
+  --background: #f7b46e;
   --background-activated: #e5a35d;
   --background-hover: #f9c28a;
 
@@ -283,17 +516,17 @@ ion-fab-button.custom-fab {
   }
 
   .alert-title {
-    color: #8b4513 !important;
+    color: var(--ion-color-primary) !important;
     font-size: 1.2rem;
     font-weight: 600;
   }
 
   .alert-sub-title {
-    color: #8b4513;
+    color: var(--ion-color-primary);
   }
 
   .alert-message {
-    color: #8b4513;
+    color: var(--ion-color-primary);
     font-size: 1rem;
     padding: 16px;
   }
@@ -306,17 +539,163 @@ ion-fab-button.custom-fab {
       font-weight: 500;
 
       &.delete-button {
-        color: #ff4646;
+        color: var(--ion-color-primary) !important;
         font-weight: 600;
       }
 
       &.cancel-button {
-        color: #8b4513;
+        color: var(--ion-color-medium);
       }
 
       .alert-button-inner {
         justify-content: center;
       }
     }
+  }
+}
+
+// Estilos específicos para los botones de eliminar
+ion-button[color="danger"] {
+  --color: var(--ion-color-primary);
+
+  ion-icon[name="trash-outline"] {
+    color: var(--ion-color-primary);
+  }
+}
+
+// Estilos para el botón de eliminar en el alert
+::ng-deep .custom-alert {
+  .delete-button {
+    color: var(--ion-color-primary) !important;
+  }
+}
+
+// Asegurarse de que el icono de basura siempre tenga el color azul
+ion-icon[name="trash-outline"] {
+  color: var(--ion-color-primary);
+}
+
+// Mejoramos el modal
+.subject-modal {
+  --height: 100%;
+  --width: 100%;
+  --backdrop-opacity: 0.8;
+
+  ion-header {
+    ion-toolbar {
+      --background: linear-gradient(135deg, #f5f7fa 0%, #e4ecfb 100%);
+      --border-style: none;
+
+      .modal-button {
+        --color: var(--ion-color-primary);
+        font-size: 1.2rem;
+
+        &.save-button {
+          margin-right: 8px;
+          font-weight: 600;
+        }
+
+        .modal-icon {
+          font-size: 1.5rem;
+          color: var(--ion-color-primary);
+        }
+      }
+    }
+  }
+
+  .modal-content {
+    --background: linear-gradient(135deg, #f5f7fa 0%, #e4ecfb 100%);
+
+    &::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(56, 128, 255, 0.05)" stroke-width="2"/></svg>');
+      background-size: 300px 300px;
+      opacity: 0.5;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .form-container {
+      padding: 1.5rem 1rem;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 20px;
+      margin: 1rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+  }
+}
+
+// Mejoramos los elementos del formulario
+.name-input-container {
+  margin-bottom: 1.5rem;
+  text-align: center;
+  padding: 0 1rem;
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 25%;
+    width: 50%;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(56, 128, 255, 0.3),
+      transparent
+    );
+  }
+
+  .name-input {
+    --background: transparent;
+    --color: var(--ion-color-primary);
+    --placeholder-color: var(--ion-color-primary);
+    --padding-start: 0;
+    --padding-end: 0;
+    border: none;
+    border-bottom: 1px solid var(--ion-color-primary);
+    border-radius: 0;
+    text-align: center;
+    font-size: 1.3rem;
+    margin: 0 auto;
+    max-width: 90%;
+    font-weight: 500;
+
+    &::placeholder {
+      font-weight: 500;
+      opacity: 0.7;
+    }
+  }
+}
+
+// Mejoramos los estilos para el campo de créditos
+.custom-input {
+  margin-bottom: 2rem; // Aumentado para separarlo más del contenido inferior
+  margin-top: 1rem; // Añadido para separarlo del campo de nombre
+  --background: transparent;
+  --border-color: var(--ion-color-primary);
+  --highlight-color-focused: var(--ion-color-primary);
+
+  ion-label {
+    color: var(--ion-color-primary) !important;
+    font-weight: 500;
+    opacity: 1 !important;
+    font-size: 1rem;
+    transform: translateY(-1px) scale(1) !important; // Subimos más la etiqueta
+    margin-bottom: 8px; // Añadimos margen inferior
+  }
+
+  ion-input {
+    --color: var(--ion-color-primary) !important; // Cambiado a azul
+    font-weight: 500;
+    --padding-top: 12px; // Añadimos padding superior para separar del label
   }
 }

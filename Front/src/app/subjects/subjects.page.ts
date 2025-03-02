@@ -1,19 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController, IonInput, IonModal } from '@ionic/angular';
 import { Subject, ScheduleItem } from '../interfaces/subject.interface';
+import { ToastService, ToastType } from '../services/toast.service';
 
 // Definimos un tipo para los días de la semana
 type DayOfWeek =
-  | 'Domingo'
   | 'Lunes'
   | 'Martes'
   | 'Miércoles'
   | 'Jueves'
   | 'Viernes'
-  | 'Sábado';
+  | 'Sábado'
+  | 'Domingo';
 
 @Component({
   selector: 'app-subjects',
@@ -21,6 +22,9 @@ type DayOfWeek =
   styleUrls: ['./subjects.page.scss'],
 })
 export class SubjectsPage implements OnInit {
+  @ViewChild('nameInput') nameInput!: IonInput;
+  @ViewChild(IonModal) modal!: IonModal;
+
   subjects: Subject[] = [];
   showModal = false;
   isEditing = false;
@@ -28,40 +32,56 @@ export class SubjectsPage implements OnInit {
   currentSubjectId: string | null = null;
   selectedScheduleItems: ScheduleItem[] = [];
 
+  // Reordenamos los días de la semana para que empiecen en lunes
   availableDays = [
-    { short: 'D', value: 'Domingo' },
     { short: 'L', value: 'Lunes' },
     { short: 'M', value: 'Martes' },
     { short: 'X', value: 'Miércoles' },
     { short: 'J', value: 'Jueves' },
     { short: 'V', value: 'Viernes' },
     { short: 'S', value: 'Sábado' },
+    { short: 'D', value: 'Domingo' },
   ];
 
-  // Lista de horas predefinidas para evitar errores de formato
+  // Lista de horas predefinidas con intervalos de 30 minutos
   availableTimes = [
     '7:00 AM',
+    '7:30 AM',
     '8:00 AM',
+    '8:30 AM',
     '9:00 AM',
+    '9:30 AM',
     '10:00 AM',
+    '10:30 AM',
     '11:00 AM',
+    '11:30 AM',
     '12:00 PM',
+    '12:30 PM',
     '1:00 PM',
+    '1:30 PM',
     '2:00 PM',
+    '2:30 PM',
     '3:00 PM',
+    '3:30 PM',
     '4:00 PM',
+    '4:30 PM',
     '5:00 PM',
+    '5:30 PM',
     '6:00 PM',
+    '6:30 PM',
     '7:00 PM',
+    '7:30 PM',
     '8:00 PM',
+    '8:30 PM',
     '9:00 PM',
+    '9:30 PM',
   ];
 
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
     private alertController: AlertController,
-    private toastController: ToastController,
+    private toastService: ToastService,
     private fb: FormBuilder
   ) {
     this.subjectForm = this.fb.group({
@@ -74,6 +94,23 @@ export class SubjectsPage implements OnInit {
     this.loadSubjects();
   }
 
+  // Método para ordenar los horarios por día de la semana
+  sortScheduleByDay(schedule: ScheduleItem[]): ScheduleItem[] {
+    const dayOrder: { [key: string]: number } = {
+      Lunes: 1,
+      Martes: 2,
+      Miércoles: 3,
+      Jueves: 4,
+      Viernes: 5,
+      Sábado: 6,
+      Domingo: 7,
+    };
+
+    return [...schedule].sort((a, b) => {
+      return dayOrder[a.day] - dayOrder[b.day];
+    });
+  }
+
   loadSubjects() {
     const userId = this.authService.getCurrentUserId();
     if (userId) {
@@ -82,7 +119,7 @@ export class SubjectsPage implements OnInit {
           this.subjects = subjects;
         },
         error: (error) => {
-          this.presentToast('Error al cargar las materias', 'danger');
+          this.toastService.showToast('Error al cargar las materias', 'error');
           console.error('Error:', error);
         },
       });
@@ -122,10 +159,19 @@ export class SubjectsPage implements OnInit {
       const userId = this.authService.getCurrentUserId();
       if (!userId) return;
 
+      // Verificar que haya al menos un horario
+      if (this.selectedScheduleItems.length === 0) {
+        this.toastService.showToast(
+          'Debes agregar al menos un horario',
+          'warning'
+        );
+        return;
+      }
+
       const subjectData = {
         user_id: userId,
         name: formData.name,
-        credits: formData.credits,
+        credits: parseInt(formData.credits), // Asegurarnos de que sea un número
         schedule: this.selectedScheduleItems,
       };
 
@@ -134,16 +180,19 @@ export class SubjectsPage implements OnInit {
           await this.apiService
             .updateSubject(this.currentSubjectId, subjectData)
             .toPromise();
-          this.presentToast('✓ Materia actualizada con éxito', 'success');
+          this.toastService.showToast(
+            'Materia actualizada con éxito',
+            'success'
+          );
         } else {
           await this.apiService.createSubject(subjectData).toPromise();
-          this.presentToast('✓ Materia creada con éxito', 'success');
+          this.toastService.showToast('Materia creada con éxito', 'success');
         }
 
         this.dismissModal();
         await this.loadSubjects();
       } catch (error) {
-        this.presentToast('❌ Error al guardar la materia', 'danger');
+        this.toastService.showToast('Error al guardar la materia', 'error');
         console.error('Error:', error);
       }
     }
@@ -169,15 +218,15 @@ export class SubjectsPage implements OnInit {
               this.apiService.deleteSubject(subject._id).subscribe({
                 next: () => {
                   this.loadSubjects();
-                  this.presentToast(
-                    '✨ Materia eliminada con éxito',
+                  this.toastService.showToast(
+                    'Materia eliminada con éxito',
                     'success'
                   );
                 },
                 error: (error) => {
-                  this.presentToast(
-                    '❌ Error al eliminar la materia',
-                    'danger'
+                  this.toastService.showToast(
+                    'Error al eliminar la materia',
+                    'error'
                   );
                   console.error('Error:', error);
                 },
@@ -191,40 +240,58 @@ export class SubjectsPage implements OnInit {
     await alert.present();
   }
 
-  private async presentToast(
-    message: string,
-    color: 'success' | 'danger' | 'warning'
-  ) {
-    const toast = await this.toastController.create({
-      message: message.replace('✨', '✓'),
-      duration: 2500,
-      position: 'middle',
-      cssClass: 'large-toast',
-    });
-    await toast.present();
-  }
-
   addScheduleItem() {
-    // Inicializar con valores predeterminados
+    // Inicializar con valores predeterminados (Lunes a las 8:00 AM)
     this.selectedScheduleItems.push({
-      day: this.availableDays[1].value, // Lunes por defecto
-      time: this.availableTimes[1], // 8:00 AM por defecto
+      day: this.availableDays[0].value, // Lunes por defecto
+      time: this.availableTimes[2], // 8:00 AM por defecto
     });
+
+    // Ordenar los horarios después de agregar uno nuevo
+    this.selectedScheduleItems = this.sortScheduleByDay(
+      this.selectedScheduleItems
+    );
   }
 
   removeScheduleItem(index: number) {
     this.selectedScheduleItems.splice(index, 1);
   }
 
-  updateScheduleTime(index: number, time: string | null | undefined) {
+  updateScheduleTime(
+    index: number,
+    time: string | string[] | null | undefined
+  ) {
     if (time !== null && time !== undefined) {
-      this.selectedScheduleItems[index].time = time;
+      // Convertir a string si es un array
+      const timeValue = Array.isArray(time) ? time[0] : time;
+      this.selectedScheduleItems[index].time = timeValue;
     }
   }
 
   updateScheduleDay(index: number, day: string | null | undefined) {
     if (day !== null && day !== undefined) {
       this.selectedScheduleItems[index].day = day;
+      // Ordenar los horarios después de cambiar un día
+      this.selectedScheduleItems = this.sortScheduleByDay(
+        this.selectedScheduleItems
+      );
     }
+  }
+
+  formatTime(timeString: string): string {
+    // Si es un formato ISO, convertirlo a formato legible
+    if (timeString.includes('T')) {
+      try {
+        const date = new Date(timeString);
+        return date.toLocaleTimeString('es-ES', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true,
+        });
+      } catch (e) {
+        return timeString;
+      }
+    }
+    return timeString;
   }
 }
