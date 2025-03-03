@@ -69,6 +69,29 @@ ion-fab {
     margin: 0 auto;
     position: relative;
 
+    // Título de la página
+    .page-title {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      text-align: center;
+
+      .title-icon {
+        font-size: 2rem;
+        margin-right: 12px;
+        color: var(--ion-color-primary);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--ion-color-primary);
+      }
+    }
+
     // Añadimos elementos decorativos
     &::before,
     &::after {

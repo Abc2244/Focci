@@ -1,11 +1,17 @@
-<ion-content class="subjects-content">
+<ion-content class="subjects-content" fullscreen>
   <div class="subjects-container">
+    <!-- Título de la página -->
+    <div class="page-title">
+      <ion-icon name="book-outline" class="title-icon"></ion-icon>
+      <h1>Materias</h1>
+    </div>
+
     <!-- Lista de Materias -->
     <div class="subject-list">
       <ion-card class="subject-card" *ngFor="let subject of subjects">
         <ion-card-header>
           <div class="card-header-content">
-            <ion-icon name="book-outline" class="subject-icon"></ion-icon>
+            <ion-icon name="library-outline" class="subject-icon"></ion-icon>
             <div class="card-title-container">
               <ion-card-title>{{ subject.name }}</ion-card-title>
               <ion-card-subtitle>

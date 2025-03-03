@@ -1,9 +1,14 @@
-import { HttpClient } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpErrorResponse,
+} from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { Task, CreateTaskDTO } from './interfaces/task.interface';
 import { Subject, ScheduleItem } from './interfaces/subject.interface';
 import { environment } from '../environments/environment';
+import { catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -170,7 +175,41 @@ export class ApiService {
     return this.http.get<any[]>(`${this.apiUrl}/users/${userId}/tasks`);
   }
 
-  getUserProfile(user_id: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/users/${user_id}/profile/`);
+  getUserProfile(userId: string): Observable<any> {
+    return this.http
+      .get(`${this.apiUrl}/users/${userId}/profile/`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(catchError(this.handleError));
+  }
+
+  updateUserProfile(userId: string, profileData: any): Observable<any> {
+    return this.http
+      .put(`${this.apiUrl}/users/${userId}`, profileData, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(catchError(this.handleError));
+  }
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    if (error.error instanceof ErrorEvent) {
+      // Error del lado del cliente
+      console.error('Error del cliente:', error.error.message);
+    } else {
+      // Error del lado del servidor
+      console.error(
+        `Código de error ${error.status}, ` + `mensaje: ${error.error.message}`
+      );
+    }
+    // Retorna un observable con un mensaje de error
+    return throwError(error.message || 'Error en el servidor');
   }
 }

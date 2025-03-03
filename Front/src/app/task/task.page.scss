@@ -41,7 +41,30 @@
     margin: 0 auto;
     position: relative;
 
-    // Añadimos elementos decorativos
+    // Título de la página
+    .page-title {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      text-align: center;
+
+      .title-icon {
+        font-size: 2rem;
+        margin-right: 12px;
+        color: var(--ion-color-secondary);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--ion-color-secondary);
+      }
+    }
+
+    // Elementos decorativos
     &::before,
     &::after {
       content: "";
@@ -109,7 +132,7 @@
         align-items: center;
 
         .task-icon {
-          font-size: 2rem;
+          font-size: 2.2rem;
           color: var(--ion-color-secondary);
           margin-right: 1rem;
         }
@@ -151,10 +174,10 @@
         display: flex;
         align-items: center;
 
-        .subtitle-icon {
-          margin-right: 0.5rem;
-          font-size: 1rem;
-          color: var(--ion-color-secondary);
+        .subject-icon {
+          color: var(--ion-color-primary) !important;
+          font-size: 1.2rem;
+          margin-right: 5px;
         }
       }
     }
@@ -665,11 +688,9 @@ ion-header {
 
   ion-header {
     ion-toolbar {
-      --background: linear-gradient(
-        135deg,
-        #f5f7fa 0%,
-        var(--ion-color-secondary-tint) 100%
-      );
+      --background: white !important;
+      --border-style: none;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 
       .modal-button {
         --color: var(--ion-color-secondary);
@@ -689,49 +710,51 @@ ion-header {
           }
         }
       }
+
+      ion-title {
+        color: var(--ion-color-secondary);
+        font-weight: 600;
+        font-size: 1.3rem;
+      }
     }
   }
 
-  .modal-content {
-    --background: linear-gradient(
-      135deg,
-      #f5f7fa 0%,
-      var(--ion-color-secondary-tint) 100%
-    );
+  .form-container {
+    .input-group {
+      .custom-input {
+        margin-bottom: 20px;
 
-    .form-container {
-      padding: 1.5rem;
+        .form-label.large-label {
+          font-size: 1.2rem !important;
+          font-weight: 500 !important;
+          color: var(--ion-color-secondary) !important;
+          transform-origin: left top !important;
+          transition: all 0.3s ease !important;
+        }
 
-      .input-group {
-        background: white;
-        border-radius: 16px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        .large-input {
+          font-size: 1.3rem !important;
+          --padding-top: 12px !important;
+          --padding-bottom: 12px !important;
+        }
 
-        .custom-input {
-          margin-bottom: 1.8rem;
-          --background: transparent;
-          --border-color: rgba(38, 166, 154, 0.2);
-          --highlight-color-focused: var(--ion-color-secondary);
+        ion-select.large-input::part(text) {
+          font-size: 1.3rem !important;
+        }
 
-          .form-label {
+        ion-select.large-input::part(icon) {
+          font-size: 1.4rem !important;
+        }
+
+        &.item-has-focus {
+          .form-label.large-label {
             color: var(--ion-color-secondary) !important;
-            font-weight: 600;
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
           }
+        }
 
-          ion-input,
-          ion-select,
-          ion-datetime {
-            --color: #333333;
-            font-size: 1.2rem;
-            font-weight: 500;
-            margin-top: 0.5rem;
-          }
-
-          &:last-child {
-            margin-bottom: 0;
+        &.item-has-value {
+          .form-label.large-label {
+            transform: scale(0.9) !important;
           }
         }
       }
@@ -855,17 +878,38 @@ ion-icon[name="trash-outline"] {
       font-weight: 500 !important;
     }
   }
+
+  font-size: 1.2rem !important;
+
+  .datetime-header {
+    font-size: 1.3rem !important;
+  }
+
+  .datetime-buttons {
+    ion-button {
+      font-size: 1.2rem !important;
+    }
+  }
+
+  .wheel-column {
+    .wheel-item {
+      font-size: 1.2rem !important;
+    }
+  }
 }
 
 // Corregir los estilos del action-sheet para el selector de materias
 ::ng-deep .action-sheet-group {
   background: #f5f9ff !important;
 
+  .action-sheet-title {
+    font-size: 1.3rem !important;
+    padding: 16px !important;
+  }
+
   .action-sheet-button {
-    color: var(--ion-color-secondary) !important;
-    font-weight: 500 !important;
-    font-size: 1rem !important;
-    padding: 12px !important;
+    font-size: 1.2rem !important;
+    padding: 16px !important;
   }
 
   .action-sheet-selected {
@@ -880,12 +924,6 @@ ion-icon[name="trash-outline"] {
       right: 16px !important;
       color: var(--ion-color-secondary) !important;
     }
-  }
-
-  .action-sheet-title {
-    color: var(--ion-color-secondary) !important;
-    font-weight: 600 !important;
-    font-size: 1.1rem !important;
   }
 }
 
@@ -1021,10 +1059,13 @@ ion-modal.datetime-modal {
 
     ion-card-subtitle {
       font-size: 1.05rem;
+      display: flex;
+      align-items: center;
 
-      .subtitle-icon {
+      .subject-icon {
+        color: var(--ion-color-primary) !important;
         font-size: 1.2rem;
-        color: var(--ion-color-secondary);
+        margin-right: 5px;
       }
     }
   }
@@ -1040,5 +1081,231 @@ ion-modal.datetime-modal {
   h2 {
     color: var(--ion-color-secondary);
     font-size: 1.3rem;
+  }
+}
+
+// Ajustar los colores de las pestañas para que coincidan con los de subjects
+ion-tab-bar {
+  --background: white;
+  --border: none;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  padding: 5px 0;
+
+  ion-tab-button {
+    --color: #999;
+    --color-selected: var(--ion-color-primary);
+    --background: transparent;
+    --background-focused: rgba(33, 150, 243, 0.1);
+    --padding-top: 8px;
+    --padding-bottom: 8px;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 3px;
+      background: var(--ion-color-primary);
+      transform: translateX(-50%);
+      transition: width 0.3s ease;
+    }
+
+    &.tab-selected {
+      &::before {
+        width: 50%;
+      }
+
+      ion-icon,
+      ion-label {
+        color: var(--ion-color-primary);
+      }
+    }
+
+    ion-icon {
+      font-size: 24px;
+      transition: all 0.3s ease;
+    }
+
+    ion-label {
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+  }
+}
+
+// Corregir los colores del selector de horario en la página de materias
+::ng-deep .schedule-selector {
+  ion-item {
+    --background: white;
+    --border-color: rgba(33, 150, 243, 0.3);
+    --highlight-color-focused: var(--ion-color-primary);
+
+    ion-label {
+      color: var(--ion-color-primary) !important;
+      font-weight: 500;
+    }
+
+    ion-select {
+      --placeholder-color: var(--ion-color-primary);
+      --placeholder-opacity: 0.7;
+      color: var(--ion-color-primary) !important;
+
+      &::part(icon) {
+        color: var(--ion-color-primary) !important;
+      }
+
+      &::part(text) {
+        color: var(--ion-color-primary) !important;
+      }
+    }
+
+    ion-datetime {
+      --placeholder-color: var(--ion-color-primary);
+      color: var(--ion-color-primary) !important;
+    }
+
+    ion-input {
+      --placeholder-color: var(--ion-color-primary);
+      --placeholder-opacity: 0.7;
+      color: var(--ion-color-primary) !important;
+    }
+
+    &.item-has-focus {
+      --highlight-background: var(--ion-color-primary);
+    }
+  }
+
+  .schedule-day-selector {
+    ion-segment {
+      --background: white;
+      border-radius: 8px;
+      margin: 10px 0;
+
+      ion-segment-button {
+        --background: transparent;
+        --background-checked: rgba(33, 150, 243, 0.1);
+        --color: #999;
+        --color-checked: var(--ion-color-primary);
+        --indicator-color: var(--ion-color-primary);
+        min-height: 40px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        letter-spacing: 0;
+        text-transform: none;
+
+        &::part(indicator) {
+          height: 3px;
+        }
+      }
+    }
+  }
+
+  .schedule-time-selector {
+    ion-item {
+      --padding-start: 0;
+      --inner-padding-end: 0;
+
+      ion-label {
+        margin-right: 10px;
+      }
+    }
+  }
+
+  .add-schedule-button {
+    --background: var(--ion-color-primary);
+    --background-activated: var(--ion-color-primary-shade);
+    --background-focused: var(--ion-color-primary-shade);
+    --color: white;
+    margin-top: 15px;
+    height: 40px;
+    font-size: 1rem;
+    font-weight: 500;
+
+    ion-icon {
+      margin-right: 8px;
+    }
+  }
+
+  .schedule-list {
+    margin-top: 20px;
+
+    .schedule-item {
+      background: rgba(33, 150, 243, 0.05);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-left: 3px solid var(--ion-color-primary);
+
+      .schedule-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+
+        .day-name {
+          font-weight: 600;
+          color: var(--ion-color-primary);
+          font-size: 1.1rem;
+        }
+
+        .delete-button {
+          --color: var(--ion-color-primary);
+          --padding-start: 8px;
+          --padding-end: 8px;
+          height: 30px;
+
+          ion-icon {
+            font-size: 1.2rem;
+          }
+        }
+      }
+
+      .schedule-item-content {
+        display: flex;
+        flex-direction: column;
+
+        .time-info,
+        .classroom-info {
+          display: flex;
+          align-items: center;
+          margin: 4px 0;
+          color: #666;
+
+          ion-icon {
+            color: var(--ion-color-primary);
+            margin-right: 8px;
+            font-size: 1.1rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Asegurarse de que los action-sheets para selección de día usen azul
+::ng-deep .day-select-action-sheet {
+  .action-sheet-group {
+    background: white !important;
+
+    .action-sheet-button {
+      color: var(--ion-color-primary) !important;
+
+      &.action-sheet-selected {
+        color: var(--ion-color-primary) !important;
+        background: rgba(33, 150, 243, 0.1) !important;
+
+        &::after {
+          color: var(--ion-color-primary) !important;
+        }
+      }
+    }
+
+    .action-sheet-title {
+      color: var(--ion-color-primary) !important;
+    }
   }
 }

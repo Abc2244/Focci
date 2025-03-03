@@ -1,6 +1,11 @@
 <ion-content class="tasks-content">
+  <!-- Título de la página -->
   <div class="tasks-container">
-    <!-- Lista de Tareas -->
+    <div class="page-title">
+      <ion-icon name="checkbox-outline" class="title-icon"></ion-icon>
+      <h1>Tareas</h1>
+    </div>
+
     <div class="task-list">
       <!-- Tareas Pendientes -->
       <ion-card class="task-card" *ngFor="let task of incompleteTasks">
@@ -10,7 +15,7 @@
             <div class="card-title-container">
               <ion-card-title>{{ task.description }}</ion-card-title>
               <ion-card-subtitle>
-                <ion-icon name="book-outline" class="subtitle-icon"></ion-icon>
+                <ion-icon name="book-outline" class="subject-icon"></ion-icon>
                 {{ getSubjectName(task.subject_id) }}
               </ion-card-subtitle>
             </div>
@@ -82,10 +87,7 @@
               <div class="card-title-container">
                 <ion-card-title>{{ task.description }}</ion-card-title>
                 <ion-card-subtitle>
-                  <ion-icon
-                    name="book-outline"
-                    class="subtitle-icon"
-                  ></ion-icon>
+                  <ion-icon name="book-outline" class="subject-icon"></ion-icon>
                   {{ getSubjectName(task.subject_id) }}
                 </ion-card-subtitle>
               </div>
@@ -144,12 +146,14 @@
             <ion-icon name="close-outline" class="modal-icon"></ion-icon>
           </ion-button>
         </ion-buttons>
+        <ion-title>
+          {{ isEditing ? 'Editar Tarea' : 'Nueva Tarea' }}
+        </ion-title>
         <ion-buttons slot="end">
           <ion-button
             (click)="saveTask()"
             class="modal-button save-button"
             [disabled]="!taskForm.valid"
-            color="secondary"
           >
             <span class="save-button-text"
               >{{ isEditing ? 'Actualizar' : 'Crear' }}</span
@@ -164,20 +168,29 @@
         <div class="form-container">
           <div class="input-group">
             <ion-item class="custom-input">
-              <ion-label position="floating" class="form-label"
+              <ion-label position="floating" class="form-label large-label"
                 >Descripción</ion-label
               >
-              <ion-input formControlName="description" type="text"></ion-input>
+              <ion-input
+                formControlName="description"
+                type="text"
+                class="large-input"
+              ></ion-input>
             </ion-item>
 
             <ion-item class="custom-input">
-              <ion-label position="floating" class="form-label"
+              <ion-label position="floating" class="form-label large-label"
                 >Materia</ion-label
               >
-              <ion-select formControlName="subject_id" interface="action-sheet">
+              <ion-select
+                formControlName="subject_id"
+                interface="action-sheet"
+                class="large-input"
+              >
                 <ion-select-option
                   *ngFor="let subject of subjects"
                   [value]="subject._id"
+                  class="large-option"
                 >
                   {{ subject.name }}
                 </ion-select-option>
@@ -185,7 +198,7 @@
             </ion-item>
 
             <ion-item class="custom-input">
-              <ion-label position="floating" class="form-label"
+              <ion-label position="floating" class="form-label large-label"
                 >Fecha de entrega</ion-label
               >
               <ion-datetime
@@ -194,6 +207,7 @@
                 presentation="date-time"
                 [min]="minDate"
                 locale="es-ES"
+                class="large-input"
               ></ion-datetime>
             </ion-item>
           </div>
