@@ -32,11 +32,39 @@ const routes: Routes = [
           import('../profile/profile.module').then((m) => m.ProfilePageModule),
       },
       {
+        path: 'week',
+        loadChildren: () =>
+          import('../week/week.module').then((m) => m.WeekPageModule),
+      },
+      {
+        path: 'calendar',
+        loadChildren: () =>
+          import('../calendar/calendar.module').then(
+            (m) => m.CalendarPageModule
+          ),
+      },
+      {
+        path: 'stats',
+        loadChildren: () =>
+          import('../stats/stats.module').then((m) => m.StatsPageModule),
+      },
+      {
+        path: 'smart',
+        loadChildren: () =>
+          import('../smart/smart.module').then((m) => m.SmartPageModule),
+      },
+      {
         path: '',
-        redirectTo: '/tabs/subjects',
+        redirectTo: '/tabs/week',
         pathMatch: 'full',
       },
     ],
+  },
+  {
+    // Ruta comodín para redirigir a la página principal
+    path: '**',
+    redirectTo: '/tabs/week',
+    pathMatch: 'full',
   },
 ];
 
