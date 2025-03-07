@@ -1,11 +1,11 @@
+@import "src/app/shared/styles/common";
+
 .register-content {
-  --background: linear-gradient(135deg, #fff5e6 0%, #fff 100%);
+  @extend .page-content !optional;
 
   .register-container {
+    @include flex-center;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     padding: 2rem;
   }
 
@@ -20,7 +20,7 @@
     }
 
     h1 {
-      color: #8b4513;
+      color: var(--ion-color-primary);
       font-size: 2rem;
       margin-bottom: 2rem;
       font-weight: 600;
@@ -40,30 +40,26 @@
     margin-bottom: 1rem;
     padding: 0.3rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --highlight-color: var(--ion-color-primary);
 
     ion-label {
-      color: #8b4513;
+      color: var(--ion-color-primary);
       font-weight: 500;
       margin-bottom: 0.5rem;
     }
 
     ion-input {
+      --color: var(--app-text-color);
       --padding-start: 1rem;
-      --placeholder-color: #ccc;
-      --placeholder-opacity: 0.8;
+      --placeholder-color: var(--app-color-medium);
+      --placeholder-opacity: 0.7;
     }
   }
 
   .register-button {
-    --background: #ff8c00;
-    --background-hover: #ffa500;
-    --border-radius: 10px;
-    --color: white;
+    @extend .custom-button;
     margin-top: 2rem;
-    height: 48px;
-    font-weight: 600;
     font-size: 1.1rem;
-    box-shadow: 0 4px 8px rgba(255, 140, 0, 0.2);
   }
 
   .login-link {
@@ -71,12 +67,12 @@
     text-align: center;
 
     p {
-      color: #8b4513;
+      color: var(--ion-color-primary);
       margin-bottom: 0.5rem;
     }
 
     .login-button {
-      --color: #ff8c00;
+      --color: var(--ion-color-primary);
       font-weight: 500;
       text-transform: none;
       font-size: 1rem;
@@ -86,7 +82,7 @@
 
 // Estilos para los items de ion-input cuando están enfocados
 ion-item.item-has-focus {
-  --highlight-background: #ff8c00;
+  --highlight-background: var(--ion-color-primary-tint);
 }
 
 // Animación suave para los botones

@@ -1,12 +1,20 @@
-import { HttpClient } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpErrorResponse,
+} from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { Task, CreateTaskDTO } from './interfaces/task.interface';
+import { Subject, ScheduleItem } from './interfaces/subject.interface';
+import { environment } from '../environments/environment';
+import { catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApiService {
-  private apiUrl = 'http://127.0.0.1:8000';
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
@@ -46,63 +54,79 @@ export class ApiService {
   // Tareas
   // -----------------------------------------
 
-  // Crear nueva tarea
-  createTask(task: {
-    user_id: string;
-    subject_id: string;
-    description: string;
-    due_date: string;
-  }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/tasks/`, task);
+  createTask(task: CreateTaskDTO): Observable<any> {
+    const taskData = {
+      ...task,
+      completed: false,
+    };
+    return this.http.post(`${this.apiUrl}/tasks/`, taskData);
   }
 
-  // Obtener tareas de un usuario
-  getUserTasks(user_id: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/${user_id}/tasks/`);
+  getUserTasks(user_id: string): Observable<Task[]> {
+    return this.http.get<Task[]>(`${this.apiUrl}/users/${user_id}/tasks/`);
   }
 
-  // Obtener tareas pendientes de un usuario
-  getPendingTasks(user_id: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/${user_id}/tasks/pending/`);
+  getPendingTasks(user_id: string): Observable<Task[]> {
+    return this.http.get<Task[]>(
+      `${this.apiUrl}/users/${user_id}/tasks/pending/`
+    );
   }
 
-  // Obtener tareas completadas de un usuario
-  getCompletedTasks(user_id: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/${user_id}/tasks/completed/`);
+  getCompletedTasks(user_id: string): Observable<Task[]> {
+    return this.http.get<Task[]>(
+      `${this.apiUrl}/users/${user_id}/tasks/completed/`
+    );
   }
 
-  // Marcar tarea como completada
   completeTask(task_id: string): Observable<any> {
     return this.http.patch(`${this.apiUrl}/tasks/${task_id}/complete/`, {});
   }
 
-  // Actualizar tarea
-  updateTask(task_id: string, taskData: any): Observable<any> {
+  updateTask(task_id: string, taskData: Partial<Task>): Observable<any> {
     return this.http.put(`${this.apiUrl}/tasks/${task_id}/`, taskData);
   }
 
-  // Eliminar tarea
   deleteTask(task_id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/tasks/${task_id}/`);
   }
 
-  // Eliminar todas las tareas completadas de un usuario
   deleteCompletedTasks(user_id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/users/${user_id}/tasks/completed/`);
+  }
+
+  uncompleteTask(task_id: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/tasks/${task_id}/uncomplete/`, {});
   }
 
   // -----------------------------------------
   // Materias
   // -----------------------------------------
 
-  // Obtener materias de un usuario
-  getUserSubjects(user_id: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/${user_id}/subjects/`);
+  getUserSubjects(user_id: string): Observable<Subject[]> {
+    return this.http.get<Subject[]>(
+      `${this.apiUrl}/users/${user_id}/subjects/`
+    );
   }
 
-  // Obtener tareas de una materia
-  getTasksBySubject(subject_id: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/subjects/${subject_id}/tasks/`);
+  getTasksBySubject(subject_id: string): Observable<Task[]> {
+    return this.http.get<Task[]>(
+      `${this.apiUrl}/subjects/${subject_id}/tasks/`
+    );
+  }
+
+  createSubject(subject: Subject): Observable<any> {
+    return this.http.post(`${this.apiUrl}/subjects/`, subject);
+  }
+
+  updateSubject(
+    subject_id: string,
+    subjectData: Partial<Subject>
+  ): Observable<any> {
+    return this.http.put(`${this.apiUrl}/subjects/${subject_id}/`, subjectData);
+  }
+
+  deleteSubject(subject_id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/subjects/${subject_id}/`);
   }
 
   // -----------------------------------------
@@ -120,8 +144,10 @@ export class ApiService {
   }
 
   // Obtener recordatorios próximos de un usuario
-  getUpcomingReminders(user_id: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/${user_id}/reminders/upcoming/`);
+  getUpcomingReminders(userId: string): Observable<any[]> {
+    const url = `${this.apiUrl}/users/${userId}/reminders/upcoming/`;
+    console.log('Calling API URL:', url);
+    return this.http.get<any[]>(url);
   }
 
   // Obtener recordatorios por prioridad
@@ -142,5 +168,48 @@ export class ApiService {
   // Eliminar un recordatorio
   deleteReminder(reminder_id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/reminders/${reminder_id}/`);
+  }
+
+  // Add this method to fetch tasks
+  getTasks(userId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/users/${userId}/tasks`);
+  }
+
+  getUserProfile(userId: string): Observable<any> {
+    return this.http
+      .get(`${this.apiUrl}/users/${userId}/profile/`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(catchError(this.handleError));
+  }
+
+  updateUserProfile(userId: string, profileData: any): Observable<any> {
+    return this.http
+      .put(`${this.apiUrl}/users/${userId}`, profileData, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(catchError(this.handleError));
+  }
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    if (error.error instanceof ErrorEvent) {
+      // Error del lado del cliente
+      console.error('Error del cliente:', error.error.message);
+    } else {
+      // Error del lado del servidor
+      console.error(
+        `Código de error ${error.status}, ` + `mensaje: ${error.error.message}`
+      );
+    }
+    // Retorna un observable con un mensaje de error
+    return throwError(error.message || 'Error en el servidor');
   }
 }

@@ -1,0 +1,346 @@
+// Variables
+:root {
+  --menu-bg: rgba(255, 255, 255, 0.85);
+  --menu-backdrop-filter: blur(10px);
+  --menu-shadow: 0 8px 32px rgba(0, 31, 63, 0.1);
+  --menu-header-height: 180px;
+  --menu-item-radius: 12px;
+  --menu-item-active-bg: rgba(var(--ion-color-primary-rgb), 0.15);
+  --menu-item-hover-bg: rgba(var(--ion-color-primary-rgb), 0.08);
+  --tab-height: 65px;
+  --tab-indicator-size: 5px;
+  --tab-transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+  --header-height: 60px;
+}
+
+// Estilos para el menú lateral con glassmorphism
+ion-menu.glassmorphism-menu {
+  --width: 280px;
+  --background: var(--menu-bg);
+
+  &::part(backdrop) {
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  &::part(container) {
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--menu-shadow);
+    backdrop-filter: var(--menu-backdrop-filter);
+    -webkit-backdrop-filter: var(--menu-backdrop-filter);
+  }
+
+  ion-toolbar {
+    --background: var(--ion-color-primary);
+    --color: white;
+  }
+
+  ion-content {
+    --background: white;
+    --padding-top: 0;
+    --padding-bottom: 20px;
+
+    .menu-header {
+      padding: 20px 16px;
+      background: linear-gradient(
+        135deg,
+        var(--ion-color-primary) 0%,
+        var(--ion-color-primary-shade) 100%
+      );
+      margin-bottom: 20px;
+
+      .user-info {
+        display: flex;
+        align-items: center;
+
+        .avatar {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.2);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: 15px;
+
+          ion-icon {
+            font-size: 40px;
+            color: white;
+          }
+        }
+
+        .user-details {
+          h2 {
+            margin: 0;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+          }
+
+          p {
+            margin: 5px 0 0;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+
+  .menu-items {
+    padding: 0;
+    background: transparent;
+
+    ion-item {
+      --padding-start: 16px;
+      --padding-end: 16px;
+      --min-height: 56px;
+      margin: 0 8px 8px;
+      --background: transparent;
+      --background-hover: rgba(var(--ion-color-primary-rgb), 0.08);
+      --ripple-color: var(--ion-color-primary);
+      border-radius: 8px;
+      --color: var(--ion-color-primary);
+
+      &.active-item {
+        --background: rgba(var(--ion-color-primary-rgb), 0.12);
+        --color: var(--ion-color-primary);
+        font-weight: 600;
+
+        ion-icon {
+          color: var(--ion-color-primary);
+        }
+      }
+
+      ion-icon {
+        font-size: 22px;
+        margin-right: 16px;
+        color: var(--ion-color-primary);
+      }
+
+      ion-label {
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--ion-color-primary);
+      }
+    }
+  }
+}
+
+// Estilos para la barra de navegación superior moderna
+.modern-header {
+  position: relative;
+  z-index: 10;
+
+  ion-toolbar {
+    --background: white;
+    --color: var(--ion-color-dark);
+    --border-width: 0;
+    --min-height: var(--header-height);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    position: relative;
+
+    .page-title {
+      font-weight: 600;
+      letter-spacing: 0.5px;
+
+      .title-text {
+        position: relative;
+        display: inline-block;
+        background: linear-gradient(
+          135deg,
+          var(--ion-color-primary) 0%,
+          var(--ion-color-secondary) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-fill-color: transparent;
+      }
+    }
+  }
+}
+
+// Estilos para el botón de menú azul
+.blue-menu-button {
+  --color: var(--ion-color-primary) !important;
+
+  .menu-icon {
+    span {
+      background-color: var(--ion-color-primary) !important;
+    }
+  }
+}
+
+// Estilos para el botón de menú animado
+.animated-menu-button {
+  --padding-start: 0;
+  --padding-end: 0;
+
+  .menu-icon {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+
+    span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+
+      &:nth-child(1) {
+        transform-origin: left;
+      }
+
+      &:nth-child(3) {
+        transform-origin: left;
+      }
+    }
+  }
+
+  &.menu-button-activated {
+    .menu-icon {
+      span {
+        &:nth-child(1) {
+          transform: rotate(45deg);
+        }
+
+        &:nth-child(2) {
+          opacity: 0;
+        }
+
+        &:nth-child(3) {
+          transform: rotate(-45deg);
+        }
+      }
+    }
+  }
+}
+
+// Estilos para la barra superior
+ion-header {
+  ion-toolbar {
+    --background: var(--ion-color-primary);
+    --color: white;
+
+    ion-menu-button {
+      --color: white;
+      display: block;
+      color: white;
+      font-size: 24px;
+      margin-right: 8px;
+    }
+  }
+}
+
+// Aseguramos que el contenido principal tenga el espacio correcto
+#main-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  ion-content.main-content {
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --offset-top: 0;
+    --offset-bottom: 0;
+  }
+}
+
+// Estilos para el botón de menú blanco
+.white-menu-button {
+  --color: white !important;
+
+  .menu-icon {
+    span {
+      background-color: white !important;
+    }
+  }
+}
+
+// Estilos mejorados para la barra de tabs
+ion-tabs {
+  ion-tab-bar.custom-tabs {
+    --background: white;
+    --border: none;
+    box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.05);
+    height: 60px;
+    padding: 0 10px;
+
+    .tab-button {
+      position: relative;
+      --color: var(--ion-color-medium);
+      --color-selected: var(--ion-color-primary);
+      transition: all 0.3s ease;
+
+      ion-icon {
+        font-size: 24px;
+        transition: all 0.3s ease;
+      }
+
+      .tab-indicator {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 4px;
+        background: var(--ion-color-primary);
+        border-radius: 4px 4px 0 0;
+        transform: translateX(-50%);
+        transition: width 0.3s ease;
+        opacity: 0;
+      }
+
+      &.tab-selected {
+        ion-icon {
+          color: var(--ion-color-primary);
+          transform: translateY(-4px) scale(1.2);
+        }
+
+        .tab-indicator {
+          width: 30px;
+          opacity: 1;
+        }
+      }
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(var(--ion-color-primary-rgb), 0.1);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: all 0.3s ease;
+        z-index: -1;
+      }
+
+      &.tab-selected::before {
+        width: 40px;
+        height: 40px;
+      }
+    }
+  }
+}
+
+// Eliminar los estilos antiguos de tabs que ya no se usarán
+// (Mantengo los estilos de animación de ripple por si quieres usarlos en otro lugar)
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 1;
+  }
+  20% {
+    transform: scale(25, 25);
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(40, 40);
+  }
+}

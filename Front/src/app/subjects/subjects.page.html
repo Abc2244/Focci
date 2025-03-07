@@ -1,0 +1,179 @@
+<ion-content class="subjects-content" fullscreen>
+  <div class="subjects-container">
+    <!-- Título de la página -->
+    <div class="page-title">
+      <ion-icon name="book-outline" class="title-icon"></ion-icon>
+      <h1>Materias</h1>
+    </div>
+
+    <!-- Lista de Materias -->
+    <div class="subject-list">
+      <ion-card class="subject-card" *ngFor="let subject of subjects">
+        <ion-card-header>
+          <div class="card-header-content">
+            <ion-icon name="library-outline" class="subject-icon"></ion-icon>
+            <div class="card-title-container">
+              <ion-card-title>{{ subject.name }}</ion-card-title>
+              <ion-card-subtitle>
+                <ion-icon
+                  name="school-outline"
+                  class="subtitle-icon"
+                ></ion-icon>
+                {{ subject.credits }} Créditos
+              </ion-card-subtitle>
+            </div>
+          </div>
+        </ion-card-header>
+
+        <ion-card-content>
+          <div class="schedule-chips">
+            <ion-chip
+              *ngFor="let item of subject.schedule"
+              color="primary"
+              class="schedule-chip"
+            >
+              <ion-icon name="time-outline" class="schedule-icon"></ion-icon>
+              <span class="schedule-text"
+                >{{ item.day }} - {{ formatTime(item.time) }}</span
+              >
+            </ion-chip>
+          </div>
+
+          <div class="subject-actions">
+            <ion-button
+              fill="clear"
+              (click)="editSubject(subject)"
+              class="action-button"
+            >
+              <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+            <ion-button
+              fill="clear"
+              color="danger"
+              (click)="deleteSubject(subject)"
+              class="action-button"
+            >
+              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Mensaje cuando no hay materias -->
+      <div class="empty-state" *ngIf="subjects.length === 0">
+        <ion-icon name="book-outline"></ion-icon>
+        <p>No tienes materias registradas</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botón flotante para agregar con el evento click -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button class="custom-fab" (click)="addSubject()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
+
+<!-- Modal simplificado que funcionaba antes -->
+<ion-modal [isOpen]="showModal" class="subject-modal">
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button (click)="dismissModal()" class="modal-button">
+            <ion-icon name="close-outline" class="modal-icon"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-buttons slot="end">
+          <ion-button
+            (click)="saveSubject()"
+            class="modal-button save-button"
+            [disabled]="!subjectForm.valid"
+          >
+            {{ isEditing ? 'Actualizar' : 'Crear' }}
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="modal-content">
+      <form [formGroup]="subjectForm">
+        <div class="form-container">
+          <!-- Campo de nombre con estilo personalizado -->
+          <div class="name-input-container">
+            <ion-input
+              class="name-input"
+              type="text"
+              formControlName="name"
+              placeholder="Nombre de materia"
+            ></ion-input>
+          </div>
+
+          <ion-item class="custom-input">
+            <ion-label position="floating">Créditos</ion-label>
+            <ion-input
+              type="number"
+              formControlName="credits"
+              placeholder="Ej: 4"
+            ></ion-input>
+          </ion-item>
+
+          <div class="schedule-selector">
+            <ion-label>Horarios de clase</ion-label>
+
+            <div class="schedule-items">
+              <div
+                *ngFor="let item of selectedScheduleItems; let i = index"
+                class="schedule-item"
+              >
+                <ion-select
+                  [value]="item.day"
+                  (ionChange)="updateScheduleDay(i, $event.detail.value)"
+                  placeholder="Día"
+                  interface="action-sheet"
+                  class="day-select"
+                >
+                  <ion-select-option
+                    *ngFor="let day of availableDays"
+                    [value]="day.value"
+                  >
+                    {{ day.value }}
+                  </ion-select-option>
+                </ion-select>
+
+                <ion-datetime
+                  presentation="time"
+                  [value]="item.time"
+                  (ionChange)="updateScheduleTime(i, $event.detail.value)"
+                  class="time-select"
+                  hourCycle="h12"
+                  locale="es-ES"
+                  size="cover"
+                  preferWheel="true"
+                ></ion-datetime>
+
+                <ion-button
+                  fill="clear"
+                  color="primary"
+                  (click)="removeScheduleItem(i)"
+                >
+                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+              </div>
+            </div>
+
+            <ion-button
+              expand="block"
+              (click)="addScheduleItem()"
+              class="add-schedule-btn"
+            >
+              <ion-icon name="add-outline" slot="start"></ion-icon>
+              Agregar horario
+            </ion-button>
+          </div>
+        </div>
+      </form>
+    </ion-content>
+  </ng-template>
+</ion-modal>

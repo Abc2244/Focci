@@ -4,17 +4,17 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { TaskManagerPageRoutingModule } from './task-manager-routing.module';
+import { SmartPageRoutingModule } from './smart-routing.module';
 
-import { TaskManagerPage } from './task-manager.page';
+import { SmartPage } from './smart.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    TaskManagerPageRoutingModule
+    SmartPageRoutingModule
   ],
-  declarations: [TaskManagerPage]
+  declarations: [SmartPage]
 })
-export class TaskManagerPageModule {}
+export class SmartPageModule {}

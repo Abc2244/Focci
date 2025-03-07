@@ -1,0 +1,528 @@
+@import "src/app/shared/styles/common";
+
+// Variables de colores para recordatorios
+$reminder-primary: var(--ion-color-primary);
+$reminder-primary-tint: var(--ion-color-primary-tint);
+$reminder-primary-shade: var(--ion-color-primary-shade);
+
+// Colores para prioridades
+$priority-low: #4caf50; // Verde para prioridad baja
+$priority-medium: #ff9800; // Naranja para prioridad media
+$priority-high: #f44336; // Rojo para prioridad alta
+
+// Color para tareas
+$task-color: #673ab7; // Púrpura para tareas
+
+.reminders-content {
+  @extend .page-content;
+  --background: linear-gradient(
+    135deg,
+    #f5f7fa 0%,
+    var(--ion-color-primary-tint) 100%
+  );
+  --padding-top: 20px;
+
+  &::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(33, 150, 243, 0.05)" stroke-width="2"/></svg>');
+    background-size: 300px 300px;
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .reminders-container {
+    padding: 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+
+    // Título de la página
+    .page-title {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      text-align: center;
+
+      .title-icon {
+        font-size: 2rem;
+        margin-right: 12px;
+        color: $reminder-primary;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: $reminder-primary;
+      }
+    }
+
+    // Elementos decorativos
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      z-index: -1;
+    }
+
+    &::before {
+      top: -50px;
+      right: -50px;
+      background: radial-gradient(
+        circle,
+        rgba(33, 150, 243, 0.1) 0%,
+        rgba(33, 150, 243, 0) 70%
+      );
+    }
+
+    &::after {
+      bottom: -50px;
+      left: -50px;
+      background: radial-gradient(
+        circle,
+        rgba(33, 150, 243, 0.1) 0%,
+        rgba(33, 150, 243, 0) 70%
+      );
+    }
+  }
+
+  // Estilos para las tarjetas de recordatorios
+  .reminder-card {
+    margin-bottom: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    background: white;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    max-height: 220px;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    &.completed {
+      opacity: 0.8;
+      background: linear-gradient(to right, #f9f9f9, white);
+
+      .completed-icon {
+        color: #4caf50;
+      }
+    }
+
+    &.canceled {
+      opacity: 0.7;
+      background: linear-gradient(to right, #f9f9f9, white);
+
+      .canceled-icon {
+        color: #9e9e9e;
+      }
+    }
+
+    ion-card-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+      .card-header-content {
+        display: flex;
+        align-items: center;
+
+        .reminder-icon {
+          font-size: 1.8rem;
+          margin-right: 12px;
+          color: $reminder-primary;
+        }
+
+        .card-title-container {
+          flex: 1;
+
+          ion-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #333;
+          }
+
+          ion-card-subtitle {
+            display: flex;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #666;
+            margin: 0;
+
+            .date-icon {
+              margin-right: 4px;
+              font-size: 0.9rem;
+            }
+          }
+        }
+      }
+    }
+
+    ion-card-content {
+      padding: 12px 16px;
+
+      .reminder-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 10px;
+
+        ion-chip {
+          height: 26px;
+          font-size: 0.75rem;
+          padding: 0 8px;
+          margin: 0;
+
+          .chip-icon {
+            margin-right: 4px;
+            font-size: 0.85rem;
+          }
+
+          &.priority-chip {
+            &.priority-1 {
+              --background: rgba(76, 175, 80, 0.15);
+              color: #2e7d32;
+              border: 1px solid rgba(76, 175, 80, 0.3);
+
+              .chip-icon {
+                color: #2e7d32;
+              }
+            }
+
+            &.priority-2 {
+              --background: rgba(139, 195, 74, 0.15);
+              color: #558b2f;
+              border: 1px solid rgba(139, 195, 74, 0.3);
+
+              .chip-icon {
+                color: #558b2f;
+              }
+            }
+
+            &.priority-3 {
+              --background: rgba(255, 193, 7, 0.15);
+              color: #f57f17;
+              border: 1px solid rgba(255, 193, 7, 0.3);
+
+              .chip-icon {
+                color: #f57f17;
+              }
+            }
+
+            &.priority-4 {
+              --background: rgba(255, 152, 0, 0.15);
+              color: #e65100;
+              border: 1px solid rgba(255, 152, 0, 0.3);
+
+              .chip-icon {
+                color: #e65100;
+              }
+            }
+
+            &.priority-5 {
+              --background: rgba(244, 67, 54, 0.15);
+              color: #c62828;
+              border: 1px solid rgba(244, 67, 54, 0.3);
+
+              .chip-icon {
+                color: #c62828;
+              }
+            }
+          }
+
+          &.status-chip {
+            &.status-pendiente {
+              --background: rgba(33, 150, 243, 0.15);
+              color: #1565c0;
+              border: 1px solid rgba(33, 150, 243, 0.3);
+
+              .chip-icon {
+                color: #1565c0;
+              }
+            }
+
+            &.status-completado {
+              --background: rgba(76, 175, 80, 0.15);
+              color: #2e7d32;
+              border: 1px solid rgba(76, 175, 80, 0.3);
+
+              .chip-icon {
+                color: #2e7d32;
+              }
+            }
+
+            &.status-cancelado {
+              --background: rgba(158, 158, 158, 0.15);
+              color: #616161;
+              border: 1px solid rgba(158, 158, 158, 0.3);
+
+              .chip-icon {
+                color: #616161;
+              }
+            }
+          }
+
+          &.insistence-chip {
+            &.insistence-low {
+              --background: rgba(76, 175, 80, 0.15);
+              color: #2e7d32;
+              border: 1px solid rgba(76, 175, 80, 0.3);
+
+              .chip-icon {
+                color: #2e7d32;
+              }
+            }
+
+            &.insistence-medium {
+              --background: rgba(255, 193, 7, 0.15);
+              color: #f57f17;
+              border: 1px solid rgba(255, 193, 7, 0.3);
+
+              .chip-icon {
+                color: #f57f17;
+              }
+            }
+
+            &.insistence-high {
+              --background: rgba(244, 67, 54, 0.15);
+              color: #c62828;
+              border: 1px solid rgba(244, 67, 54, 0.3);
+
+              .chip-icon {
+                color: #c62828;
+              }
+            }
+          }
+        }
+      }
+
+      .task-info {
+        margin-bottom: 10px;
+
+        .task-chip {
+          --background: rgba(103, 58, 183, 0.15) !important;
+          color: #4527a0 !important;
+          border: 1px solid rgba(103, 58, 183, 0.3) !important;
+          height: 26px;
+          font-size: 0.75rem;
+          padding: 0 8px;
+          margin: 0;
+
+          .chip-icon {
+            margin-right: 4px;
+            font-size: 0.85rem;
+            color: #4527a0 !important;
+          }
+        }
+      }
+
+      .reminder-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 4px;
+
+        .action-button {
+          --padding-start: 8px;
+          --padding-end: 8px;
+          height: 36px;
+
+          ion-icon {
+            font-size: 1.2rem;
+          }
+        }
+      }
+    }
+  }
+
+  // Divider para secciones
+  .section-divider {
+    display: flex;
+    align-items: center;
+    margin: 24px 0 16px;
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .divider-text {
+      padding: 0 12px;
+      font-size: 0.9rem;
+      color: #666;
+      font-weight: 500;
+    }
+  }
+
+  // Estado vacío
+  .empty-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 200px);
+
+    .empty-state-content {
+      background: white;
+      border-radius: 16px;
+      padding: 40px 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      max-width: 400px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .empty-icon {
+        font-size: 5rem;
+        color: rgba(33, 150, 243, 0.3);
+        margin-bottom: 20px;
+      }
+
+      h2 {
+        color: #333;
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+      }
+
+      p {
+        color: #666;
+        font-size: 1rem;
+        margin-bottom: 30px;
+        line-height: 1.5;
+      }
+
+      .add-button {
+        --background: var(--ion-color-primary);
+        --background-activated: var(--ion-color-primary-shade);
+        --background-hover: var(--ion-color-primary-tint);
+        --border-radius: 10px;
+        --box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+        font-weight: 600;
+        max-width: 250px;
+      }
+    }
+  }
+}
+
+// Estilos para el modal
+.reminder-modal {
+  --border-radius: 16px;
+
+  ion-header {
+    ion-toolbar {
+      --background: white;
+      --color: #333;
+
+      ion-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+
+      .modal-button {
+        --color: #666;
+
+        &.save-button {
+          --color: var(--ion-color-primary);
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  .modal-content {
+    --background: #f9f9f9;
+
+    .form-container {
+      padding: 16px;
+
+      .custom-input {
+        --background: white;
+        --border-radius: 8px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+
+        .form-label {
+          color: #333;
+          font-size: 0.9rem;
+          font-weight: 500;
+        }
+
+        &.datetime-input {
+          .custom-datetime {
+            margin-top: 16px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            min-height: 280px;
+
+            --background: transparent;
+            --color: #333;
+            --background-color: white;
+
+            --ion-color-base: #333;
+            --ion-text-color: #333;
+            --ion-text-color-step-400: #555;
+            --ion-text-color-step-650: #333;
+
+            --ion-color-primary: var(--ion-color-primary);
+            --ion-color-primary-contrast: white;
+
+            --calendar-day-color: #333;
+            --calendar-day-background: transparent;
+
+            --calendar-day-selected-color: white;
+            --calendar-day-selected-background: var(--ion-color-primary);
+
+            --calendar-day-today-color: var(--ion-color-primary);
+            --calendar-day-today-background: rgba(33, 150, 243, 0.1);
+          }
+        }
+      }
+
+      ion-select {
+        color: #333;
+        --placeholder-color: #666;
+      }
+
+      ion-select-option {
+        color: #333;
+      }
+    }
+  }
+}
+
+// Estilos globales para el calendario
+ion-datetime {
+  color: #333 !important;
+
+  .calendar-day {
+    color: #333 !important;
+  }
+
+  .calendar-day-selected {
+    color: white !important;
+    background-color: var(--ion-color-primary) !important;
+  }
+
+  .datetime-text {
+    color: #333 !important;
+  }
+
+  .datetime-hour,
+  .datetime-minute,
+  .datetime-ampm {
+    color: #333 !important;
+  }
+}

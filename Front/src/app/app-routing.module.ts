@@ -1,35 +1,51 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'home',
-    /*redirectTo: 'login',*/
-    pathMatch: 'full'
-  },
-  {
-    path: 'home', // Aseguramos que Home está registrado aquí
-    loadChildren: () => import('./home/home.module').then(m => m.HomePageModule)
+    redirectTo: 'tabs',
+    pathMatch: 'full',
   },
   {
     path: 'login',
-    loadChildren: () => import('./login/login.module').then(m => m.LoginPageModule)
+    loadChildren: () =>
+      import('./login/login.module').then((m) => m.LoginPageModule),
   },
   {
     path: 'register',
-    loadChildren: () => import('./register/register.module').then(m => m.RegisterPageModule)
+    loadChildren: () =>
+      import('./register/register.module').then((m) => m.RegisterPageModule),
   },
   {
-    path: 'task-manager',
-    loadChildren: () => import('./task-manager/task-manager.module').then(m => m.TaskManagerPageModule)
-  }
+    path: 'tabs',
+    loadChildren: () =>
+      import('./tabs/tabs.module').then((m) => m.TabsPageModule),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'week',
+    loadChildren: () => import('./week/week.module').then( m => m.WeekPageModule)
+  },
+  {
+    path: 'calendar',
+    loadChildren: () => import('./calendar/calendar.module').then( m => m.CalendarPageModule)
+  },
+  {
+    path: 'stats',
+    loadChildren: () => import('./stats/stats.module').then( m => m.StatsPageModule)
+  },
+  {
+    path: 'smart',
+    loadChildren: () => import('./smart/smart.module').then( m => m.SmartPageModule)
+  },
 ];
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })
+    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
   ],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

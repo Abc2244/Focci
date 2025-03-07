@@ -109,7 +109,6 @@ git push origin Julian
 
 ¡Con esto ya puedes empezar a trabajar sin problemas! 🚀
 
-<<<<<<< HEAD
 
 santiaog mria esto 
 
@@ -263,7 +262,6 @@ npm install
 ionic serve (para probar en navegador)
 o
 npx cap run android (para correr en emulador/dispositivo)
-=======
 SANTIAGO DE AQUI EN ADELANTE ETO TE SIRVE PARA CAPACITOR Y ANDROID Studio
 
 # Configuración del Frontend con Capacitor y Android Studio
@@ -367,4 +365,3 @@ Esto abrirá la aplicación en el navegador con recarga automática.
 
 Con estos pasos, tu entorno estará listo para trabajar con Capacitor y Android Studio en **Windows**. 🚀📱
 
->>>>>>> julian

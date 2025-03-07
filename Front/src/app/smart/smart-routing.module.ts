@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { TaskManagerPage } from './task-manager.page';
+import { SmartPage } from './smart.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: TaskManagerPage
+    component: SmartPage
   }
 ];
 
@@ -14,4 +14,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class TaskManagerPageRoutingModule {}
+export class SmartPageRoutingModule {}
