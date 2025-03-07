@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
 import { ToastController } from '@ionic/angular';
+import { ToastService } from '../services/toast.service';
 
 @Component({
   selector: 'app-reminders',
@@ -26,7 +27,8 @@ export class RemindersPage implements OnInit {
     private apiService: ApiService,
     private authService: AuthService,
     private fb: FormBuilder,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private toastService: ToastService
   ) {
     this.reminderForm = this.fb.group({
       reminder_date: ['', Validators.required],
@@ -41,7 +43,6 @@ export class RemindersPage implements OnInit {
   }
 
   ngOnInit() {
-    console.log('RemindersPage initialized');
     this.loadReminders();
     this.loadTasks();
   }
@@ -49,25 +50,21 @@ export class RemindersPage implements OnInit {
   loadReminders(): void {
     this.isLoading = true;
     const userId = this.authService.getCurrentUserId();
-    console.log('Current User ID:', userId);
     if (userId) {
       this.apiService.getUpcomingReminders(userId).subscribe(
         (data: any) => {
-          console.log('Reminders Data Structure:', data);
           this.reminders = data;
           this.filterReminders();
           this.isLoading = false;
         },
         (error: any) => {
-          console.error('Error loading reminders:', error);
           this.isLoading = false;
-          this.presentToast('Error al cargar recordatorios', 'danger');
+          this.toastService.showToast('Error al cargar recordatorios', 'error');
         }
       );
     } else {
-      console.error('User ID not found');
       this.isLoading = false;
-      this.presentToast('Usuario no identificado', 'danger');
+      this.toastService.showToast('Usuario no identificado', 'error');
     }
   }
 
@@ -88,6 +85,33 @@ export class RemindersPage implements OnInit {
     return task ? task.description : 'Tarea no encontrada';
   }
 
+  getPriorityText(priority: number): string {
+    switch (Number(priority)) {
+      case 1: return 'Baja';
+      case 2: return 'Media-Baja';
+      case 3: return 'Media';
+      case 4: return 'Media-Alta';
+      case 5: return 'Alta';
+      default: return 'No definida';
+    }
+  }
+
+  getInsistenceClass(level: number): string {
+    level = Number(level);
+    if (level <= 3) return 'insistence-low';
+    if (level <= 7) return 'insistence-medium';
+    return 'insistence-high';
+  }
+
+  getInsistenceText(level: number): string {
+    const levels = [
+      'Muy Baja', 'Baja', 'Baja-Media', 'Media-Baja',
+      'Media', 'Media-Alta', 'Alta-Media', 'Alta',
+      'Muy Alta', 'Crítica', 'Urgente',
+    ];
+    return levels[level] || 'Media';
+  }
+
   loadTasks(): void {
     const userId = this.authService.getCurrentUserId();
     if (userId) {
@@ -96,8 +120,7 @@ export class RemindersPage implements OnInit {
           this.tasks = data;
         },
         (error: any) => {
-          console.error('Error loading tasks:', error);
-          this.presentToast('Error al cargar tareas', 'danger');
+          this.toastService.showToast('Error al cargar tareas', 'error');
         }
       );
     }
@@ -134,45 +157,38 @@ export class RemindersPage implements OnInit {
 
   saveReminder(): void {
     if (this.reminderForm.invalid) {
-      this.presentToast('Por favor complete todos los campos', 'warning');
+      this.toastService.showToast('Por favor complete todos los campos', 'warning');
       return;
     }
 
     const userId = this.authService.getCurrentUserId();
     if (!userId) {
-      this.presentToast('Usuario no identificado', 'danger');
+      this.toastService.showToast('Usuario no identificado', 'error');
       return;
     }
 
-    const reminderData = {
-      ...this.reminderForm.value,
-      user_id: userId,
-    };
+    const reminderData = { ...this.reminderForm.value, user_id: userId };
 
     if (this.isEditing && this.currentReminderId) {
-      this.apiService
-        .updateReminder(this.currentReminderId, reminderData)
-        .subscribe(
-          () => {
-            this.loadReminders();
-            this.showModal = false;
-            this.presentToast('Recordatorio actualizado', 'success');
-          },
-          (error: any) => {
-            console.error('Error updating reminder:', error);
-            this.presentToast('Error al actualizar recordatorio', 'danger');
-          }
-        );
+      this.apiService.updateReminder(this.currentReminderId, reminderData).subscribe(
+        () => {
+          this.loadReminders();
+          this.showModal = false;
+          this.toastService.showToast('Recordatorio actualizado', 'success');
+        },
+        () => {
+          this.toastService.showToast('Error al actualizar recordatorio', 'error');
+        }
+      );
     } else {
       this.apiService.createReminder(reminderData).subscribe(
         () => {
           this.loadReminders();
           this.showModal = false;
-          this.presentToast('Recordatorio creado', 'success');
+          this.toastService.showToast('Recordatorio creado', 'success');
         },
-        (error: any) => {
-          console.error('Error creating reminder:', error);
-          this.presentToast('Error al crear recordatorio', 'danger');
+        () => {
+          this.toastService.showToast('Error al crear recordatorio', 'error');
         }
       );
     }
@@ -182,11 +198,10 @@ export class RemindersPage implements OnInit {
     this.apiService.deleteReminder(reminderId).subscribe(
       () => {
         this.loadReminders();
-        this.presentToast('Recordatorio eliminado', 'success');
+        this.toastService.showToast('Recordatorio eliminado', 'success');
       },
-      (error: any) => {
-        console.error('Error deleting reminder:', error);
-        this.presentToast('Error al eliminar recordatorio', 'danger');
+      () => {
+        this.toastService.showToast('Error al eliminar recordatorio', 'error');
       }
     );
   }
@@ -195,20 +210,15 @@ export class RemindersPage implements OnInit {
     const reminder = this.reminders.find((r) => r._id === reminderId);
     if (!reminder) return;
 
-    const updatedReminder = {
-      ...reminder,
-      status: 'completado',
-      completed_date: new Date().toISOString(),
-    };
+    const updatedReminder = { ...reminder, status: 'completado', completed_date: new Date().toISOString() };
 
     this.apiService.updateReminder(reminderId, updatedReminder).subscribe(
       () => {
         this.loadReminders();
-        this.presentToast('Recordatorio completado', 'success');
+        this.toastService.showToast('Recordatorio completado', 'success');
       },
-      (error: any) => {
-        console.error('Error completing reminder:', error);
-        this.presentToast('Error al completar recordatorio', 'danger');
+      () => {
+        this.toastService.showToast('Error al completar recordatorio', 'error');
       }
     );
   }
@@ -217,84 +227,20 @@ export class RemindersPage implements OnInit {
     const reminder = this.reminders.find((r) => r._id === reminderId);
     if (!reminder) return;
 
-    const updatedReminder = {
-      ...reminder,
-      status: 'pendiente',
-      completed_date: null,
-    };
+    const updatedReminder = { ...reminder, status: 'pendiente', completed_date: null };
 
     this.apiService.updateReminder(reminderId, updatedReminder).subscribe(
       () => {
         this.loadReminders();
-        this.presentToast('Recordatorio reactivado', 'success');
+        this.toastService.showToast('Recordatorio reactivado', 'info');
       },
-      (error: any) => {
-        console.error('Error reactivating reminder:', error);
-        this.presentToast('Error al reactivar recordatorio', 'danger');
+      () => {
+        this.toastService.showToast('Error al reactivar recordatorio', 'error');
       }
     );
   }
 
-  // Método para convertir el nivel de prioridad numérico a texto
-  getPriorityText(priority: number): string {
-    switch (Number(priority)) {
-      case 1:
-        return 'Baja';
-      case 2:
-        return 'Media-Baja';
-      case 3:
-        return 'Media';
-      case 4:
-        return 'Media-Alta';
-      case 5:
-        return 'Alta';
-      default:
-        return 'No definida';
-    }
-  }
-
-  // Método para obtener la clase CSS según el nivel de insistencia
-  getInsistenceClass(level: number): string {
-    level = Number(level);
-    if (level >= 0 && level <= 3) {
-      return 'insistence-low';
-    } else if (level >= 4 && level <= 7) {
-      return 'insistence-medium';
-    } else {
-      return 'insistence-high';
-    }
-  }
-
-  // Método para convertir el nivel de insistencia numérico a texto
-  getInsistenceText(level: number): string {
-    const levels = [
-      'Muy Baja',
-      'Baja',
-      'Baja-Media',
-      'Media-Baja',
-      'Media',
-      'Media-Alta',
-      'Alta-Media',
-      'Alta',
-      'Muy Alta',
-      'Crítica',
-      'Urgente',
-    ];
-
-    return levels[level] || 'Media';
-  }
-
-  async presentToast(message: string, color: string = 'primary') {
-    const toast = await this.toastController.create({
-      message: message,
-      duration: 2000,
-      color: color,
-      position: 'bottom',
-    });
-    toast.present();
-  }
-
-  dismissModal() {
+  dismissModal(): void {
     this.showModal = false;
   }
 }
