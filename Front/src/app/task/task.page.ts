@@ -34,7 +34,7 @@ export class TaskPage implements OnInit {
     private apiService: ApiService,
     private authService: AuthService,
     private alertController: AlertController,
-    private toastService: ToastService, // SE REEMPLAZA ToastController POR ToastService
+    private toastService: ToastService,
     private fb: FormBuilder
   ) {
     this.taskForm = this.fb.group({
