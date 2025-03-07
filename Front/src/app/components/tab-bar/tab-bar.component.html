@@ -1,0 +1,59 @@
+<div class="tab-bar-container">
+  <ion-tab-bar class="custom-tabs">
+    <ion-tab-button
+      [class.tab-selected]="activeTab === 'week'"
+      class="tab-button"
+      (click)="navigateTo('week')"
+    >
+      <div class="tab-button-inner">
+        <div class="icon-container">
+          <ion-icon name="calendar-outline"></ion-icon>
+          <div class="icon-background"></div>
+        </div>
+        <div class="tab-label">Semana</div>
+      </div>
+    </ion-tab-button>
+
+    <ion-tab-button
+      [class.tab-selected]="activeTab === 'calendar'"
+      class="tab-button"
+      (click)="navigateTo('calendar')"
+    >
+      <div class="tab-button-inner">
+        <div class="icon-container">
+          <ion-icon name="calendar-number-outline"></ion-icon>
+          <div class="icon-background"></div>
+        </div>
+        <div class="tab-label">Calendario</div>
+      </div>
+    </ion-tab-button>
+
+    <ion-tab-button
+      [class.tab-selected]="activeTab === 'stats'"
+      class="tab-button"
+      (click)="navigateTo('stats')"
+    >
+      <div class="tab-button-inner">
+        <div class="icon-container">
+          <ion-icon name="bar-chart-outline"></ion-icon>
+          <div class="icon-background"></div>
+        </div>
+        <div class="tab-label">Estadísticas</div>
+      </div>
+    </ion-tab-button>
+
+    <ion-tab-button
+      [class.tab-selected]="activeTab === 'smart'"
+      class="tab-button"
+      (click)="navigateTo('smart')"
+    >
+      <div class="tab-button-inner">
+        <div class="icon-container">
+          <ion-icon name="bulb-outline"></ion-icon>
+          <div class="icon-background"></div>
+        </div>
+        <div class="tab-label">Inteligente</div>
+      </div>
+    </ion-tab-button>
+  </ion-tab-bar>
+</div>
