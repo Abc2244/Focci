@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: "https://focci.onrender.com"
+  apiUrl: 'https://focci.onrender.com',
 };
 
 /*

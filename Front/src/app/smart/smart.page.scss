@@ -1,0 +1,198 @@
+.smart-content {
+  --background: #f8f9fa;
+
+  .page-container {
+    padding: 20px;
+
+    .page-title {
+      margin-bottom: 20px;
+
+      h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--ion-color-dark);
+        margin: 0;
+      }
+    }
+
+    .recommendations-section {
+      margin-bottom: 30px;
+
+      h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--ion-color-dark);
+        margin-bottom: 16px;
+      }
+
+      .recommendation-card {
+        display: flex;
+        background: white;
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+        .recommendation-icon {
+          width: 50px;
+          height: 50px;
+          min-width: 50px;
+          border-radius: 50%;
+          background: rgba(var(--ion-color-primary-rgb), 0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: 16px;
+
+          ion-icon {
+            font-size: 24px;
+            color: var(--ion-color-primary);
+          }
+        }
+
+        .recommendation-content {
+          flex: 1;
+
+          .recommendation-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ion-color-dark);
+            margin-bottom: 8px;
+          }
+
+          .recommendation-text {
+            font-size: 14px;
+            color: var(--ion-color-medium);
+            line-height: 1.4;
+          }
+        }
+      }
+    }
+
+    .smart-planning {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+      h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--ion-color-dark);
+        margin-top: 0;
+        margin-bottom: 20px;
+      }
+
+      .timeline {
+        position: relative;
+
+        &::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 24px;
+          width: 2px;
+          background: rgba(var(--ion-color-primary-rgb), 0.2);
+        }
+
+        .timeline-item {
+          position: relative;
+          padding-left: 50px;
+          margin-bottom: 24px;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          &::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 18px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--ion-color-primary);
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px rgba(var(--ion-color-primary-rgb), 0.3);
+          }
+
+          .timeline-time {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ion-color-primary);
+            margin-bottom: 4px;
+          }
+
+          .timeline-content {
+            .timeline-title {
+              font-size: 16px;
+              font-weight: 600;
+              color: var(--ion-color-dark);
+              margin-bottom: 4px;
+            }
+
+            .timeline-details {
+              font-size: 14px;
+              color: var(--ion-color-medium);
+            }
+          }
+        }
+      }
+    }
+
+    .study-tips {
+      h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--ion-color-dark);
+        margin-bottom: 16px;
+      }
+
+      .tip-card {
+        display: flex;
+        background: white;
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+        .tip-icon {
+          width: 50px;
+          height: 50px;
+          min-width: 50px;
+          border-radius: 50%;
+          background: rgba(var(--ion-color-warning-rgb), 0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: 16px;
+
+          ion-icon {
+            font-size: 24px;
+            color: var(--ion-color-warning);
+          }
+        }
+
+        .tip-content {
+          flex: 1;
+
+          .tip-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ion-color-dark);
+            margin-bottom: 8px;
+          }
+
+          .tip-text {
+            font-size: 14px;
+            color: var(--ion-color-medium);
+            line-height: 1.4;
+          }
+        }
+      }
+    }
+  }
+}

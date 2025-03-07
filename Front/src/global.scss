@@ -11,6 +11,7 @@
 
 /* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
+@import "./app/shared/styles/common.scss";
 
 /* Basic CSS for apps built with Ionic */
 @import "@ionic/angular/css/normalize.css";
@@ -35,3 +36,345 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+// Nueva paleta de colores
+:root {
+  // Colores principales
+  --ion-color-primary: #1e88e5; // Azul Eléctrico
+  --ion-color-primary-rgb: 30, 136, 229;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #1a78ca;
+  --ion-color-primary-tint: #3594e8;
+
+  // Color secundario
+  --ion-color-secondary: #26a69a; // Verde Menta
+  --ion-color-secondary-rgb: 38, 166, 154;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #219288;
+  --ion-color-secondary-tint: #3cafa4;
+
+  // Color de advertencia
+  --ion-color-warning: #fbc02d; // Amarillo Brillante
+  --ion-color-warning-rgb: 251, 192, 45;
+  --ion-color-warning-contrast: #000000;
+  --ion-color-warning-contrast-rgb: 0, 0, 0;
+  --ion-color-warning-shade: #dda928;
+  --ion-color-warning-tint: #fbc642;
+
+  // Color de urgencia
+  --ion-color-danger: #fb8c00; // Naranja Intenso
+  --ion-color-danger-rgb: 251, 140, 0;
+  --ion-color-danger-contrast: #000000;
+  --ion-color-danger-contrast-rgb: 0, 0, 0;
+  --ion-color-danger-shade: #dd7b00;
+  --ion-color-danger-tint: #fb981a;
+
+  // Fondos
+  --app-background-light: #f5f5f5; // Blanco Humo
+  --app-background-dark: #263238; // Azul Profundo
+
+  // Elementos secundarios
+  --app-color-medium: #b0bec5; // Gris Medio
+
+  // Texto
+  --app-text-color: #37474f; // Gris Grafito
+
+  // Gradientes
+  --app-gradient-light: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+  --app-gradient-primary: linear-gradient(135deg, #1e88e5 0%, #64b5f6 100%);
+  --app-gradient-secondary: linear-gradient(135deg, #26a69a 0%, #4db6ac 100%);
+}
+
+// Estilos para los alerts personalizados
+.custom-alert {
+  --background: var(--app-background-light);
+
+  .alert-wrapper {
+    background: var(--app-gradient-light);
+    border-radius: 15px;
+  }
+
+  .alert-head {
+    text-align: center;
+    color: var(--ion-color-primary);
+
+    .alert-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+  }
+
+  .alert-input-group {
+    padding: 10px;
+
+    .alert-input {
+      border: 1px solid var(--app-color-medium);
+      border-radius: 8px;
+      margin: 5px 0;
+      --padding-start: 10px;
+      background: white;
+    }
+  }
+
+  .alert-message {
+    color: var(--app-text-color);
+  }
+
+  .alert-button-group {
+    .alert-button {
+      color: var(--ion-color-primary);
+
+      &.delete-button {
+        color: var(--ion-color-danger) !important;
+      }
+    }
+  }
+}
+
+// Estilos comunes para las barras de herramientas
+ion-toolbar {
+  --background: var(--ion-color-primary);
+  --border-style: none;
+
+  ion-title {
+    color: white;
+    font-weight: 600;
+  }
+
+  ion-menu-button {
+    color: white;
+  }
+}
+
+// Estilos para el contenido
+.subjects-content,
+.tasks-content,
+.reminders-content,
+.login-content,
+.register-content,
+.profile-content {
+  --background: var(--app-gradient-light);
+}
+
+// Nuestros estilos globales para botones y elementos
+.custom-button {
+  --background: var(--ion-color-primary);
+  --background-hover: var(--ion-color-primary-tint);
+  --color: white;
+  margin: 10px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.section-title {
+  color: var(--ion-color-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 20px 0;
+}
+
+.item-title {
+  color: var(--ion-color-primary);
+  font-weight: 500;
+}
+
+.item-subtitle {
+  color: var(--app-text-color);
+}
+
+// Estilos para el toast personalizado
+.app-toast {
+  --border-radius: 8px;
+  --box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+  --min-height: 48px;
+  --max-width: 90%;
+  font-weight: 500;
+  text-align: center;
+  padding: 12px 16px;
+  margin-top: 16px;
+
+  &::part(message) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &.toast-success {
+    --background: #e8f5e9;
+    --color: var(--ion-color-secondary);
+    --button-color: var(--ion-color-secondary);
+  }
+
+  &.toast-error {
+    --background: #fff3e0;
+    --color: var(--ion-color-danger);
+    --button-color: var(--ion-color-danger);
+  }
+
+  &.toast-warning {
+    --background: #fff8e1;
+    --color: var(--ion-color-warning);
+    --button-color: var(--ion-color-warning);
+  }
+
+  &.toast-info {
+    --background: #e3f2fd;
+    --color: var(--ion-color-primary);
+    --button-color: var(--ion-color-primary);
+  }
+}
+
+// Estilos para el botón flotante
+ion-fab {
+  ion-fab-button.custom-fab {
+    --background: var(--ion-color-primary);
+    --background-activated: var(--ion-color-primary-shade);
+    --background-hover: var(--ion-color-primary-tint);
+
+    ion-icon {
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+    }
+  }
+}
+
+// Estilos para las tabs
+ion-tab-bar {
+  --background: white;
+  padding: 8px 0;
+  border: none;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+
+  ion-tab-button {
+    --color: var(--app-color-medium);
+    --color-selected: var(--ion-color-primary);
+    --ripple-color: transparent;
+    background: transparent;
+
+    &.tab-selected {
+      ion-icon {
+        transform: scale(1.1);
+      }
+
+      ion-label {
+        font-weight: 600;
+        opacity: 1;
+      }
+    }
+
+    ion-icon {
+      font-size: 24px;
+      transition: all 0.2s ease;
+    }
+
+    ion-label {
+      font-size: 12px;
+      margin-top: 4px;
+      font-weight: 500;
+      opacity: 0.9;
+      transition: all 0.2s ease;
+    }
+  }
+}
+
+// Estilos para inputs personalizados
+.custom-input {
+  --background: transparent;
+  --border-color: transparent;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  padding: 0.3rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --highlight-color: var(--ion-color-primary);
+
+  ion-label {
+    color: var(--ion-color-primary);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  ion-input {
+    --color: var(--app-text-color);
+    --padding-start: 1rem;
+    --placeholder-color: var(--app-color-medium);
+    --placeholder-opacity: 0.7;
+  }
+}
+
+// Estilos para tarjetas
+ion-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: white;
+
+  ion-card-header {
+    ion-card-title {
+      color: var(--ion-color-primary);
+      font-weight: 600;
+    }
+
+    ion-card-subtitle {
+      color: var(--app-text-color);
+    }
+  }
+}
+
+// Estilos para modales
+ion-modal {
+  --border-radius: 16px;
+
+  ion-header {
+    ion-toolbar {
+      --background: white;
+
+      .modal-button {
+        --color: var(--ion-color-primary);
+
+        &.save-button {
+          --color: var(--ion-color-primary);
+        }
+      }
+    }
+  }
+
+  .modal-content {
+    --background: var(--app-background-light);
+  }
+}
+
+// Estado vacío
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+
+  ion-icon {
+    font-size: 5rem;
+    color: var(--app-color-medium);
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: var(--app-text-color);
+    font-size: 1.2rem;
+  }
+}
+
+// Estilos para los botones de acción, especialmente los de eliminar
+ion-button[color="danger"] {
+  --color: var(--ion-color-danger);
+}
+
+// Estilos para los botones de alerta de eliminación
+.delete-button {
+  color: var(--ion-color-danger) !important;
+  font-weight: 600;
+}

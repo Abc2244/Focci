@@ -20,11 +20,31 @@ async def create_task(task: Task):
 async def complete_task(task_id: str):
     result = await mongodb.get_collection("tasks").update_one(
         {"_id": ObjectId(task_id)},
-        {"$set": {"completed": True}}
+        {
+            "$set": {
+                "completed": True,
+                "completed_date": datetime.datetime.utcnow().isoformat()
+            }
+        }
     )
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
     return {"message": "Tarea marcada como completada"}
+
+@router.patch("/tasks/{task_id}/uncomplete/")
+async def uncomplete_task(task_id: str):
+    result = await mongodb.get_collection("tasks").update_one(
+        {"_id": ObjectId(task_id)},
+        {
+            "$set": {
+                "completed": False,
+                "completed_date": None  # Optionally clear the completed date
+            }
+        }
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Tarea no encontrada")
+    return {"message": "Tarea marcada como incompleta"}
 
 @router.get("/tasks/{task_id}/reminders/")
 async def get_reminders_by_task(task_id: str):

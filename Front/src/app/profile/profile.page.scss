@@ -1,0 +1,346 @@
+@import "src/app/shared/styles/common";
+
+// Variables de colores
+$profile-primary: var(--ion-color-primary);
+$profile-primary-tint: var(--ion-color-primary-tint);
+$profile-primary-shade: var(--ion-color-primary-shade);
+$profile-light-bg: #f5f7fa;
+$profile-card-bg: white;
+$profile-text-dark: #333;
+$profile-text-medium: #555;
+$profile-text-light: #777;
+
+.profile-content {
+  --background: linear-gradient(
+    135deg,
+    #f5f7fa 0%,
+    var(--ion-color-primary-tint) 100%
+  );
+
+  &::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(33, 150, 243, 0.05)" stroke-width="2"/></svg>');
+    background-size: 300px 300px;
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: -1;
+  }
+}
+
+.profile-container {
+  padding: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+
+  // Encabezado del perfil
+  .profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(10px);
+
+    .user-avatar-container {
+      position: relative;
+      margin-bottom: 1rem;
+
+      .user-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          $profile-primary-tint,
+          $profile-primary
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        border: 4px solid white;
+
+        .avatar-icon {
+          font-size: 60px;
+          color: white;
+        }
+      }
+
+      .edit-avatar-button {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: $profile-primary;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+
+        ion-icon {
+          font-size: 20px;
+          color: white;
+        }
+      }
+    }
+
+    .user-name {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: $profile-text-dark;
+    }
+
+    .user-email {
+      margin: 0.5rem 0 0;
+      font-size: 1rem;
+      color: $profile-text-medium;
+    }
+  }
+
+  // Secciones del perfil
+  .profile-sections {
+    .profile-card {
+      margin-bottom: 1.5rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      background-color: white;
+
+      ion-card-header {
+        background-color: rgba($profile-primary, 0.05);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+        .card-header-content {
+          display: flex;
+          align-items: center;
+
+          .section-icon {
+            font-size: 24px;
+            margin-right: 10px;
+            color: $profile-primary;
+          }
+
+          ion-card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+            color: $profile-text-dark;
+          }
+        }
+      }
+
+      ion-card-content {
+        padding: 0;
+        background-color: white;
+
+        ion-list {
+          background-color: transparent;
+          padding: 0;
+
+          ion-item {
+            --background: white;
+            --padding-start: 16px;
+            --padding-end: 16px;
+            --padding-top: 12px;
+            --padding-bottom: 12px;
+            --inner-padding-end: 0;
+
+            ion-icon {
+              margin-right: 16px;
+            }
+
+            ion-label {
+              h2 {
+                font-size: 1rem;
+                font-weight: 500;
+                color: $profile-text-dark;
+                margin-bottom: 4px;
+              }
+
+              p {
+                font-size: 0.85rem;
+                color: $profile-text-light;
+                margin: 0;
+              }
+            }
+
+            ion-toggle {
+              --background: #e0e0e0;
+              --background-checked: var(--ion-color-primary);
+              --handle-background: white;
+              --handle-background-checked: white;
+            }
+          }
+        }
+      }
+    }
+
+    // Botón de cerrar sesión
+    .logout-button {
+      margin-top: 1rem;
+      --border-radius: 12px;
+      --box-shadow: 0 4px 8px rgba(var(--ion-color-danger-rgb), 0.3);
+      font-weight: 600;
+    }
+  }
+}
+
+// Estilos para el modal
+.profile-modal {
+  --border-radius: 16px;
+
+  ion-header {
+    ion-toolbar {
+      --background: white;
+      --color: $profile-text-dark;
+
+      ion-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: $profile-text-dark;
+      }
+
+      ion-button {
+        --color: $profile-text-medium;
+      }
+    }
+  }
+
+  .modal-content {
+    --background: #f9f9f9;
+
+    .form-container {
+      padding: 16px;
+
+      .custom-input {
+        --background: white;
+        --border-radius: 8px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+
+        ion-label {
+          color: $profile-text-medium;
+          font-size: 0.9rem;
+        }
+
+        ion-input {
+          --color: $profile-text-dark;
+          --placeholder-color: $profile-text-light;
+          --placeholder-opacity: 0.7;
+        }
+      }
+
+      .error-message {
+        color: var(--ion-color-danger);
+        font-size: 0.8rem;
+        margin-top: -8px;
+        margin-bottom: 16px;
+        padding-left: 16px;
+      }
+    }
+  }
+}
+
+// Estilos para modo oscuro
+:host-context(.dark) {
+  .profile-content {
+    --background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  }
+
+  .profile-header {
+    background: rgba(40, 40, 40, 0.8);
+
+    .user-name {
+      color: #f5f5f5;
+    }
+
+    .user-email {
+      color: #cccccc;
+    }
+  }
+
+  .profile-card {
+    background: #2d2d2d !important;
+
+    ion-card-header {
+      background: rgba($profile-primary, 0.15) !important;
+
+      ion-card-title {
+        color: #f5f5f5 !important;
+      }
+    }
+
+    ion-card-content {
+      background-color: #2d2d2d !important;
+
+      ion-list {
+        ion-item {
+          --background: #2d2d2d !important;
+
+          ion-label h2 {
+            color: #f5f5f5 !important;
+          }
+
+          ion-label p {
+            color: #cccccc !important;
+          }
+        }
+      }
+    }
+  }
+
+  .profile-modal {
+    ion-header ion-toolbar {
+      --background: #2d2d2d;
+      --color: #f5f5f5;
+    }
+
+    .modal-content {
+      --background: #1a1a1a;
+
+      .custom-input {
+        --background: #2d2d2d;
+
+        ion-label {
+          color: #cccccc;
+        }
+
+        ion-input {
+          --color: #f5f5f5;
+          --placeholder-color: #999999;
+        }
+      }
+    }
+  }
+}
+
+// Añadir esto al final del archivo para darle mayor prioridad
+ion-card-content ion-list ion-item ion-label h2 {
+  color: #333 !important;
+  font-weight: 500 !important;
+}
+
+ion-card-content ion-list ion-item ion-label p {
+  color: #666 !important;
+}
+
+// Para los modales
+.profile-modal .custom-input ion-input {
+  --color: #333 !important;
+}
+
+.profile-modal .custom-input ion-label {
+  color: #555 !important;
+}
