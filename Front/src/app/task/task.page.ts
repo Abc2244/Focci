@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
-import { AlertController, AlertInput, ToastController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 import { Task, CreateTaskDTO } from '../interfaces/task.interface';
 import { Subject } from '../interfaces/subject.interface';
+import { ToastService } from '../services/toast.service';
 
 @Component({
   selector: 'app-task',
@@ -33,7 +34,7 @@ export class TaskPage implements OnInit {
     private apiService: ApiService,
     private authService: AuthService,
     private alertController: AlertController,
-    private toastController: ToastController,
+    private toastService: ToastService, // SE REEMPLAZA ToastController POR ToastService
     private fb: FormBuilder
   ) {
     this.taskForm = this.fb.group({
@@ -53,32 +54,33 @@ export class TaskPage implements OnInit {
   loadSubjects() {
     const userId = this.authService.getCurrentUserId();
     if (userId) {
-      this.apiService.getUserSubjects(userId).subscribe(
-        (subjects) => {
+      this.apiService.getUserSubjects(userId).subscribe({
+        next: (subjects) => {
           this.subjects = subjects as Subject[];
-          // Crear un mapa de ID de materia a nombre para referencia rápida
           subjects.forEach((subject: any) => {
             this.subjectMap.set(subject._id, subject.name);
           });
         },
-        (error) => {
+        error: (error) => {
+          this.toastService.showToast('Error al cargar las materias', 'error');
           console.error('Error al cargar las materias:', error);
-        }
-      );
+        },
+      });
     }
   }
 
   loadTasks() {
     const userId = this.authService.getCurrentUserId();
     if (userId) {
-      this.apiService.getUserTasks(userId).subscribe(
-        (tasks) => {
+      this.apiService.getUserTasks(userId).subscribe({
+        next: (tasks) => {
           this.tasks = tasks;
         },
-        (error) => {
+        error: (error) => {
+          this.toastService.showToast('Error al cargar las tareas', 'error');
           console.error('Error al cargar las tareas:', error);
-        }
-      );
+        },
+      });
     }
   }
 
@@ -88,36 +90,42 @@ export class TaskPage implements OnInit {
   }
 
   completeTask(taskId: string) {
-    this.apiService.completeTask(taskId).subscribe(
-      () => {
+    this.apiService.completeTask(taskId).subscribe({
+      next: () => {
         this.loadTasks();
+        this.toastService.showToast('Tarea completada', 'success');
       },
-      (error) => {
+      error: (error) => {
+        this.toastService.showToast('Error al completar la tarea', 'error');
         console.error('Error al completar la tarea:', error);
-      }
-    );
+      },
+    });
   }
 
   uncompleteTask(taskId: string) {
-    this.apiService.uncompleteTask(taskId).subscribe(
-      () => {
+    this.apiService.uncompleteTask(taskId).subscribe({
+      next: () => {
         this.loadTasks();
+        this.toastService.showToast('Tarea marcada como pendiente', 'info');
       },
-      (error) => {
+      error: (error) => {
+        this.toastService.showToast('Error al desmarcar la tarea', 'error');
         console.error('Error al desmarcar la tarea:', error);
-      }
-    );
+      },
+    });
   }
 
   deleteTask(taskId: string) {
-    this.apiService.deleteTask(taskId).subscribe(
-      () => {
+    this.apiService.deleteTask(taskId).subscribe({
+      next: () => {
         this.loadTasks();
+        this.toastService.showToast('Tarea eliminada con éxito', 'success');
       },
-      (error) => {
+      error: (error) => {
+        this.toastService.showToast('Error al eliminar la tarea', 'error');
         console.error('Error al eliminar la tarea:', error);
-      }
-    );
+      },
+    });
   }
 
   async addTask() {
@@ -144,31 +152,19 @@ export class TaskPage implements OnInit {
           await this.apiService
             .updateTask(this.currentTaskId, taskData)
             .toPromise();
-          this.presentToast('✓ Tarea actualizada con éxito', 'success');
+          this.toastService.showToast('Tarea actualizada con éxito', 'success');
         } else {
           await this.apiService.createTask(taskData).toPromise();
-          this.presentToast('✓ Tarea creada con éxito', 'success');
+          this.toastService.showToast('Tarea creada con éxito', 'success');
         }
 
         this.dismissModal();
         await this.loadTasks();
       } catch (error) {
-        this.presentToast('❌ Error al guardar la tarea', 'danger');
+        this.toastService.showToast('Error al guardar la tarea', 'error');
         console.error('Error:', error);
       }
     }
-  }
-
-  // Método auxiliar para mostrar mensajes
-  async presentToast(message: string, color: string = 'warning') {
-    const toast = await this.toastController.create({
-      message: message,
-      duration: 2000,
-      position: 'bottom',
-      color: color,
-      cssClass: 'custom-toast',
-    });
-    toast.present();
   }
 
   dismissModal() {
