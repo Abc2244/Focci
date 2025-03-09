@@ -7,14 +7,16 @@ import { IonicModule } from '@ionic/angular';
 import { WeekPageRoutingModule } from './week-routing.module';
 
 import { WeekPage } from './week.page';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    WeekPageRoutingModule
+    WeekPageRoutingModule,
+    SharedModule,
   ],
-  declarations: [WeekPage]
+  declarations: [WeekPage],
 })
 export class WeekPageModule {}

@@ -27,6 +27,15 @@
       margin-bottom: 20px;
       text-align: center;
       position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .title-icon {
+        font-size: 28px;
+        margin-right: 10px;
+        color: var(--ion-color-primary);
+      }
 
       &:after {
         content: "";
@@ -36,14 +45,14 @@
         transform: translateX(-50%);
         width: 60px;
         height: 3px;
-        background: #ffffff;
+        background: var(--ion-color-primary);
         border-radius: 3px;
       }
 
       h1 {
         font-size: 28px;
         font-weight: 700;
-        color: #ffffff;
+        color: var(--ion-color-primary);
         margin: 0;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
       }
@@ -82,9 +91,10 @@
         &:before {
           content: "";
           position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
+          bottom: 10px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 20px;
           height: 4px;
           background: transparent;
           transition: all 0.3s ease;
@@ -109,19 +119,19 @@
           background: #ffffff;
           transform: translateY(-4px);
           box-shadow: 0 8px 16px rgba(59, 103, 191, 0.3);
-          border: 2px solid #3b67bf;
+          border: 2px solid var(--ion-color-primary);
 
           &:before {
-            background: #3b67bf;
+            background: var(--ion-color-primary);
           }
 
           .day-name {
-            color: #3b67bf;
+            color: var(--ion-color-primary);
             font-weight: 600;
           }
 
           .day-number {
-            color: #3b67bf;
+            color: var(--ion-color-primary);
             font-weight: 700;
           }
         }
@@ -137,7 +147,7 @@
 
           .day-name,
           .day-number {
-            color: #3b67bf;
+            color: var(--ion-color-primary);
           }
         }
       }
@@ -245,7 +255,6 @@
 
           h3 {
             margin-bottom: 0;
-            color: #3b67bf;
           }
 
           .add-task-btn {
@@ -404,19 +413,20 @@
           }
 
           .task-checkbox {
-            min-width: 24px;
-            height: 24px;
-            margin-right: 12px;
+            min-width: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            transition: all 0.2s ease;
-
-            &:hover {
-              transform: scale(1.1);
-            }
 
             ion-icon {
               font-size: 24px;
-              color: #3b67bf;
+              color: #6c5ce7;
+              transition: all 0.2s ease;
+            }
+
+            &:hover ion-icon {
+              transform: scale(1.1);
             }
           }
 
@@ -436,38 +446,80 @@
               color: #5a6274;
             }
           }
-
-          .task-priority {
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-
-            &:hover {
-              transform: scale(1.1);
-            }
-
-            &.high {
-              color: #e74c3c;
-            }
-
-            &.medium {
-              color: #f39c12;
-            }
-
-            &.low {
-              color: #2ecc71;
-            }
-
-            ion-icon {
-              font-size: 18px;
-            }
-          }
         }
       }
+    }
+
+    // Estilos para estados vacíos
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      margin-bottom: 20px;
+
+      ion-icon {
+        font-size: 48px;
+        color: #3b67bf;
+        margin-bottom: 15px;
+      }
+
+      h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0 0 10px 0;
+      }
+
+      p {
+        font-size: 14px;
+        color: #5a6274;
+        text-align: center;
+        margin: 0;
+      }
+
+      &.small {
+        padding: 15px;
+
+        ion-icon {
+          font-size: 32px;
+          margin-bottom: 10px;
+        }
+
+        p {
+          margin: 0;
+        }
+      }
+    }
+
+    // Estilos para el indicador de carga
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+
+      ion-spinner {
+        width: 40px;
+        height: 40px;
+        color: #3b67bf;
+        margin-bottom: 15px;
+      }
+
+      p {
+        color: #ffffff;
+        font-size: 16px;
+      }
+    }
+
+    // Estilos para tareas completadas
+    .task-title.completed {
+      text-decoration: line-through;
+      color: #95a5a6;
     }
   }
 }
