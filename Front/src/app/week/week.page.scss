@@ -511,8 +511,9 @@
       }
 
       p {
-        color: #ffffff;
+        color: #333333;
         font-size: 16px;
+        font-weight: 500;
       }
     }
 
@@ -522,4 +523,212 @@
       color: #95a5a6;
     }
   }
+
+  // Estilos para los modales
+  ion-modal {
+    --background: rgba(255, 255, 255, 0.95);
+
+    .modal-content {
+      --background: #f8faff;
+
+      ion-item {
+        --background: transparent;
+        --color: #333333;
+
+        ion-label {
+          color: #333333;
+          font-weight: 500;
+        }
+
+        ion-input,
+        ion-select,
+        ion-datetime {
+          --color: #333333;
+          color: #333333;
+          --placeholder-color: #666666;
+        }
+      }
+    }
+
+    ion-header ion-toolbar {
+      --background: var(--ion-color-primary);
+      --color: white;
+
+      ion-title {
+        color: white;
+        font-weight: 600;
+      }
+
+      ion-button {
+        --color: white;
+      }
+    }
+
+    .form-container {
+      padding: 16px;
+
+      .name-input-container {
+        margin-bottom: 16px;
+
+        .name-input {
+          --background: white;
+          --color: #333333;
+          --padding-start: 16px;
+          --padding-end: 16px;
+          --padding-top: 12px;
+          --padding-bottom: 12px;
+          --border-radius: 8px;
+          --border-color: #d1d1d1;
+          --border-width: 1px;
+          --border-style: solid;
+          --placeholder-color: #666666;
+          margin-bottom: 16px;
+          font-size: 16px;
+          color: #333333;
+        }
+      }
+
+      .custom-input {
+        --background: white;
+        --border-radius: 8px;
+        --border-color: #d1d1d1;
+        --border-width: 1px;
+        --border-style: solid;
+        margin-bottom: 16px;
+
+        ion-label {
+          color: #333333;
+        }
+      }
+
+      .schedule-selector {
+        margin-top: 20px;
+
+        ion-label {
+          color: #333333;
+          font-weight: 600;
+          margin-bottom: 12px;
+          display: block;
+        }
+
+        .schedule-items {
+          .schedule-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            background: white;
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+            ion-select,
+            ion-datetime {
+              --color: #333333;
+              color: #333333;
+            }
+          }
+        }
+
+        .add-schedule-btn {
+          --background: var(--ion-color-primary);
+          --color: white;
+          margin-top: 12px;
+        }
+      }
+    }
+  }
+
+  // Estilos específicos para los select e inputs dentro de los modales
+  ion-select::part(text),
+  ion-select::part(placeholder),
+  ion-datetime::part(text),
+  ion-datetime::part(placeholder) {
+    color: #333333;
+  }
+
+  ion-select-option {
+    color: #333333;
+  }
+}
+
+// Estilos específicos para los modales
+.task-modal,
+.subject-modal {
+  --height: 100%;
+  --width: 100%;
+  --background: transparent;
+
+  ion-header {
+    ion-toolbar {
+      --background: var(--ion-color-primary-tint);
+      --color: #ffffff;
+      --border-style: none;
+
+      ion-title {
+        color: #ff1717;
+        font-weight: 600;
+      }
+
+      ion-buttons {
+        ion-button {
+          --color: #ffffff;
+        }
+      }
+    }
+  }
+
+  .modal-content {
+    --background: linear-gradient(
+      135deg,
+      #f5f7fa 0%,
+      var(--ion-color-primary-tint) 100%
+    );
+
+    form {
+      .form-container {
+        padding: 20px;
+
+        .input-group {
+          background: rgba(255, 255, 255, 0.9);
+          border-radius: 12px;
+          padding: 15px;
+          margin-bottom: 20px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+          .custom-input {
+            --background: transparent;
+            --border-color: rgba(59, 103, 191, 0.3);
+            --highlight-color-focused: var(--ion-color-primary);
+            margin-bottom: 15px;
+
+            ion-label {
+              color: #333333 !important;
+              font-weight: 500;
+            }
+
+            ion-input,
+            ion-textarea,
+            ion-select,
+            ion-datetime {
+              --color: #333333 !important;
+              color: #333333 !important;
+              --placeholder-color: #666666;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Estilos específicos para los select e inputs dentro de los modales
+ion-select::part(text),
+ion-select::part(placeholder),
+ion-datetime::part(text),
+ion-datetime::part(placeholder) {
+  color: #333333 !important;
+}
+
+ion-select-option {
+  color: #333333 !important;
 }

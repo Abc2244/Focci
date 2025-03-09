@@ -23,7 +23,11 @@
     <div class="day-events" *ngIf="weekDays.length > 0">
       <div class="day-header">
         <h2>{{weekDays[selectedDay].name}} {{weekDays[selectedDay].number}}</h2>
-        <ion-button fill="clear" class="add-event-btn" (click)="addNewEvent()">
+        <ion-button
+          fill="clear"
+          class="add-event-btn"
+          (click)="showSubjectModal()"
+        >
           <ion-icon name="add-circle-outline"></ion-icon>
         </ion-button>
       </div>
@@ -47,6 +51,10 @@
       <!-- Sección de mañana -->
       <div class="event-section" *ngIf="morningEvents.length > 0">
         <h3>Mañana</h3>
+        <div class="empty-state small" *ngIf="morningEvents.length === 0">
+          <ion-icon name="sunny-outline"></ion-icon>
+          <p>No hay eventos para esta mañana</p>
+        </div>
         <div class="event-card" *ngFor="let event of morningEvents">
           <div class="event-time">{{event.time}}</div>
           <div class="event-content">
@@ -62,6 +70,10 @@
       <!-- Sección de tarde -->
       <div class="event-section" *ngIf="afternoonEvents.length > 0">
         <h3>Tarde</h3>
+        <div class="empty-state small" *ngIf="afternoonEvents.length === 0">
+          <ion-icon name="partly-sunny-outline"></ion-icon>
+          <p>No hay eventos para esta tarde</p>
+        </div>
         <div class="event-card" *ngFor="let event of afternoonEvents">
           <div class="event-time">{{event.time}}</div>
           <div class="event-content">
@@ -78,7 +90,11 @@
       <div class="event-section" *ngIf="!isLoading">
         <div class="section-header">
           <h3>Tareas pendientes</h3>
-          <ion-button fill="clear" class="add-task-btn" (click)="addNewTask()">
+          <ion-button
+            fill="clear"
+            class="add-task-btn"
+            (click)="showTaskModal()"
+          >
             <ion-icon name="add-outline"></ion-icon>
           </ion-button>
         </div>
@@ -108,4 +124,181 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal para crear tarea con estilos mejorados -->
+  <ion-modal [isOpen]="showTaskModalFlag" class="task-modal">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title
+            >{{ isEditingTask ? 'Editar Tarea' : 'Nueva Tarea' }}</ion-title
+          >
+          <ion-buttons slot="end">
+            <ion-button (click)="dismissTaskModal()">
+              <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+          <ion-buttons slot="start">
+            <ion-button (click)="saveTask()" [disabled]="!taskForm.valid">
+              <ion-icon name="checkmark-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="modal-content">
+        <form [formGroup]="taskForm">
+          <div class="form-container">
+            <div class="input-group">
+              <ion-item class="custom-input">
+                <ion-label position="floating" class="form-label large-label"
+                  >Descripción</ion-label
+                >
+                <ion-input
+                  formControlName="description"
+                  type="text"
+                  placeholder="Ej: Completar ejercicios de matemáticas"
+                  class="large-input"
+                ></ion-input>
+              </ion-item>
+
+              <ion-item class="custom-input">
+                <ion-label position="floating" class="form-label large-label"
+                  >Materia</ion-label
+                >
+                <ion-select
+                  formControlName="subject_id"
+                  placeholder="Selecciona una materia"
+                  class="large-input"
+                >
+                  <ion-select-option
+                    *ngFor="let subject of subjects"
+                    [value]="subject._id"
+                    class="large-option"
+                  >
+                    {{ subject.name }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-item class="custom-input">
+                <ion-label position="floating" class="form-label large-label"
+                  >Fecha de entrega</ion-label
+                >
+                <ion-datetime
+                  formControlName="due_date"
+                  displayFormat="DD/MM/YYYY HH:mm"
+                  presentation="date-time"
+                  [min]="minDate"
+                  locale="es-ES"
+                  class="large-input"
+                ></ion-datetime>
+              </ion-item>
+            </div>
+          </div>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modal para crear materia con estilos mejorados -->
+  <ion-modal [isOpen]="showSubjectModalFlag" class="subject-modal">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title
+            >{{ isEditingSubject ? 'Editar Materia' : 'Nueva Materia'
+            }}</ion-title
+          >
+          <ion-buttons slot="end">
+            <ion-button (click)="dismissSubjectModal()">
+              <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+          <ion-buttons slot="start">
+            <ion-button (click)="saveSubject()" [disabled]="!subjectForm.valid">
+              <ion-icon name="checkmark-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="modal-content">
+        <form [formGroup]="subjectForm">
+          <div class="form-container">
+            <!-- Campo de nombre con estilo personalizado -->
+            <div class="name-input-container">
+              <ion-input
+                class="name-input"
+                type="text"
+                formControlName="name"
+                placeholder="Nombre de materia"
+              ></ion-input>
+            </div>
+
+            <ion-item class="custom-input">
+              <ion-label position="floating">Créditos</ion-label>
+              <ion-input
+                type="number"
+                formControlName="credits"
+                placeholder="Ej: 4"
+              ></ion-input>
+            </ion-item>
+
+            <div class="schedule-selector">
+              <ion-label>Horarios de clase</ion-label>
+
+              <div class="schedule-items">
+                <div
+                  *ngFor="let item of selectedScheduleItems; let i = index"
+                  class="schedule-item"
+                >
+                  <ion-select
+                    [value]="item.day"
+                    placeholder="Día"
+                    (ionChange)="updateScheduleDay(i, $event.detail.value)"
+                    interface="action-sheet"
+                    class="day-select"
+                  >
+                    <ion-select-option
+                      *ngFor="let day of availableDays"
+                      [value]="day.value"
+                    >
+                      {{ day.value }}
+                    </ion-select-option>
+                  </ion-select>
+
+                  <ion-datetime
+                    [value]="item.time"
+                    presentation="time"
+                    (ionChange)="updateScheduleTime(i, $event.detail.value)"
+                    locale="es-ES"
+                    size="cover"
+                    preferWheel="true"
+                  ></ion-datetime>
+
+                  <ion-button
+                    fill="clear"
+                    color="primary"
+                    (click)="removeScheduleItem(i)"
+                  >
+                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </div>
+              </div>
+
+              <ion-button
+                expand="block"
+                (click)="addScheduleItem()"
+                class="add-schedule-btn"
+              >
+                <ion-icon name="add-outline" slot="start"></ion-icon>
+                Agregar horario
+              </ion-button>
+            </div>
+          </div>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

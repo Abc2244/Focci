@@ -54,12 +54,13 @@ export class ApiService {
   // Tareas
   // -----------------------------------------
 
-  createTask(task: CreateTaskDTO): Observable<any> {
-    const taskData = {
-      ...task,
-      completed: false,
-    };
-    return this.http.post(`${this.apiUrl}/tasks/`, taskData);
+  createTask(taskData: any): Observable<any> {
+    console.log('API createTask called with:', taskData);
+    return this.http
+      .post(`${this.apiUrl}/tasks`, taskData, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(catchError(this.handleError));
   }
 
   getUserTasks(user_id: string): Observable<Task[]> {
@@ -114,8 +115,13 @@ export class ApiService {
     );
   }
 
-  createSubject(subject: Subject): Observable<any> {
-    return this.http.post(`${this.apiUrl}/subjects/`, subject);
+  createSubject(subjectData: any): Observable<any> {
+    console.log('API createSubject called with:', subjectData);
+    return this.http
+      .post(`${this.apiUrl}/subjects`, subjectData, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(catchError(this.handleError));
   }
 
   updateSubject(
