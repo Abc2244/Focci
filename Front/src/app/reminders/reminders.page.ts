@@ -34,6 +34,7 @@ export class RemindersPage implements OnInit {
       reminder_date: ['', Validators.required],
       priority: [3, Validators.required],
       task_id: ['', Validators.required],
+      message: ['', Validators.required],
       status: ['pendiente', Validators.required],
       insistence_level: [
         1,
@@ -87,12 +88,18 @@ export class RemindersPage implements OnInit {
 
   getPriorityText(priority: number): string {
     switch (Number(priority)) {
-      case 1: return 'Baja';
-      case 2: return 'Media-Baja';
-      case 3: return 'Media';
-      case 4: return 'Media-Alta';
-      case 5: return 'Alta';
-      default: return 'No definida';
+      case 1:
+        return 'Baja';
+      case 2:
+        return 'Media-Baja';
+      case 3:
+        return 'Media';
+      case 4:
+        return 'Media-Alta';
+      case 5:
+        return 'Alta';
+      default:
+        return 'No definida';
     }
   }
 
@@ -105,9 +112,17 @@ export class RemindersPage implements OnInit {
 
   getInsistenceText(level: number): string {
     const levels = [
-      'Muy Baja', 'Baja', 'Baja-Media', 'Media-Baja',
-      'Media', 'Media-Alta', 'Alta-Media', 'Alta',
-      'Muy Alta', 'Crítica', 'Urgente',
+      'Muy Baja',
+      'Baja',
+      'Baja-Media',
+      'Media-Baja',
+      'Media',
+      'Media-Alta',
+      'Alta-Media',
+      'Alta',
+      'Muy Alta',
+      'Crítica',
+      'Urgente',
     ];
     return levels[level] || 'Media';
   }
@@ -132,6 +147,7 @@ export class RemindersPage implements OnInit {
     this.reminderForm.reset({
       reminder_date: new Date().toISOString(),
       priority: 3,
+      message: '',
       status: 'pendiente',
       insistence_level: 1,
     });
@@ -145,6 +161,7 @@ export class RemindersPage implements OnInit {
       reminder_date: reminder.reminder_date,
       priority: reminder.priority,
       task_id: reminder.task_id,
+      message: reminder.message || '',
       status: reminder.status,
       insistence_level: reminder.insistence_level,
     });
@@ -157,7 +174,10 @@ export class RemindersPage implements OnInit {
 
   saveReminder(): void {
     if (this.reminderForm.invalid) {
-      this.toastService.showToast('Por favor complete todos los campos', 'warning');
+      this.toastService.showToast(
+        'Por favor complete todos los campos',
+        'warning'
+      );
       return;
     }
 
@@ -170,16 +190,21 @@ export class RemindersPage implements OnInit {
     const reminderData = { ...this.reminderForm.value, user_id: userId };
 
     if (this.isEditing && this.currentReminderId) {
-      this.apiService.updateReminder(this.currentReminderId, reminderData).subscribe(
-        () => {
-          this.loadReminders();
-          this.showModal = false;
-          this.toastService.showToast('Recordatorio actualizado', 'success');
-        },
-        () => {
-          this.toastService.showToast('Error al actualizar recordatorio', 'error');
-        }
-      );
+      this.apiService
+        .updateReminder(this.currentReminderId, reminderData)
+        .subscribe(
+          () => {
+            this.loadReminders();
+            this.showModal = false;
+            this.toastService.showToast('Recordatorio actualizado', 'success');
+          },
+          () => {
+            this.toastService.showToast(
+              'Error al actualizar recordatorio',
+              'error'
+            );
+          }
+        );
     } else {
       this.apiService.createReminder(reminderData).subscribe(
         () => {
@@ -210,7 +235,11 @@ export class RemindersPage implements OnInit {
     const reminder = this.reminders.find((r) => r._id === reminderId);
     if (!reminder) return;
 
-    const updatedReminder = { ...reminder, status: 'completado', completed_date: new Date().toISOString() };
+    const updatedReminder = {
+      ...reminder,
+      status: 'completado',
+      completed_date: new Date().toISOString(),
+    };
 
     this.apiService.updateReminder(reminderId, updatedReminder).subscribe(
       () => {
@@ -227,7 +256,11 @@ export class RemindersPage implements OnInit {
     const reminder = this.reminders.find((r) => r._id === reminderId);
     if (!reminder) return;
 
-    const updatedReminder = { ...reminder, status: 'pendiente', completed_date: null };
+    const updatedReminder = {
+      ...reminder,
+      status: 'pendiente',
+      completed_date: null,
+    };
 
     this.apiService.updateReminder(reminderId, updatedReminder).subscribe(
       () => {

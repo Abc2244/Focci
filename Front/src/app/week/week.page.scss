@@ -528,28 +528,6 @@
   ion-modal {
     --background: rgba(255, 255, 255, 0.95);
 
-    .modal-content {
-      --background: #f8faff;
-
-      ion-item {
-        --background: transparent;
-        --color: #333333;
-
-        ion-label {
-          color: #333333;
-          font-weight: 500;
-        }
-
-        ion-input,
-        ion-select,
-        ion-datetime {
-          --color: #333333;
-          color: #333333;
-          --placeholder-color: #666666;
-        }
-      }
-    }
-
     ion-header ion-toolbar {
       --background: var(--ion-color-primary);
       --color: white;
@@ -564,75 +542,41 @@
       }
     }
 
-    .form-container {
-      padding: 16px;
+    ion-content {
+      --background: #f8faff;
 
-      .name-input-container {
-        margin-bottom: 16px;
+      form {
+        .form-container {
+          padding: 20px;
 
-        .name-input {
-          --background: white;
-          --color: #333333;
-          --padding-start: 16px;
-          --padding-end: 16px;
-          --padding-top: 12px;
-          --padding-bottom: 12px;
-          --border-radius: 8px;
-          --border-color: #d1d1d1;
-          --border-width: 1px;
-          --border-style: solid;
-          --placeholder-color: #666666;
-          margin-bottom: 16px;
-          font-size: 16px;
-          color: #333333;
-        }
-      }
+          .input-group {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
-      .custom-input {
-        --background: white;
-        --border-radius: 8px;
-        --border-color: #d1d1d1;
-        --border-width: 1px;
-        --border-style: solid;
-        margin-bottom: 16px;
+            .custom-input {
+              --background: transparent;
+              --border-color: rgba(59, 103, 191, 0.3);
+              --highlight-color-focused: var(--ion-color-primary);
+              margin-bottom: 15px;
 
-        ion-label {
-          color: #333333;
-        }
-      }
+              ion-label {
+                color: #333333 !important;
+                font-weight: 500;
+              }
 
-      .schedule-selector {
-        margin-top: 20px;
-
-        ion-label {
-          color: #333333;
-          font-weight: 600;
-          margin-bottom: 12px;
-          display: block;
-        }
-
-        .schedule-items {
-          .schedule-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-            background: white;
-            padding: 8px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-            ion-select,
-            ion-datetime {
-              --color: #333333;
-              color: #333333;
+              ion-input,
+              ion-textarea,
+              ion-select,
+              ion-datetime {
+                --color: #333333 !important;
+                color: #333333 !important;
+                --placeholder-color: #666666;
+              }
             }
           }
-        }
-
-        .add-schedule-btn {
-          --background: var(--ion-color-primary);
-          --color: white;
-          margin-top: 12px;
         }
       }
     }
@@ -643,11 +587,11 @@
   ion-select::part(placeholder),
   ion-datetime::part(text),
   ion-datetime::part(placeholder) {
-    color: #333333;
+    color: #333333 !important;
   }
 
   ion-select-option {
-    color: #333333;
+    color: #333333 !important;
   }
 }
 
@@ -665,7 +609,7 @@
       --border-style: none;
 
       ion-title {
-        color: #ff1717;
+        color: #ffffffd2;
         font-weight: 600;
       }
 
