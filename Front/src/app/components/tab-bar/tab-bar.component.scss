@@ -1,84 +1,81 @@
-.tab-bar-container {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+:host {
+  --tab-height: 65px;
+  --tab-indicator-size: 5px;
+  --tab-transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+  display: block;
   width: 100%;
-  height: var(--tab-height);
-  z-index: 1000;
+}
 
-  ion-tab-bar.custom-tabs {
-    --background: white;
-    --border: none;
-    box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.05);
-    height: var(--tab-height);
-    padding: 0 10px;
+// Estilos mejorados para la barra de tabs
+ion-tab-bar.custom-tabs {
+  --background: white;
+  box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.05);
+  height: 60px;
+  padding: 0 10px;
+  border: none;
 
-    .tab-button {
-      position: relative;
-      --color: var(--ion-color-medium);
-      --color-selected: var(--ion-color-primary);
+  ion-tab-button.tab-button {
+    position: relative;
+    --color: var(--ion-color-medium);
+    --color-selected: var(--ion-color-primary);
+    --background: transparent;
+    --ripple-color: var(--ion-color-primary);
+    transition: all 0.3s ease;
+
+    ion-icon {
+      font-size: 24px;
       transition: all 0.3s ease;
+    }
 
-      .tab-button-inner {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+    span {
+      font-size: 12px;
+      margin-top: 4px;
+      transition: all 0.3s ease;
+    }
 
-        .icon-container {
-          position: relative;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+    .tab-indicator {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 4px;
+      background: var(--ion-color-primary);
+      border-radius: 4px 4px 0 0;
+      transform: translateX(-50%);
+      transition: width 0.3s ease;
+      opacity: 0;
+    }
 
-          ion-icon {
-            font-size: 24px;
-            color: var(--ion-color-medium);
-            transition: all 0.3s ease;
-            z-index: 2;
-          }
+    &.tab-selected {
+      --color: var(--ion-color-primary);
 
-          .icon-background {
-            position: absolute;
-            width: 0;
-            height: 0;
-            background: rgba(var(--ion-color-primary-rgb), 0.1);
-            border-radius: 50%;
-            transition: all 0.3s ease;
-            z-index: 1;
-          }
-        }
-
-        .tab-label {
-          font-size: 12px;
-          font-weight: 500;
-          color: var(--ion-color-medium);
-          margin-top: 4px;
-          transition: all 0.3s ease;
-        }
+      ion-icon {
+        transform: translateY(-4px) scale(1.2);
       }
 
-      &.tab-selected {
-        .tab-button-inner {
-          .icon-container {
-            ion-icon {
-              color: var(--ion-color-primary);
-              transform: translateY(-4px);
-            }
-
-            .icon-background {
-              width: 36px;
-              height: 36px;
-            }
-          }
-
-          .tab-label {
-            color: var(--ion-color-primary);
-            font-weight: 600;
-          }
-        }
+      .tab-indicator {
+        width: 30px;
+        opacity: 1;
       }
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(var(--ion-color-primary-rgb), 0.1);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: all 0.3s ease;
+      z-index: -1;
+    }
+
+    &.tab-selected::before {
+      width: 40px;
+      height: 40px;
     }
   }
 }

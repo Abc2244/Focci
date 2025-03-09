@@ -1,11 +1,6 @@
-import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
-import {
-  MenuController,
-  Platform,
-  IonTabs,
-  AnimationController,
-} from '@ionic/angular';
-import { Router, NavigationEnd, Event } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { MenuController, Platform } from '@ionic/angular';
+import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -13,8 +8,7 @@ import { filter } from 'rxjs/operators';
   templateUrl: 'tabs.page.html',
   styleUrls: ['tabs.page.scss'],
 })
-export class TabsPage implements OnInit, AfterViewInit {
-  @ViewChild(IonTabs) tabs!: IonTabs;
+export class TabsPage implements OnInit {
   activeTab: string = 'week';
   pageTitle: string = 'Mi Semana';
 
@@ -33,20 +27,15 @@ export class TabsPage implements OnInit, AfterViewInit {
   constructor(
     private menuCtrl: MenuController,
     private platform: Platform,
-    private router: Router,
-    private animationCtrl: AnimationController
+    private router: Router
   ) {}
 
   ngOnInit() {
-    // Asegurarse de que el menú esté habilitado
-    this.menuCtrl.enable(true, 'main-menu');
-
-    // Detectar cambios de ruta para actualizar el título y el tab activo
+    // Suscribirse a los eventos de navegación para actualizar el título y la pestaña activa
     this.router.events
       .pipe(
         filter(
-          (event: Event): event is NavigationEnd =>
-            event instanceof NavigationEnd
+          (event): event is NavigationEnd => event instanceof NavigationEnd
         )
       )
       .subscribe((event: NavigationEnd) => {
@@ -65,37 +54,37 @@ export class TabsPage implements OnInit, AfterViewInit {
       });
   }
 
-  ngAfterViewInit() {
-    // Asegurarse de que el menú esté disponible después de que la vista se haya inicializado
-    setTimeout(() => {
-      this.menuCtrl.enable(true, 'main-menu');
-
-      // Obtener el tab inicial
-      if (this.tabs) {
-        const selectedTab = this.tabs.getSelected();
-        if (selectedTab) {
-          this.activeTab = selectedTab;
-          this.updatePageTitle(this.activeTab);
-        }
-      }
-    }, 100);
-  }
-
   updatePageTitle(route: string) {
     this.pageTitle = this.pageTitles[route] || 'Mi Semana';
-  }
-
-  getPageTitle() {
-    return this.pageTitle;
   }
 
   openMenu() {
     this.menuCtrl.open('main-menu');
   }
 
-  // Método para animar la transición entre tabs
+  // Método para manejar el cambio de tabs
   tabChanged(event: any) {
-    this.activeTab = event.tab;
+    let tab: string;
+
+    // Manejar tanto el evento de ion-tabs como el evento personalizado
+    if (event && event.tab) {
+      tab = event.tab;
+    } else if (event && event.detail && event.detail.tab) {
+      tab = event.detail.tab;
+    } else {
+      return;
+    }
+
+    this.activeTab = tab;
     this.updatePageTitle(this.activeTab);
+
+    // Asegurarse de que la navegación ocurra solo una vez
+    if (event.tab) {
+      // Si viene de nuestro componente personalizado, la navegación ya ocurrió
+      return;
+    }
+
+    // Navegar a la ruta correspondiente
+    this.router.navigate(['/tabs', tab]);
   }
 }

@@ -1,5 +1,4 @@
-import { Component, Input } from '@angular/core';
-import { MenuController } from '@ionic/angular';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-header',
@@ -8,10 +7,9 @@ import { MenuController } from '@ionic/angular';
 })
 export class HeaderComponent {
   @Input() pageTitle: string = '';
+  @Output() menuToggle = new EventEmitter<void>();
 
-  constructor(private menuCtrl: MenuController) {}
-
-  openMenu() {
-    this.menuCtrl.open('main-menu');
+  toggleMenu() {
+    this.menuToggle.emit();
   }
 }

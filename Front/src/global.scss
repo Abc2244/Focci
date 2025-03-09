@@ -378,3 +378,30 @@ ion-button[color="danger"] {
   color: var(--ion-color-danger) !important;
   font-weight: 600;
 }
+
+// Asegurarse de que el contenido sea visible
+ion-content {
+  --background: white;
+}
+
+ion-router-outlet {
+  background: white;
+}
+
+.ion-page {
+  background: white;
+  display: flex;
+  flex-direction: column;
+}
+
+// Ajustar el espacio para la barra de tabs
+ion-tabs {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  ion-router-outlet {
+    flex: 1;
+    overflow: auto;
+  }
+}

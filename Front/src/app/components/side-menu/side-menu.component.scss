@@ -1,0 +1,123 @@
+// Variables
+:host {
+  --menu-bg: rgba(255, 255, 255, 0.85);
+  --menu-backdrop-filter: blur(10px);
+  --menu-shadow: 0 8px 32px rgba(0, 31, 63, 0.1);
+  --menu-header-height: 180px;
+  --menu-item-radius: 12px;
+  --menu-item-active-bg: rgba(var(--ion-color-primary-rgb), 0.15);
+  --menu-item-hover-bg: rgba(var(--ion-color-primary-rgb), 0.08);
+}
+
+// Estilos para el menú lateral con glassmorphism
+ion-menu.glassmorphism-menu {
+  --width: 280px;
+  --background: var(--menu-bg);
+
+  &::part(backdrop) {
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  &::part(container) {
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--menu-shadow);
+    backdrop-filter: var(--menu-backdrop-filter);
+    -webkit-backdrop-filter: var(--menu-backdrop-filter);
+  }
+
+  ion-toolbar {
+    --background: var(--ion-color-primary);
+    --color: white;
+  }
+
+  ion-content {
+    --background: white;
+    --padding-top: 0;
+    --padding-bottom: 20px;
+
+    .menu-header {
+      padding: 20px 16px;
+      background: linear-gradient(
+        135deg,
+        var(--ion-color-primary) 0%,
+        var(--ion-color-primary-shade) 100%
+      );
+      margin-bottom: 20px;
+
+      .user-info {
+        display: flex;
+        align-items: center;
+
+        .avatar {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.2);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: 15px;
+
+          ion-icon {
+            font-size: 40px;
+            color: white;
+          }
+        }
+
+        .user-details {
+          h2 {
+            margin: 0;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+          }
+
+          p {
+            margin: 5px 0 0;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+
+  .menu-items {
+    padding: 0;
+    background: transparent;
+
+    ion-item {
+      --padding-start: 16px;
+      --padding-end: 16px;
+      --min-height: 56px;
+      margin: 0 8px 8px;
+      --background: transparent;
+      --background-hover: rgba(var(--ion-color-primary-rgb), 0.08);
+      --ripple-color: var(--ion-color-primary);
+      border-radius: 8px;
+      --color: var(--ion-color-primary);
+
+      &.active-item {
+        --background: rgba(var(--ion-color-primary-rgb), 0.12);
+        --color: var(--ion-color-primary);
+        font-weight: 600;
+
+        ion-icon {
+          color: var(--ion-color-primary);
+        }
+      }
+
+      ion-icon {
+        font-size: 22px;
+        margin-right: 16px;
+        color: var(--ion-color-primary);
+      }
+
+      ion-label {
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--ion-color-primary);
+      }
+    }
+  }
+}

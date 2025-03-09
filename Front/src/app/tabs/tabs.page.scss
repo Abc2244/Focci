@@ -154,7 +154,6 @@ ion-menu.glassmorphism-menu {
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        text-fill-color: transparent;
       }
     }
   }
@@ -238,6 +237,7 @@ ion-header {
 
 // Aseguramos que el contenido principal tenga el espacio correcto
 #main-content {
+  background-color: white;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -247,6 +247,7 @@ ion-header {
     --padding-bottom: 0;
     --offset-top: 0;
     --offset-bottom: 0;
+    margin-bottom: 60px; // Espacio para la barra de tabs
   }
 }
 
@@ -328,8 +329,7 @@ ion-tabs {
   }
 }
 
-// Eliminar los estilos antiguos de tabs que ya no se usarán
-// (Mantengo los estilos de animación de ripple por si quieres usarlos en otro lugar)
+// Animación de ripple (por si quieres usarla en otro lugar)
 @keyframes ripple {
   0% {
     transform: scale(0, 0);
@@ -343,4 +343,8 @@ ion-tabs {
     opacity: 0;
     transform: scale(40, 40);
   }
+}
+
+ion-content {
+  --background: white;
 }

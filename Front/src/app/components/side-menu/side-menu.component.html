@@ -1,0 +1,42 @@
+<ion-menu
+  side="start"
+  menuId="main-menu"
+  contentId="main-content"
+  class="glassmorphism-menu"
+>
+  <ion-header class="ion-no-border">
+    <ion-toolbar>
+      <div class="menu-header-bg"></div>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+    <div class="menu-header">
+      <div class="user-info">
+        <div class="avatar-container">
+          <div class="avatar">
+            <ion-icon name="person-circle-outline"></ion-icon>
+          </div>
+          <div class="avatar-glow"></div>
+        </div>
+        <div class="user-details">
+          <h2>Estudiante</h2>
+          <p>Organiza tu tiempo</p>
+        </div>
+      </div>
+    </div>
+
+    <ion-list lines="none" class="menu-items">
+      <ion-menu-toggle auto-hide="false" *ngFor="let item of menuItems">
+        <ion-item
+          [routerLink]="item.path"
+          routerDirection="root"
+          routerLinkActive="active-item"
+        >
+          <ion-icon [name]="item.icon"></ion-icon>
+          <ion-label>{{ item.label }}</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+    </ion-list>
+  </ion-content>
+</ion-menu>

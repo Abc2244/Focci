@@ -1,145 +1,20 @@
 <ion-app>
-  <!-- Menú lateral con efecto de glassmorphism -->
-  <ion-menu
-    side="start"
-    menuId="main-menu"
-    contentId="main-content"
-    class="glassmorphism-menu"
-  >
-    <ion-header class="ion-no-border">
-      <ion-toolbar>
-        <div class="menu-header-bg"></div>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content>
-      <div class="menu-header">
-        <div class="user-info">
-          <div class="avatar-container">
-            <div class="avatar">
-              <ion-icon name="person-circle-outline"></ion-icon>
-            </div>
-            <div class="avatar-glow"></div>
-          </div>
-          <div class="user-details">
-            <h2>Estudiante</h2>
-            <p>Organiza tu tiempo</p>
-          </div>
-        </div>
-      </div>
-
-      <ion-list lines="none" class="menu-items">
-        <ion-menu-toggle auto-hide="false">
-          <ion-item
-            routerLink="/tabs/subjects"
-            routerDirection="root"
-            routerLinkActive="active-item"
-          >
-            <ion-icon name="book-outline"></ion-icon>
-            <ion-label>Materias</ion-label>
-          </ion-item>
-        </ion-menu-toggle>
-
-        <ion-menu-toggle auto-hide="false">
-          <ion-item
-            routerLink="/tabs/tasks"
-            routerDirection="root"
-            routerLinkActive="active-item"
-          >
-            <ion-icon name="checkbox-outline"></ion-icon>
-            <ion-label>Tareas</ion-label>
-          </ion-item>
-        </ion-menu-toggle>
-
-        <ion-menu-toggle auto-hide="false">
-          <ion-item
-            routerLink="/tabs/reminders"
-            routerDirection="root"
-            routerLinkActive="active-item"
-          >
-            <ion-icon name="alarm-outline"></ion-icon>
-            <ion-label>Recordatorios</ion-label>
-          </ion-item>
-        </ion-menu-toggle>
-
-        <ion-menu-toggle auto-hide="false">
-          <ion-item
-            routerLink="/tabs/profile"
-            routerDirection="root"
-            routerLinkActive="active-item"
-          >
-            <ion-icon name="person-outline"></ion-icon>
-            <ion-label>Perfil</ion-label>
-          </ion-item>
-        </ion-menu-toggle>
-      </ion-list>
-    </ion-content>
-  </ion-menu>
+  <!-- Componente del menú lateral -->
+  <app-side-menu></app-side-menu>
 
   <div class="ion-page" id="main-content">
-    <ion-header class="ion-no-border">
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-menu-button class="animated-menu-button blue-menu-button">
-            <div class="menu-icon">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </ion-menu-button>
-        </ion-buttons>
-        <ion-title class="page-title">
-          <div class="title-text">{{ getPageTitle() }}</div>
-        </ion-title>
-      </ion-toolbar>
-    </ion-header>
+    <!-- Componente del header -->
+    <app-header [pageTitle]="pageTitle" (menuToggle)="openMenu()"></app-header>
 
-    <ion-content class="main-content">
-      <ion-router-outlet></ion-router-outlet>
-    </ion-content>
-
+    <!-- Estructura de tabs de Ionic -->
     <ion-tabs (ionTabsDidChange)="tabChanged($event)">
-      <ion-tab-bar slot="bottom" class="modern-tabs">
-        <ion-tab-button tab="week" class="tab-button">
-          <div class="tab-button-inner">
-            <div class="icon-container">
-              <ion-icon name="calendar-outline"></ion-icon>
-              <div class="icon-background"></div>
-            </div>
-            <div class="tab-label">Semana</div>
-          </div>
-        </ion-tab-button>
+      <ion-router-outlet></ion-router-outlet>
 
-        <ion-tab-button tab="calendar" class="tab-button">
-          <div class="tab-button-inner">
-            <div class="icon-container">
-              <ion-icon name="calendar-number-outline"></ion-icon>
-              <div class="icon-background"></div>
-            </div>
-            <div class="tab-label">Calendario</div>
-          </div>
-        </ion-tab-button>
-
-        <ion-tab-button tab="stats" class="tab-button">
-          <div class="tab-button-inner">
-            <div class="icon-container">
-              <ion-icon name="bar-chart-outline"></ion-icon>
-              <div class="icon-background"></div>
-            </div>
-            <div class="tab-label">Estadísticas</div>
-          </div>
-        </ion-tab-button>
-
-        <ion-tab-button tab="smart" class="tab-button">
-          <div class="tab-button-inner">
-            <div class="icon-container">
-              <ion-icon name="bulb-outline"></ion-icon>
-              <div class="icon-background"></div>
-            </div>
-            <div class="tab-label">Inteligente</div>
-          </div>
-        </ion-tab-button>
-      </ion-tab-bar>
+      <!-- Componente de la barra de tabs -->
+      <app-tab-bar
+        [activeTab]="activeTab"
+        (tabChange)="tabChanged($event)"
+      ></app-tab-bar>
     </ion-tabs>
   </div>
 </ion-app>
