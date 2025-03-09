@@ -6,6 +6,7 @@
 
     .page-title {
       margin-bottom: 20px;
+      text-align: center;
 
       h1 {
         font-size: 28px;
@@ -43,13 +44,14 @@
       grid-template-columns: repeat(7, 1fr);
       gap: 8px;
       margin-bottom: 30px;
+      justify-items: center;
 
       .weekday {
         text-align: center;
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--ion-color-medium);
-        padding: 8px 0;
+        font-weight: 600;
+        color: var(--ion-color-primary);
+        padding: 10px 0;
+        width: 100%;
       }
 
       .day {
@@ -58,6 +60,7 @@
         align-items: center;
         justify-content: center;
         height: 40px;
+        width: 40px;
         font-size: 16px;
         font-weight: 500;
         color: var(--ion-color-dark);

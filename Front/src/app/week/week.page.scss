@@ -1,18 +1,51 @@
 .week-content {
-  --background: #f8f9fa;
+  --background: linear-gradient(
+    135deg,
+    #f5f7fa 0%,
+    var(--ion-color-primary-tint) 100%
+  );
   --padding-top: 0px;
 
+  &::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(30, 136, 229, 0.05)" stroke-width="2"/></svg>');
+    background-size: 300px 300px;
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: -1;
+  }
+
   .page-container {
-    padding: 0 20px 20px;
+    padding: 20px;
 
     .page-title {
       margin-bottom: 20px;
+      text-align: center;
+      position: relative;
+
+      &:after {
+        content: "";
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: #ffffff;
+        border-radius: 3px;
+      }
 
       h1 {
         font-size: 28px;
         font-weight: 700;
-        color: var(--ion-color-dark);
+        color: #ffffff;
         margin: 0;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
       }
     }
 
@@ -23,6 +56,7 @@
       margin-bottom: 24px;
       scrollbar-width: none; /* Firefox */
       -ms-overflow-style: none; /* IE and Edge */
+      justify-content: center; /* Centrar horizontalmente */
 
       &::-webkit-scrollbar {
         display: none; /* Chrome, Safari, Opera */
@@ -37,106 +71,298 @@
         height: 80px;
         margin-right: 12px;
         border-radius: 16px;
-        background: white;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         cursor: pointer;
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+
+        &:before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 4px;
+          background: transparent;
+          transition: all 0.3s ease;
+        }
 
         .day-name {
           font-size: 14px;
           font-weight: 500;
-          color: var(--ion-color-medium);
+          color: #5a6274;
           margin-bottom: 8px;
+          transition: all 0.3s ease;
         }
 
         .day-number {
           font-size: 20px;
           font-weight: 600;
-          color: var(--ion-color-dark);
+          color: #2c3e50;
+          transition: all 0.3s ease;
         }
 
         &.active {
-          background: var(--ion-color-primary);
+          background: #ffffff;
           transform: translateY(-4px);
-          box-shadow: 0 8px 16px rgba(var(--ion-color-primary-rgb), 0.3);
+          box-shadow: 0 8px 16px rgba(59, 103, 191, 0.3);
+          border: 2px solid #3b67bf;
 
-          .day-name,
+          &:before {
+            background: #3b67bf;
+          }
+
+          .day-name {
+            color: #3b67bf;
+            font-weight: 600;
+          }
+
           .day-number {
-            color: white;
+            color: #3b67bf;
+            font-weight: 700;
           }
         }
 
         &:hover:not(.active) {
           transform: translateY(-2px);
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          border: 2px solid rgba(59, 103, 191, 0.3);
+
+          &:before {
+            background: rgba(59, 103, 191, 0.3);
+          }
+
+          .day-name,
+          .day-number {
+            color: #3b67bf;
+          }
         }
       }
     }
 
     .day-events {
-      h2 {
-        font-size: 20px;
-        font-weight: 600;
-        color: var(--ion-color-dark);
+      .day-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         margin-bottom: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 12px 16px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(5px);
+
+        h2 {
+          font-size: 22px;
+          font-weight: 600;
+          color: #3b67bf;
+          margin: 0;
+          text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
+        }
+
+        .add-event-btn {
+          --padding-start: 8px;
+          --padding-end: 8px;
+          --color: #3b67bf;
+          position: relative;
+          overflow: hidden;
+
+          &:after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(59, 103, 191, 0.1);
+            border-radius: 50%;
+            transform: scale(0);
+            transition: transform 0.3s ease;
+          }
+
+          &:active:after {
+            transform: scale(1.5);
+          }
+
+          ion-icon {
+            font-size: 24px;
+          }
+        }
       }
 
       .event-section {
         margin-bottom: 24px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #3b67bf;
+        position: relative;
+        overflow: hidden;
+
+        &:before {
+          content: "";
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 60px;
+          height: 60px;
+          background: linear-gradient(
+            135deg,
+            transparent 50%,
+            rgba(59, 103, 191, 0.05) 50%
+          );
+          border-radius: 0 0 0 60px;
+        }
 
         h3 {
           font-size: 16px;
           font-weight: 600;
-          color: var(--ion-color-medium);
+          color: #3b67bf;
           margin-bottom: 12px;
           display: flex;
           align-items: center;
+          position: relative;
 
-          &::before {
+          &:after {
             content: "";
-            display: inline-block;
-            width: 4px;
-            height: 16px;
-            background: var(--ion-color-primary);
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 30px;
+            height: 2px;
+            background: #3b67bf;
             border-radius: 2px;
-            margin-right: 8px;
+          }
+        }
+
+        .section-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+
+          h3 {
+            margin-bottom: 0;
+            color: #3b67bf;
+          }
+
+          .add-task-btn {
+            --padding-start: 4px;
+            --padding-end: 4px;
+            --color: #3b67bf;
+            margin: 0;
+            height: 30px;
+            position: relative;
+            overflow: hidden;
+
+            &:after {
+              content: "";
+              position: absolute;
+              width: 100%;
+              height: 100%;
+              background: rgba(59, 103, 191, 0.1);
+              border-radius: 50%;
+              transform: scale(0);
+              transition: transform 0.3s ease;
+            }
+
+            &:active:after {
+              transform: scale(1.5);
+            }
+
+            ion-icon {
+              font-size: 18px;
+            }
           }
         }
 
         .event-card {
           display: flex;
-          background: white;
+          background: #f8faff;
           border-radius: 12px;
           padding: 16px;
           margin-bottom: 12px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+          border-left: 3px solid #3b67bf;
+          position: relative;
+          overflow: hidden;
+
+          &:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(
+              135deg,
+              transparent 50%,
+              rgba(59, 103, 191, 0.03) 50%
+            );
+            border-radius: 0 0 0 40px;
+          }
+
+          &:last-child {
+            margin-bottom: 0;
+          }
 
           &:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
           }
 
           .event-time {
             min-width: 80px;
             font-size: 14px;
             font-weight: 600;
-            color: var(--ion-color-primary);
+            color: #3b67bf;
+            position: relative;
+
+            &:after {
+              content: "";
+              position: absolute;
+              top: 50%;
+              right: 10px;
+              transform: translateY(-50%);
+              width: 1px;
+              height: 70%;
+              background: rgba(90, 98, 116, 0.2);
+            }
           }
 
           .event-content {
             flex: 1;
+            padding: 0 10px;
 
             .event-title {
               font-size: 16px;
               font-weight: 600;
-              color: var(--ion-color-dark);
+              color: #2c3e50;
               margin-bottom: 4px;
             }
 
             .event-details {
               font-size: 14px;
-              color: var(--ion-color-medium);
+              color: #5a6274;
+            }
+          }
+
+          .event-actions {
+            display: flex;
+            align-items: center;
+            color: #3b67bf;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+              color: #2b4e9a;
+              transform: scale(1.1);
+            }
+
+            ion-icon {
+              font-size: 18px;
             }
           }
         }
@@ -144,42 +370,70 @@
         .task-card {
           display: flex;
           align-items: center;
-          background: white;
+          background: #f8faff;
           border-radius: 12px;
           padding: 16px;
           margin-bottom: 12px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+          border-left: 3px solid #6c5ce7;
+          position: relative;
+          overflow: hidden;
+
+          &:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(
+              135deg,
+              transparent 50%,
+              rgba(108, 92, 231, 0.03) 50%
+            );
+            border-radius: 0 0 0 40px;
+          }
+
+          &:last-child {
+            margin-bottom: 0;
+          }
 
           &:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
           }
 
           .task-checkbox {
             min-width: 24px;
             height: 24px;
             margin-right: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+              transform: scale(1.1);
+            }
 
             ion-icon {
               font-size: 24px;
-              color: var(--ion-color-medium);
+              color: #3b67bf;
             }
           }
 
           .task-content {
             flex: 1;
+            padding: 0 10px;
 
             .task-title {
               font-size: 16px;
               font-weight: 600;
-              color: var(--ion-color-dark);
+              color: #2c3e50;
               margin-bottom: 4px;
             }
 
             .task-details {
               font-size: 14px;
-              color: var(--ion-color-medium);
+              color: #5a6274;
             }
           }
 
@@ -189,17 +443,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+              transform: scale(1.1);
+            }
 
             &.high {
-              color: var(--ion-color-danger);
+              color: #e74c3c;
             }
 
             &.medium {
-              color: var(--ion-color-warning);
+              color: #f39c12;
             }
 
             &.low {
-              color: var(--ion-color-success);
+              color: #2ecc71;
             }
 
             ion-icon {

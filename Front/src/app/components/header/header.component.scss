@@ -8,23 +8,12 @@
   z-index: 10;
 
   ion-toolbar {
-    --background: var(--ion-color-primary);
-    --color: white;
+    --background: white;
+    --color: var(--ion-color-primary);
     --border-width: 0;
     --min-height: var(--header-height);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     position: relative;
-
-    .page-title {
-      font-weight: 600;
-      letter-spacing: 0.5px;
-
-      .title-text {
-        position: relative;
-        display: inline-block;
-        color: white;
-      }
-    }
   }
 }
 
@@ -39,7 +28,7 @@
   }
 }
 
-// Estilos para el botón de menú blanco
+// Estilos para el botón de menú blanco (mantenido por si se necesita en el futuro)
 .white-menu-button {
   --color: white !important;
 

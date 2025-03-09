@@ -10,7 +10,7 @@ import { filter } from 'rxjs/operators';
 })
 export class TabsPage implements OnInit {
   activeTab: string = 'week';
-  pageTitle: string = 'Mi Semana';
+  pageTitle: string = ''; // Título vacío
 
   // Mapeo de rutas a títulos con índice de tipo string
   pageTitles: { [key: string]: string } = {
@@ -31,7 +31,7 @@ export class TabsPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Suscribirse a los eventos de navegación para actualizar el título y la pestaña activa
+    // Suscribirse a los eventos de navegación para actualizar la pestaña activa
     this.router.events
       .pipe(
         filter(
@@ -44,7 +44,7 @@ export class TabsPage implements OnInit {
         if (urlParts.length > 2) {
           const currentRoute = urlParts[2];
           this.activeTab = currentRoute;
-          this.updatePageTitle(currentRoute);
+          // Ya no actualizamos el título
         }
 
         // Cerrar el menú en dispositivos móviles al navegar
@@ -52,10 +52,6 @@ export class TabsPage implements OnInit {
           this.menuCtrl.close('main-menu');
         }
       });
-  }
-
-  updatePageTitle(route: string) {
-    this.pageTitle = this.pageTitles[route] || 'Mi Semana';
   }
 
   openMenu() {
@@ -76,7 +72,7 @@ export class TabsPage implements OnInit {
     }
 
     this.activeTab = tab;
-    this.updatePageTitle(this.activeTab);
+    // Ya no actualizamos el título
 
     // Asegurarse de que la navegación ocurra solo una vez
     if (event.tab) {

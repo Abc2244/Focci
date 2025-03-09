@@ -1,23 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 
+interface WeekDay {
+  name: string;
+  number: number;
+  date: Date;
+}
+
 @Component({
   selector: 'app-week',
   templateUrl: './week.page.html',
   styleUrls: ['./week.page.scss'],
 })
 export class WeekPage implements OnInit {
-  selectedDay = 2; // Martes seleccionado por defecto
+  selectedDay = 0; // Por defecto selecciona el primer día
 
-  // Datos de los días de la semana
-  weekDays = [
-    { name: 'Dom', number: 2 },
-    { name: 'Lun', number: 3 },
-    { name: 'Mar', number: 4 },
-    { name: 'Mié', number: 5 },
-    { name: 'Jue', number: 6 },
-    { name: 'Vie', number: 7 },
-    { name: 'Sáb', number: 8 },
-  ];
+  // Datos de los días de la semana (se inicializarán dinámicamente)
+  weekDays: WeekDay[] = [];
 
   constructor() {}
 
@@ -29,10 +27,12 @@ export class WeekPage implements OnInit {
   setupWeekDays() {
     // Obtener la fecha actual
     const today = new Date();
+    console.log('Fecha actual:', today.toLocaleDateString());
 
     // Encontrar el domingo de esta semana
     const sunday = new Date(today);
     sunday.setDate(today.getDate() - today.getDay());
+    console.log('Domingo de esta semana:', sunday.toLocaleDateString());
 
     // Generar los días de la semana
     this.weekDays = [];
@@ -43,6 +43,7 @@ export class WeekPage implements OnInit {
       this.weekDays.push({
         name: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][i],
         number: date.getDate(),
+        date: date,
       });
 
       // Si es hoy, seleccionar este día
@@ -52,8 +53,14 @@ export class WeekPage implements OnInit {
         date.getFullYear() === today.getFullYear()
       ) {
         this.selectedDay = i;
+        console.log('Día actual seleccionado:', i, date.toLocaleDateString());
       }
     }
+
+    console.log(
+      'Días de la semana generados:',
+      this.weekDays.map((d) => `${d.name} ${d.number}`)
+    );
   }
 
   selectDay(day: number) {

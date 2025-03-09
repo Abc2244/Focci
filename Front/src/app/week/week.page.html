@@ -1,6 +1,6 @@
 <ion-content class="week-content">
   <div class="page-container">
-    <!-- Selector de días de la semana -->
+    <!-- Selector de días de la semana mejorado -->
     <div class="week-selector">
       <div
         class="week-day"
@@ -14,11 +14,13 @@
     </div>
 
     <!-- Eventos del día seleccionado -->
-    <div class="day-events">
-      <h2>
-        Eventos para {{weekDays[selectedDay].name}}
-        {{weekDays[selectedDay].number}}
-      </h2>
+    <div class="day-events" *ngIf="weekDays.length > 0">
+      <div class="day-header">
+        <h2>{{weekDays[selectedDay].name}} {{weekDays[selectedDay].number}}</h2>
+        <ion-button fill="clear" class="add-event-btn">
+          <ion-icon name="add-circle-outline"></ion-icon>
+        </ion-button>
+      </div>
 
       <!-- Sección de mañana -->
       <div class="event-section">
@@ -29,12 +31,18 @@
             <div class="event-title">Matemáticas</div>
             <div class="event-details">Aula 201 - Prof. García</div>
           </div>
+          <div class="event-actions">
+            <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+          </div>
         </div>
         <div class="event-card">
           <div class="event-time">10:30 AM</div>
           <div class="event-content">
             <div class="event-title">Física</div>
             <div class="event-details">Laboratorio 3 - Prof. Martínez</div>
+          </div>
+          <div class="event-actions">
+            <ion-icon name="ellipsis-vertical-outline"></ion-icon>
           </div>
         </div>
       </div>
@@ -48,6 +56,9 @@
             <div class="event-title">Programación</div>
             <div class="event-details">Sala de Computación - Prof. López</div>
           </div>
+          <div class="event-actions">
+            <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+          </div>
         </div>
         <div class="event-card">
           <div class="event-time">4:30 PM</div>
@@ -55,12 +66,20 @@
             <div class="event-title">Inglés</div>
             <div class="event-details">Aula 105 - Prof. Smith</div>
           </div>
+          <div class="event-actions">
+            <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+          </div>
         </div>
       </div>
 
       <!-- Tareas pendientes -->
       <div class="event-section">
-        <h3>Tareas pendientes</h3>
+        <div class="section-header">
+          <h3>Tareas pendientes</h3>
+          <ion-button fill="clear" class="add-task-btn">
+            <ion-icon name="add-outline"></ion-icon>
+          </ion-button>
+        </div>
         <div class="task-card">
           <div class="task-checkbox">
             <ion-icon name="ellipse-outline"></ion-icon>
