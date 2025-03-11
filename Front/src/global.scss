@@ -85,6 +85,22 @@
   --app-gradient-light: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
   --app-gradient-primary: linear-gradient(135deg, #1e88e5 0%, #64b5f6 100%);
   --app-gradient-secondary: linear-gradient(135deg, #26a69a 0%, #4db6ac 100%);
+
+  // Nuevo color rojo burgundy
+  --ion-color-burgundy: #9e2b25;
+  --ion-color-burgundy-rgb: 158, 43, 37;
+  --ion-color-burgundy-contrast: #ffffff;
+  --ion-color-burgundy-contrast-rgb: 255, 255, 255;
+  --ion-color-burgundy-shade: #8b2620;
+  --ion-color-burgundy-tint: #a8403b;
+
+  // Tercer color para recordatorios
+  --ion-color-tertiary: #9e2b25;
+  --ion-color-tertiary-rgb: 158, 43, 37;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #8b2620;
+  --ion-color-tertiary-tint: #a8403b;
 }
 
 // Estilos para los alerts personalizados

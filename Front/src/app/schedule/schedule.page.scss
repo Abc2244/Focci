@@ -142,7 +142,10 @@
 
         .time-column {
           min-width: 60px;
-          border-right: 1px solid #e0e0e0;
+          position: sticky;
+          left: 0;
+          background: white;
+          z-index: 2;
 
           .time-slot-label {
             height: 60px;
@@ -158,6 +161,7 @@
         .calendar-content {
           flex: 1;
           position: relative;
+          min-height: 1440px; // 24 horas * 60px
 
           .time-slot-line {
             position: absolute;
@@ -230,27 +234,32 @@
             border-radius: 4px;
             padding: 4px 8px;
             overflow: hidden;
+            color: white;
+            font-size: 12px;
             cursor: pointer;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            transition: box-shadow 0.2s ease;
+            transition: all 0.2s ease;
             z-index: 1;
 
             &:hover {
-              box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+              filter: brightness(1.1);
+              transform: scale(1.02);
             }
 
             .event-title {
-              font-weight: 600;
-              font-size: 12px;
+              font-weight: 500;
+              margin-bottom: 2px;
               white-space: nowrap;
               overflow: hidden;
               text-overflow: ellipsis;
-              color: white;
+
+              &.reminder {
+                font-style: italic;
+              }
             }
 
             .event-time {
-              font-size: 10px;
-              color: rgba(255, 255, 255, 0.9);
+              font-size: 11px;
+              opacity: 0.9;
             }
           }
         }

@@ -63,11 +63,13 @@
             [ngStyle]="getEventStyle(event)"
             (click)="onEventClick(event)"
           >
-            <div class="event-title">{{ event.title }}</div>
-            <div class="event-time" *ngIf="event.startTime && event.endTime">
-              {{ event.startTime | date : "h:mm a" }} - {{ event.endTime | date
-              : "h:mm a" }}
+            <div
+              class="event-title"
+              [class.reminder]="event.type === 'reminder'"
+            >
+              {{ event.title }}
             </div>
+            <div class="event-time">{{ event.startTime | date:'HH:mm' }}</div>
           </div>
         </div>
       </div>

@@ -31,7 +31,7 @@ interface DayHeader {
   isToday: boolean;
 }
 
-interface CalendarEvent {
+export interface CalendarEvent {
   id: string;
   title: string;
   startTime: Date;
@@ -40,10 +40,10 @@ interface CalendarEvent {
   description?: string;
   location?: string;
   color: string;
-  type: 'subject' | 'task' | 'custom';
+  type: 'subject' | 'task' | 'custom' | 'reminder';
   subjectId?: string;
   taskId?: string;
-  classroom?: string;
+  reminderId?: string;
 }
 
 @Component({
@@ -56,6 +56,7 @@ export class SchedulePage implements OnInit {
 
   subjects: Subject[] = [];
   tasks: Task[] = [];
+  reminders: any[] = [];
   events: CalendarEvent[] = [];
   isLoading = true;
   currentDate = new Date();
@@ -129,6 +130,9 @@ export class SchedulePage implements OnInit {
   }
 
   processSubjectsToEvents() {
+    this.events = []; // Limpiar eventos existentes
+
+    // Procesar materias
     if (this.subjects && this.subjects.length > 0) {
       this.subjects.forEach((subject) => {
         if (subject.schedule && subject.schedule.length > 0) {
@@ -158,9 +162,10 @@ export class SchedulePage implements OnInit {
               this.events.push({
                 id: `${subject._id}-${day}`,
                 title: subject.name,
-                startTime: startTime,
-                endTime: endTime,
-                day: day,
+                startTime,
+                endTime,
+                day,
+                description: `Materia: ${subject.name}`,
                 color: '#1976d2',
                 type: 'subject',
                 subjectId: subject._id,
@@ -168,6 +173,29 @@ export class SchedulePage implements OnInit {
             }
           });
         }
+      });
+    }
+
+    // Procesar tareas
+    if (this.tasks && this.tasks.length > 0) {
+      this.tasks.forEach((task) => {
+        const dueDate = new Date(task.due_date);
+        const day = dueDate.getDay();
+
+        const endTime = new Date(dueDate);
+        endTime.setHours(dueDate.getHours() + 1);
+
+        this.events.push({
+          id: task._id || '',
+          title: task.description,
+          startTime: dueDate,
+          endTime: endTime,
+          day: day,
+          description: task.description,
+          color: '#f57c00',
+          type: 'task',
+          taskId: task._id,
+        });
       });
     }
   }
@@ -244,13 +272,24 @@ export class SchedulePage implements OnInit {
 
   getEventStyle(event: CalendarEvent) {
     const startHour = event.startTime.getHours();
+    const startMinute = event.startTime.getMinutes();
     const endHour = event.endTime.getHours();
-    const top = startHour * 60;
-    const height = (endHour - startHour) * 60;
+    const endMinute = event.endTime.getMinutes();
+
+    const top = startHour * 60 + startMinute;
+    const height = endHour * 60 + endMinute - (startHour * 60 + startMinute);
+
+    const left = (event.day / 7) * 100;
+    const width = 100 / 7;
+
     return {
       top: `${top}px`,
       height: `${height}px`,
+      left: `${left}%`,
+      width: `${width}%`,
       backgroundColor: event.color,
+      opacity: event.type === 'reminder' ? '0.9' : '1',
+      border: event.type === 'reminder' ? '2px dashed white' : 'none',
     };
   }
 
