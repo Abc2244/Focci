@@ -278,7 +278,7 @@ export class SubjectsPage implements OnInit {
     if (!timeString) return '';
 
     try {
-      // Si es un formato HH:mm, retornarlo directamente
+      // Si ya está en formato HH:mm, retornarlo formateado
       if (timeString.includes(':')) {
         const [hours, minutes] = timeString.split(':');
         const date = new Date();
@@ -289,14 +289,9 @@ export class SubjectsPage implements OnInit {
           hour12: true,
         });
       }
-      // Si es un formato ISO
-      const date = new Date(timeString);
-      return date.toLocaleTimeString('es-ES', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-      });
+      return timeString;
     } catch (e) {
+      console.error('Error formatting time:', e);
       return timeString;
     }
   }
