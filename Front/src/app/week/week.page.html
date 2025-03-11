@@ -6,7 +6,7 @@
       <h1>Mi Semana</h1>
     </div>
 
-    <!-- Selector de días de la semana mejorado -->
+    <!-- Selector de días de la semana -->
     <div class="week-selector">
       <div
         class="week-day"
@@ -19,79 +19,45 @@
       </div>
     </div>
 
-    <!-- Eventos del día seleccionado -->
+    <!-- Contenido del día -->
     <div class="day-events" *ngIf="weekDays.length > 0">
-      <div class="day-header">
-        <h2>{{weekDays[selectedDay].name}} {{weekDays[selectedDay].number}}</h2>
-        <ion-button
-          fill="clear"
-          class="add-event-btn"
-          (click)="showSubjectModal()"
+      <!-- Clases del día -->
+      <div class="event-section">
+        <div class="section-header">
+          <h3>Clases del día</h3>
+          <ion-button
+            fill="clear"
+            class="add-event-btn"
+            (click)="showSubjectModal()"
+          >
+            <ion-icon name="add-outline"></ion-icon>
+          </ion-button>
+        </div>
+
+        <!-- Mensaje cuando no hay clases -->
+        <div
+          class="empty-state"
+          *ngIf="!isLoading && getDayEvents().length === 0"
         >
-          <ion-icon name="add-circle-outline"></ion-icon>
-        </ion-button>
-      </div>
-
-      <!-- Indicador de carga -->
-      <div class="loading-container" *ngIf="isLoading">
-        <ion-spinner name="crescent"></ion-spinner>
-        <p>Cargando eventos...</p>
-      </div>
-
-      <!-- Mensaje cuando no hay eventos -->
-      <div
-        class="empty-state"
-        *ngIf="!isLoading && morningEvents.length === 0 && afternoonEvents.length === 0"
-      >
-        <ion-icon name="calendar-clear-outline"></ion-icon>
-        <h3>No hay eventos para este día</h3>
-        <p>Agrega clases o eventos para organizar tu día</p>
-      </div>
-
-      <!-- Sección de mañana -->
-      <div class="event-section" *ngIf="morningEvents.length > 0">
-        <h3>Mañana</h3>
-        <div class="empty-state small" *ngIf="morningEvents.length === 0">
-          <ion-icon name="sunny-outline"></ion-icon>
-          <p>No hay eventos para esta mañana</p>
+          <ion-icon name="school-outline"></ion-icon>
+          <p>No hay clases programadas para este día</p>
         </div>
-        <div class="event-card" *ngFor="let event of morningEvents">
-          <div class="event-time">
-            {{formatTime(event.startTime)}} - {{formatTime(event.endTime)}}
-          </div>
-          <div class="event-content">
-            <div class="event-title">{{event.title}}</div>
-            <div class="event-details">{{event.details}}</div>
-          </div>
-          <div class="event-actions">
-            <ion-icon name="ellipsis-vertical-outline"></ion-icon>
-          </div>
-        </div>
-      </div>
 
-      <!-- Sección de tarde -->
-      <div class="event-section" *ngIf="afternoonEvents.length > 0">
-        <h3>Tarde</h3>
-        <div class="empty-state small" *ngIf="afternoonEvents.length === 0">
-          <ion-icon name="partly-sunny-outline"></ion-icon>
-          <p>No hay eventos para esta tarde</p>
-        </div>
-        <div class="event-card" *ngFor="let event of afternoonEvents">
-          <div class="event-time">
-            {{formatTime(event.startTime)}} - {{formatTime(event.endTime)}}
-          </div>
-          <div class="event-content">
-            <div class="event-title">{{event.title}}</div>
-            <div class="event-details">{{event.details}}</div>
-          </div>
-          <div class="event-actions">
-            <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+        <!-- Lista de clases -->
+        <div class="events-list" *ngIf="!isLoading">
+          <div class="event-card" *ngFor="let event of getDayEvents()">
+            <div class="event-time">
+              {{formatTime(event.startTime)}} - {{formatTime(event.endTime)}}
+            </div>
+            <div class="event-content">
+              <div class="event-title">{{event.title}}</div>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Tareas pendientes -->
-      <div class="event-section" *ngIf="!isLoading">
+      <div class="event-section tasks-section">
         <div class="section-header">
           <h3>Tareas pendientes</h3>
           <ion-button
@@ -104,12 +70,16 @@
         </div>
 
         <!-- Mensaje cuando no hay tareas -->
-        <div class="empty-state small" *ngIf="tasks.length === 0">
+        <div
+          class="empty-state"
+          *ngIf="!isLoading && filteredTasks.length === 0"
+        >
           <ion-icon name="checkmark-circle-outline"></ion-icon>
-          <p>No hay tareas para este día</p>
+          <p>No hay tareas pendientes para este día</p>
         </div>
 
-        <div class="task-card" *ngFor="let task of tasks">
+        <!-- Lista de tareas -->
+        <div class="task-card" *ngFor="let task of filteredTasks">
           <div class="task-checkbox" (click)="completeTask(task._id)">
             <ion-icon
               [name]="task.completed ? 'checkmark-circle' : 'ellipse-outline'"
@@ -120,8 +90,7 @@
               {{task.description}}
             </div>
             <div class="task-details">
-              {{getSubjectName(task.subject_id) || 'Sin materia'}} - Vence
-              {{task.due_date | date:'shortDate'}}
+              {{getSubjectName(task.subject_id) || 'Sin materia'}}
             </div>
           </div>
         </div>

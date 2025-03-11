@@ -24,7 +24,7 @@ export class CalendarPage implements OnInit {
   currentDate: Date = new Date();
   selectedDate: Date = new Date();
   calendarDays: CalendarDay[] = [];
-  weekDays: string[] = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  weekDays: string[] = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
   // Datos de usuario
   userId: string = '';
@@ -55,7 +55,6 @@ export class CalendarPage implements OnInit {
   // Generar el calendario para el mes actual
   generateCalendar() {
     this.calendarDays = [];
-
     const year = this.currentDate.getFullYear();
     const month = this.currentDate.getMonth();
 
@@ -64,8 +63,8 @@ export class CalendarPage implements OnInit {
     // Último día del mes
     const lastDay = new Date(year, month + 1, 0);
 
-    // Día de la semana del primer día (0 = Domingo, 1 = Lunes, etc.)
-    const firstDayOfWeek = firstDay.getDay();
+    // Ajustar el día de la semana (0 = Lunes, 6 = Domingo)
+    const firstDayOfWeek = (firstDay.getDay() + 6) % 7;
 
     // Días del mes anterior para completar la primera semana
     const prevMonthLastDay = new Date(year, month, 0).getDate();
@@ -194,7 +193,7 @@ export class CalendarPage implements OnInit {
       day.events = [];
     });
 
-    // Agregar clases al calendario si el filtro lo permite
+    // Agregar clases al calendario
     if (this.eventFilter === 'all' || this.eventFilter === 'class') {
       this.subjects.forEach((subject) => {
         if (subject.schedule && subject.schedule.length > 0) {
@@ -208,7 +207,7 @@ export class CalendarPage implements OnInit {
                   id: subject._id,
                   title: subject.name,
                   details: `Aula: ${subject.classroom || 'No especificada'}`,
-                  time: scheduleItem.time,
+                  time: this.ensureTimeFormat(scheduleItem.startTime),
                   type: 'class',
                   color: 'primary',
                   subjectId: subject._id,
@@ -284,18 +283,22 @@ export class CalendarPage implements OnInit {
     this.updateSelectedDayEvents();
   }
 
-  // Convertir nombre del día a número (0 = Domingo, 1 = Lunes, etc.)
-  getDayNumber(dayName: string): number {
-    const days = {
-      Domingo: 0,
-      Lunes: 1,
-      Martes: 2,
-      Miércoles: 3,
-      Jueves: 4,
-      Viernes: 5,
-      Sábado: 6,
-    };
-    return days[dayName as keyof typeof days] || 0;
+  // Asegurar que el tiempo tenga un formato válido
+  private ensureTimeFormat(time: string): string {
+    if (!time) return '00:00';
+    if (time.includes('T')) {
+      try {
+        const date = new Date(time);
+        return date.toLocaleTimeString('es-ES', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        });
+      } catch (e) {
+        return '00:00';
+      }
+    }
+    return time;
   }
 
   // Actualizar eventos del día seleccionado
@@ -311,12 +314,28 @@ export class CalendarPage implements OnInit {
 
     if (selectedDay && selectedDay.events.length > 0) {
       this.selectedDayEvents = [...selectedDay.events];
-    }
 
-    // Ordenar eventos por hora
-    this.selectedDayEvents.sort((a, b) => {
-      return a.time.localeCompare(b.time);
-    });
+      // Ordenar eventos por hora, manejando casos donde time puede ser undefined
+      this.selectedDayEvents.sort((a, b) => {
+        const timeA = a.time || '00:00';
+        const timeB = b.time || '00:00';
+        return timeA.localeCompare(timeB);
+      });
+    }
+  }
+
+  // Convertir nombre del día a número (0 = Domingo, 1 = Lunes, etc.)
+  getDayNumber(dayName: string): number {
+    const days: { [key: string]: number } = {
+      Domingo: 0,
+      Lunes: 1,
+      Martes: 2,
+      Miércoles: 3,
+      Jueves: 4,
+      Viernes: 5,
+      Sábado: 6,
+    };
+    return days[dayName] ?? -1;
   }
 
   // Cambiar el filtro de eventos

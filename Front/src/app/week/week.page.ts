@@ -21,7 +21,18 @@ interface EventItem {
   endTime: string;
   type: 'class' | 'event';
   subjectId?: string;
+  date?: Date;
 }
+
+type DayMap = {
+  Lunes: number;
+  Martes: number;
+  Miércoles: number;
+  Jueves: number;
+  Viernes: number;
+  Sábado: number;
+  Domingo: number;
+};
 
 @Component({
   selector: 'app-week',
@@ -100,14 +111,10 @@ export class WeekPage implements OnInit {
     const today = new Date();
     const currentDay = today.getDay(); // 0 = Domingo, 1 = Lunes, ...
 
-    // Ajustar para que la semana comience en lunes (0 = Lunes, 6 = Domingo)
-    const startDay = new Date(today);
-    startDay.setDate(today.getDate() - ((currentDay + 6) % 7));
-
     // Crear array con los 7 días de la semana
     for (let i = 0; i < 7; i++) {
-      const date = new Date(startDay);
-      date.setDate(startDay.getDate() + i);
+      const date = new Date(today);
+      date.setDate(today.getDate() - currentDay + i);
 
       // Nombres de los días en español
       const dayNames = [
@@ -162,7 +169,7 @@ export class WeekPage implements OnInit {
     this.apiService.getUserSubjects(userId).subscribe({
       next: (subjects: Subject[]) => {
         this.subjects = subjects;
-        this.generateEventsFromSubjects();
+        this.generateEventsFromSubjects(subjects);
 
         // Cargar tareas después de obtener las materias
         this.apiService.getTasks(userId).subscribe({
@@ -218,51 +225,107 @@ export class WeekPage implements OnInit {
     });
   }
 
-  generateEventsFromSubjects() {
+  generateEventsFromSubjects(subjects: Subject[]): void {
+    // Limpiar eventos existentes
     this.morningEvents = [];
-    this.afternoonEvents = [];
 
     const selectedDate = this.weekDays[this.selectedDay].date;
-    const dayName = this.weekDays[this.selectedDay].name;
+    const selectedDayNumber = selectedDate.getDay();
 
-    this.subjects.forEach((subject) => {
-      if (subject.schedule) {
-        const todaySchedule = subject.schedule.filter(
-          (schedule) => schedule.day === dayName
-        );
+    subjects.forEach((subject) => {
+      if (subject.schedule && Array.isArray(subject.schedule)) {
+        subject.schedule.forEach((scheduleItem) => {
+          if (
+            !scheduleItem ||
+            !scheduleItem.day ||
+            !scheduleItem.startTime ||
+            !scheduleItem.endTime
+          )
+            return;
 
-        todaySchedule.forEach((schedule) => {
-          const event: EventItem = {
-            id: subject._id,
-            title: subject.name,
-            details: `${this.formatTime(
-              schedule.startTime
-            )} - ${this.formatTime(schedule.endTime)}`,
-            startTime: schedule.startTime,
-            endTime: schedule.endTime,
-            type: 'class',
-            subjectId: subject._id,
-          };
+          const scheduleDayNumber = this.getDayNumber(scheduleItem.day);
 
-          const hour = parseInt(schedule.startTime.split(':')[0], 10);
-          if (hour < 12) {
+          // Comparar con el día seleccionado
+          if (scheduleDayNumber === selectedDayNumber) {
+            const event: EventItem = {
+              id: `${subject._id}-${scheduleDayNumber}`,
+              title: subject.name,
+              details: `${scheduleItem.day} - Créditos: ${subject.credits}`,
+              startTime: this.ensureTimeFormat(scheduleItem.startTime),
+              endTime: this.ensureTimeFormat(scheduleItem.endTime),
+              type: 'class',
+              subjectId: subject._id,
+            };
+
             this.morningEvents.push(event);
-          } else {
-            this.afternoonEvents.push(event);
           }
         });
       }
     });
 
-    // Ordenar eventos por hora de inicio
-    this.morningEvents.sort((a, b) => a.startTime.localeCompare(b.startTime));
-    this.afternoonEvents.sort((a, b) => a.startTime.localeCompare(b.startTime));
+    // Ordenar eventos por hora
+    this.morningEvents.sort((a, b) =>
+      this.compareTime(a.startTime, b.startTime)
+    );
+  }
+
+  private getDayNumber(day: string): number {
+    // Mapeo correcto de días en español a números
+    // donde Lunes es 1, Martes es 2, etc.
+    const dayMap: { [key: string]: number } = {
+      Lunes: 1,
+      Martes: 2,
+      Miércoles: 3,
+      Jueves: 4,
+      Viernes: 5,
+      Sábado: 6,
+      Domingo: 0,
+    };
+    return dayMap[day] ?? -1;
+  }
+
+  private ensureTimeFormat(time: string): string {
+    if (!time) return '00:00';
+
+    try {
+      // Si ya está en formato HH:mm, retornarlo
+      if (time.includes(':')) {
+        const [hours, minutes] = time.split(':');
+        if (hours && minutes) {
+          return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+        }
+      }
+
+      // Si es una fecha ISO, convertirla
+      if (time.includes('T')) {
+        const date = new Date(time);
+        return date.toLocaleTimeString('es-ES', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        });
+      }
+
+      return '00:00';
+    } catch (e) {
+      console.error('Error al formatear tiempo:', e);
+      return '00:00';
+    }
   }
 
   selectDay(index: number) {
     this.selectedDay = index;
-    this.filterTasksForSelectedDay();
-    this.generateEventsFromSubjects();
+    this.loadEventsForSelectedDay();
+  }
+
+  private loadEventsForSelectedDay() {
+    // Limpiar eventos actuales
+    this.morningEvents = [];
+    this.afternoonEvents = [];
+
+    // Cargar eventos para el día seleccionado
+    const selectedDate = this.weekDays[this.selectedDay].date;
+    this.generateEventsFromSubjects(this.subjects);
   }
 
   getSubjectName(subjectId: string): string | null {
@@ -486,5 +549,18 @@ export class WeekPage implements OnInit {
     } catch (e) {
       return timeString;
     }
+  }
+
+  getDayEvents(): EventItem[] {
+    return this.morningEvents.sort((a, b) =>
+      this.compareTime(a.startTime, b.startTime)
+    );
+  }
+
+  private compareTime(time1: string, time2: string): number {
+    const [h1, m1] = time1.split(':').map(Number);
+    const [h2, m2] = time2.split(':').map(Number);
+    if (h1 !== h2) return h1 - h2;
+    return m1 - m2;
   }
 }

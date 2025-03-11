@@ -203,175 +203,82 @@
 
       .event-section {
         margin-bottom: 24px;
-        background: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.95);
         border-radius: 16px;
         padding: 16px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        border-left: 4px solid #3b67bf;
+        border-left: 4px solid var(--ion-color-primary);
         position: relative;
         overflow: hidden;
-
-        &:before {
-          content: "";
-          position: absolute;
-          top: 0;
-          right: 0;
-          width: 60px;
-          height: 60px;
-          background: linear-gradient(
-            135deg,
-            transparent 50%,
-            rgba(59, 103, 191, 0.05) 50%
-          );
-          border-radius: 0 0 0 60px;
-        }
-
-        h3 {
-          font-size: 16px;
-          font-weight: 600;
-          color: #3b67bf;
-          margin-bottom: 12px;
-          display: flex;
-          align-items: center;
-          position: relative;
-
-          &:after {
-            content: "";
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 30px;
-            height: 2px;
-            background: #3b67bf;
-            border-radius: 2px;
-          }
-        }
 
         .section-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 12px;
+          margin-bottom: 16px;
 
           h3 {
-            margin-bottom: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--ion-color-primary);
+          }
+        }
+
+        // Estilo específico para la sección de tareas
+        &.tasks-section {
+          border-left-color: var(--ion-color-secondary);
+
+          .section-header h3 {
+            color: var(--ion-color-secondary);
           }
 
-          .add-task-btn {
-            --padding-start: 4px;
-            --padding-end: 4px;
-            --color: #3b67bf;
-            margin: 0;
-            height: 30px;
-            position: relative;
-            overflow: hidden;
+          .task-card {
+            border-left-color: var(--ion-color-secondary);
 
-            &:after {
-              content: "";
-              position: absolute;
-              width: 100%;
-              height: 100%;
-              background: rgba(59, 103, 191, 0.1);
-              border-radius: 50%;
-              transform: scale(0);
-              transition: transform 0.3s ease;
-            }
-
-            &:active:after {
-              transform: scale(1.5);
-            }
-
-            ion-icon {
-              font-size: 18px;
+            .task-checkbox ion-icon {
+              color: var(--ion-color-secondary);
             }
           }
         }
 
+        // Estilo para las tarjetas de eventos/materias
         .event-card {
-          display: flex;
-          background: #f8faff;
+          background: white;
           border-radius: 12px;
           padding: 16px;
           margin-bottom: 12px;
-          transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-          border-left: 3px solid #3b67bf;
-          position: relative;
-          overflow: hidden;
-
-          &:after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(
-              135deg,
-              transparent 50%,
-              rgba(59, 103, 191, 0.03) 50%
-            );
-            border-radius: 0 0 0 40px;
-          }
-
-          &:last-child {
-            margin-bottom: 0;
-          }
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+          border-left: 3px solid var(--ion-color-primary);
+          display: flex;
+          align-items: center;
+          transition: transform 0.2s ease;
 
           &:hover {
-            transform: translateY(-2px) scale(1.01);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           }
 
           .event-time {
-            min-width: 80px;
-            font-size: 14px;
+            min-width: 90px;
+            color: var(--ion-color-primary);
             font-weight: 600;
-            color: #3b67bf;
-            position: relative;
-
-            &:after {
-              content: "";
-              position: absolute;
-              top: 50%;
-              right: 10px;
-              transform: translateY(-50%);
-              width: 1px;
-              height: 70%;
-              background: rgba(90, 98, 116, 0.2);
-            }
+            padding-right: 12px;
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
           }
 
           .event-content {
             flex: 1;
-            padding: 0 10px;
+            padding: 0 12px;
 
             .event-title {
-              font-size: 16px;
+              color: var(--app-text-color);
               font-weight: 600;
-              color: #2c3e50;
               margin-bottom: 4px;
             }
 
             .event-details {
-              font-size: 14px;
-              color: #5a6274;
-            }
-          }
-
-          .event-actions {
-            display: flex;
-            align-items: center;
-            color: #3b67bf;
-            cursor: pointer;
-            transition: all 0.2s ease;
-
-            &:hover {
-              color: #2b4e9a;
-              transform: scale(1.1);
-            }
-
-            ion-icon {
-              font-size: 18px;
+              color: var(--app-color-medium);
+              font-size: 0.9em;
             }
           }
         }
