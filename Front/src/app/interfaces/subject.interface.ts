@@ -1,12 +1,13 @@
 export interface ScheduleItem {
-  day: string; // Día de la semana (ej. "Lunes", "Martes", etc.)
-  time: string; // Hora (ej. "4:00 PM", "8:00 AM", etc.)
+  day: string;
+  startTime: string;
+  endTime: string;
 }
 
 export interface Subject {
-  _id?: string; // MongoDB ID
-  user_id: string;
+  _id: string;
   name: string;
   credits: number;
   schedule: ScheduleItem[];
+  user_id: string;
 }

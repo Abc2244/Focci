@@ -15,6 +15,7 @@ export class TabsPage implements OnInit {
   // Mapeo de rutas a títulos con índice de tipo string
   pageTitles: { [key: string]: string } = {
     week: 'Mi Semana',
+    schedule: 'Mi Horario',
     calendar: 'Calendario',
     stats: 'Estadísticas',
     smart: 'Asistente Inteligente',

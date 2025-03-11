@@ -33,9 +33,10 @@
               class="schedule-chip"
             >
               <ion-icon name="time-outline" class="schedule-icon"></ion-icon>
-              <span class="schedule-text"
-                >{{ item.day }} - {{ formatTime(item.time) }}</span
-              >
+              <span class="schedule-text">
+                {{ item.day }} - {{ formatTime(item.startTime) }} - {{
+                formatTime(item.endTime) }}
+              </span>
             </ion-chip>
           </div>
 
@@ -121,7 +122,6 @@
 
           <div class="schedule-selector">
             <ion-label>Horarios de clase</ion-label>
-
             <div class="schedule-items">
               <div
                 *ngFor="let item of selectedScheduleItems; let i = index"
@@ -142,20 +142,23 @@
                   </ion-select-option>
                 </ion-select>
 
-                <ion-datetime
-                  presentation="time"
-                  [value]="item.time"
-                  (ionChange)="updateScheduleTime(i, $event.detail.value)"
-                  class="time-select"
-                  hourCycle="h12"
-                  locale="es-ES"
-                  size="cover"
-                  preferWheel="true"
-                ></ion-datetime>
+                <ion-input
+                  type="time"
+                  [value]="item.startTime"
+                  (ionChange)="updateScheduleStartTime(i, $event)"
+                  placeholder="Hora inicio"
+                ></ion-input>
+
+                <ion-input
+                  type="time"
+                  [value]="item.endTime"
+                  (ionChange)="updateScheduleEndTime(i, $event)"
+                  placeholder="Hora fin"
+                ></ion-input>
 
                 <ion-button
                   fill="clear"
-                  color="primary"
+                  color="danger"
                   (click)="removeScheduleItem(i)"
                 >
                   <ion-icon name="trash-outline" slot="icon-only"></ion-icon>

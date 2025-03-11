@@ -103,10 +103,10 @@ export class ApiService {
   // Materias
   // -----------------------------------------
 
-  getUserSubjects(user_id: string): Observable<Subject[]> {
-    return this.http.get<Subject[]>(
-      `${this.apiUrl}/users/${user_id}/subjects/`
-    );
+  getUserSubjects(userId: string): Observable<Subject[]> {
+    return this.http
+      .get<Subject[]>(`${this.apiUrl}/users/${userId}/subjects`)
+      .pipe(catchError(this.handleError));
   }
 
   getTasksBySubject(subject_id: string): Observable<Task[]> {
@@ -194,6 +194,12 @@ export class ApiService {
       .put(`${this.apiUrl}/users/${userId}`, profileData, {
         headers: this.getAuthHeaders(),
       })
+      .pipe(catchError(this.handleError));
+  }
+
+  getUserReminders(userId: string) {
+    return this.http
+      .get<any[]>(`${this.apiUrl}/users/${userId}/reminders`)
       .pipe(catchError(this.handleError));
   }
 

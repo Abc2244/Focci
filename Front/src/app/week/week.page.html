@@ -56,7 +56,9 @@
           <p>No hay eventos para esta mañana</p>
         </div>
         <div class="event-card" *ngFor="let event of morningEvents">
-          <div class="event-time">{{event.time}}</div>
+          <div class="event-time">
+            {{formatTime(event.startTime)}} - {{formatTime(event.endTime)}}
+          </div>
           <div class="event-content">
             <div class="event-title">{{event.title}}</div>
             <div class="event-details">{{event.details}}</div>
@@ -75,7 +77,9 @@
           <p>No hay eventos para esta tarde</p>
         </div>
         <div class="event-card" *ngFor="let event of afternoonEvents">
-          <div class="event-time">{{event.time}}</div>
+          <div class="event-time">
+            {{formatTime(event.startTime)}} - {{formatTime(event.endTime)}}
+          </div>
           <div class="event-content">
             <div class="event-title">{{event.title}}</div>
             <div class="event-details">{{event.details}}</div>
@@ -269,12 +273,17 @@
                   </ion-select>
 
                   <ion-datetime
-                    [value]="item.time"
-                    presentation="time"
-                    (ionChange)="updateScheduleTime(i, $event.detail.value)"
-                    locale="es-ES"
-                    size="cover"
-                    preferWheel="true"
+                    [value]="item.startTime"
+                    (ionChange)="updateScheduleTime(i, $event.detail.value!, 'startTime')"
+                    display-format="HH:mm"
+                    picker-format="HH:mm"
+                  ></ion-datetime>
+
+                  <ion-datetime
+                    [value]="item.endTime"
+                    (ionChange)="updateScheduleTime(i, $event.detail.value!, 'endTime')"
+                    display-format="HH:mm"
+                    picker-format="HH:mm"
                   ></ion-datetime>
 
                   <ion-button

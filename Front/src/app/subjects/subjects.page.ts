@@ -240,31 +240,27 @@ export class SubjectsPage implements OnInit {
     await alert.present();
   }
 
-  addScheduleItem() {
-    // Inicializar con valores predeterminados (Lunes a las 8:00 AM)
-    this.selectedScheduleItems.push({
-      day: this.availableDays[0].value, // Lunes por defecto
-      time: this.availableTimes[2], // 8:00 AM por defecto
-    });
-
-    // Ordenar los horarios después de agregar uno nuevo
-    this.selectedScheduleItems = this.sortScheduleByDay(
-      this.selectedScheduleItems
-    );
-  }
-
   removeScheduleItem(index: number) {
     this.selectedScheduleItems.splice(index, 1);
   }
 
-  updateScheduleTime(
-    index: number,
-    time: string | string[] | null | undefined
-  ) {
-    if (time !== null && time !== undefined) {
-      // Convertir a string si es un array
-      const timeValue = Array.isArray(time) ? time[0] : time;
-      this.selectedScheduleItems[index].time = timeValue;
+  addScheduleItem() {
+    this.selectedScheduleItems.push({
+      day: this.availableDays[0].value,
+      startTime: '08:00',
+      endTime: '09:00',
+    });
+  }
+
+  updateScheduleStartTime(index: number, event: any) {
+    if (event && event.detail && event.detail.value) {
+      this.selectedScheduleItems[index].startTime = event.detail.value;
+    }
+  }
+
+  updateScheduleEndTime(index: number, event: any) {
+    if (event && event.detail && event.detail.value) {
+      this.selectedScheduleItems[index].endTime = event.detail.value;
     }
   }
 
@@ -279,19 +275,29 @@ export class SubjectsPage implements OnInit {
   }
 
   formatTime(timeString: string): string {
-    // Si es un formato ISO, convertirlo a formato legible
-    if (timeString.includes('T')) {
-      try {
-        const date = new Date(timeString);
+    if (!timeString) return '';
+
+    try {
+      // Si es un formato HH:mm, retornarlo directamente
+      if (timeString.includes(':')) {
+        const [hours, minutes] = timeString.split(':');
+        const date = new Date();
+        date.setHours(parseInt(hours), parseInt(minutes));
         return date.toLocaleTimeString('es-ES', {
           hour: '2-digit',
           minute: '2-digit',
           hour12: true,
         });
-      } catch (e) {
-        return timeString;
       }
+      // Si es un formato ISO
+      const date = new Date(timeString);
+      return date.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      });
+    } catch (e) {
+      return timeString;
     }
-    return timeString;
   }
 }

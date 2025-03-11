@@ -17,7 +17,8 @@ interface EventItem {
   id: string;
   title: string;
   details: string;
-  time: string;
+  startTime: string;
+  endTime: string;
   type: 'class' | 'event';
   subjectId?: string;
 }
@@ -31,7 +32,7 @@ export class WeekPage implements OnInit {
   @ViewChild('taskModal') taskModal!: IonModal;
   @ViewChild('subjectModal') subjectModal!: IonModal;
 
-  selectedDay = 0; // Por defecto selecciona el primer día
+  selectedDay: number = 0;
   weekDays: WeekDay[] = [];
   userId: string = '';
   isLoading = true;
@@ -218,35 +219,32 @@ export class WeekPage implements OnInit {
   }
 
   generateEventsFromSubjects() {
-    // Limpiar eventos existentes
     this.morningEvents = [];
     this.afternoonEvents = [];
 
-    // Obtener el día de la semana seleccionado (Lunes, Martes, etc.)
-    const selectedDayName = this.weekDays[this.selectedDay].name;
+    const selectedDate = this.weekDays[this.selectedDay].date;
+    const dayName = this.weekDays[this.selectedDay].name;
 
-    // Recorrer todas las materias y sus horarios
     this.subjects.forEach((subject) => {
-      if (subject.schedule && subject.schedule.length > 0) {
-        // Filtrar horarios para el día seleccionado
-        const daySchedules = subject.schedule.filter(
-          (schedule) => schedule.day === selectedDayName
+      if (subject.schedule) {
+        const todaySchedule = subject.schedule.filter(
+          (schedule) => schedule.day === dayName
         );
 
-        // Crear eventos para cada horario
-        daySchedules.forEach((schedule) => {
-          const eventTime = this.formatTime(schedule.time);
+        todaySchedule.forEach((schedule) => {
           const event: EventItem = {
-            id: subject._id || '',
+            id: subject._id,
             title: subject.name,
-            details: `${schedule.day} - ${eventTime}`,
-            time: eventTime,
+            details: `${this.formatTime(
+              schedule.startTime
+            )} - ${this.formatTime(schedule.endTime)}`,
+            startTime: schedule.startTime,
+            endTime: schedule.endTime,
             type: 'class',
             subjectId: subject._id,
           };
 
-          // Determinar si es mañana o tarde (antes o después de las 12:00)
-          const hour = new Date(schedule.time).getHours();
+          const hour = parseInt(schedule.startTime.split(':')[0], 10);
           if (hour < 12) {
             this.morningEvents.push(event);
           } else {
@@ -256,9 +254,9 @@ export class WeekPage implements OnInit {
       }
     });
 
-    // Ordenar eventos por hora
-    this.morningEvents.sort((a, b) => a.time.localeCompare(b.time));
-    this.afternoonEvents.sort((a, b) => a.time.localeCompare(b.time));
+    // Ordenar eventos por hora de inicio
+    this.morningEvents.sort((a, b) => a.startTime.localeCompare(b.startTime));
+    this.afternoonEvents.sort((a, b) => a.startTime.localeCompare(b.startTime));
   }
 
   selectDay(index: number) {
@@ -267,36 +265,15 @@ export class WeekPage implements OnInit {
     this.generateEventsFromSubjects();
   }
 
-  getSubjectName(subjectId: string): string {
+  getSubjectName(subjectId: string): string | null {
     const subject = this.subjects.find((s) => s._id === subjectId);
-    return subject ? subject.name : 'Sin materia';
+    return subject ? subject.name : null;
   }
 
   completeTask(taskId: string) {
     const task = this.tasks.find((t) => t._id === taskId);
     if (task) {
-      const updatedTask = { ...task, completed: !task.completed };
-
-      this.apiService.updateTask(taskId, updatedTask).subscribe(
-        () => {
-          // Actualizar tarea en la lista local
-          const index = this.tasks.findIndex((t) => t._id === taskId);
-          if (index !== -1) {
-            this.tasks[index].completed = !this.tasks[index].completed;
-          }
-
-          this.toastService.showToast(
-            updatedTask.completed
-              ? 'Tarea completada'
-              : 'Tarea marcada como pendiente',
-            'success'
-          );
-        },
-        (error) => {
-          console.error('Error al actualizar tarea:', error);
-          this.toastService.showToast('Error al actualizar tarea', 'error');
-        }
-      );
+      task.completed = !task.completed;
     }
   }
 
@@ -389,7 +366,8 @@ export class WeekPage implements OnInit {
   addScheduleItem() {
     this.selectedScheduleItems.push({
       day: 'Lunes',
-      time: new Date().toISOString(),
+      startTime: '08:00',
+      endTime: '09:00',
     });
   }
 
@@ -409,17 +387,11 @@ export class WeekPage implements OnInit {
 
   updateScheduleTime(
     index: number,
-    time: string | string[] | null | undefined
+    value: string | string[] | null,
+    field: 'startTime' | 'endTime'
   ) {
-    if (
-      index >= 0 &&
-      index < this.selectedScheduleItems.length &&
-      time !== null &&
-      time !== undefined
-    ) {
-      // Convertir a string si es un array
-      const timeValue = Array.isArray(time) ? time[0] : time;
-      this.selectedScheduleItems[index].time = timeValue;
+    if (value && typeof value === 'string') {
+      this.selectedScheduleItems[index][field] = value;
     }
   }
 
@@ -435,12 +407,12 @@ export class WeekPage implements OnInit {
     };
 
     return [...scheduleItems].sort((a, b) => {
-      // Primero ordenar por día
+      // First sort by day
       const dayDiff = dayOrder[a.day] - dayOrder[b.day];
       if (dayDiff !== 0) return dayDiff;
 
-      // Si es el mismo día, ordenar por hora
-      return a.time.localeCompare(b.time);
+      // If same day, sort by startTime
+      return a.startTime.localeCompare(b.startTime);
     });
   }
 
@@ -491,19 +463,28 @@ export class WeekPage implements OnInit {
   }
 
   formatTime(timeString: string): string {
-    // Si es un formato ISO, convertirlo a formato legible
-    if (timeString.includes('T')) {
-      try {
+    if (!timeString) return '';
+
+    try {
+      if (timeString.includes('T')) {
         const date = new Date(timeString);
         return date.toLocaleTimeString('es-ES', {
           hour: '2-digit',
           minute: '2-digit',
           hour12: true,
         });
-      } catch (e) {
-        return timeString;
       }
+      // Si ya está en formato HH:mm, retornarlo formateado
+      const [hours, minutes] = timeString.split(':');
+      const date = new Date();
+      date.setHours(parseInt(hours), parseInt(minutes));
+      return date.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      });
+    } catch (e) {
+      return timeString;
     }
-    return timeString;
   }
 }
