@@ -101,14 +101,15 @@
       <form [formGroup]="subjectForm">
         <div class="form-container">
           <!-- Campo de nombre con estilo personalizado -->
-          <div class="name-input-container">
+          <ion-item class="custom-input">
+            <ion-label position="floating">Nombre de materia</ion-label>
             <ion-input
-              class="name-input"
               type="text"
               formControlName="name"
-              placeholder="Nombre de materia"
+              placeholder="Ej: Matemáticas"
             ></ion-input>
-          </div>
+          </ion-item>
+          
 
           <ion-item class="custom-input">
             <ion-label position="floating">Créditos</ion-label>

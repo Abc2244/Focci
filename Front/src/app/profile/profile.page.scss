@@ -50,6 +50,13 @@ $profile-text-light: #777;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     backdrop-filter: blur(10px);
 
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: black; 
+      margin: 0;
+    }
+
     .user-avatar-container {
       position: relative;
       margin-bottom: 1rem;
@@ -116,10 +123,10 @@ $profile-text-light: #777;
       margin-bottom: 1.5rem;
       border-radius: 16px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      background-color: white;
+      background: rgba(255, 255, 255, 0.9);
 
       ion-card-header {
-        background-color: rgba($profile-primary, 0.05);
+        background-color:  rgba(255, 255, 255, 0.9);
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 
         .card-header-content {
@@ -143,14 +150,14 @@ $profile-text-light: #777;
 
       ion-card-content {
         padding: 0;
-        background-color: white;
+        background-color:  rgba(255, 255, 255, 0.9);
 
         ion-list {
           background-color: transparent;
           padding: 0;
 
           ion-item {
-            --background: white;
+            --background:  rgba(255, 255, 255, 0.9);
             --padding-start: 16px;
             --padding-end: 16px;
             --padding-top: 12px;
@@ -200,23 +207,6 @@ $profile-text-light: #777;
 // Estilos para el modal
 .profile-modal {
   --border-radius: 16px;
-
-  ion-header {
-    ion-toolbar {
-      --background: white;
-      --color: $profile-text-dark;
-
-      ion-title {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: $profile-text-dark;
-      }
-
-      ion-button {
-        --color: $profile-text-medium;
-      }
-    }
-  }
 
   .modal-content {
     --background: #f9f9f9;
