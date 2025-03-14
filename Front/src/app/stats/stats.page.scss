@@ -5,13 +5,13 @@
     padding: 20px;
 
     .page-title {
+
       margin-bottom: 20px;
       text-align: center;
-
       h1 {
         font-size: 28px;
         font-weight: 700;
-        color: var(--ion-color-dark);
+        color: var(--ion-color-medium);
         margin: 0;
       }
     }
@@ -78,7 +78,7 @@
           .stat-value {
             font-size: 24px;
             font-weight: 700;
-            color: var(--ion-color-dark);
+            color: var(--ion-color-medium);
             margin-bottom: 4px;
           }
 
@@ -101,7 +101,7 @@
       h2 {
         font-size: 18px;
         font-weight: 600;
-        color: var(--ion-color-dark);
+        color: var(--ion-color-medium);
         margin-top: 0;
         margin-bottom: 20px;
       }
@@ -147,7 +147,7 @@
       h2 {
         font-size: 18px;
         font-weight: 600;
-        color: var(--ion-color-dark);
+        color: var(--ion-color-medium);
         margin-top: 0;
         margin-bottom: 20px;
       }
@@ -167,7 +167,7 @@
           .subject-name {
             font-size: 14px;
             font-weight: 500;
-            color: var(--ion-color-dark);
+            color: var(--ion-color-medium);
           }
 
           .subject-percentage {
