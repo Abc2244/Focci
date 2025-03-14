@@ -12,6 +12,7 @@ export class TabBarComponent {
 
   tabs = [
     { id: 'week', icon: 'calendar-outline', label: 'Semana' },
+    { id: 'schedule', icon: 'time-outline', label: 'Horario' },
     { id: 'calendar', icon: 'calendar-number-outline', label: 'Calendario' },
     { id: 'stats', icon: 'bar-chart-outline', label: 'Estadísticas' },
     { id: 'smart', icon: 'bulb-outline', label: 'Inteligente' },

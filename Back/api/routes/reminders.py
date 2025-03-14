@@ -13,11 +13,19 @@ def serialize_mongo_document(doc):
 
 @router.post("/reminders/")
 async def create_reminder(reminder: Reminder):
+    # Asegurarse de que el campo message existe
+    if not hasattr(reminder, 'message') or reminder.message is None:
+        reminder.message = ""
+    
     reminder_id = await mongodb.get_collection("reminders").insert_one(reminder.dict())
     return {"message": "Recordatorio creado", "reminder_id": str(reminder_id.inserted_id)}
 
 @router.put("/reminders/{reminder_id}/")
 async def update_reminder(reminder_id: str, reminder: Reminder):
+    # Asegurarse de que el campo message existe
+    if not hasattr(reminder, 'message') or reminder.message is None:
+        reminder.message = ""
+        
     result = await mongodb.get_collection("reminders").update_one(
         {"_id": ObjectId(reminder_id)},
         {"$set": reminder.dict()}

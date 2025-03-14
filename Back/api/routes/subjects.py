@@ -12,8 +12,12 @@ def serialize_mongo_document(doc):
 
 @router.post("/subjects/")
 async def create_subject(subject: Subject):
-    subject_id = await mongodb.get_collection("subjects").insert_one(subject.dict())
-    return {"message": "Materia creada", "subject_id": str(subject_id.inserted_id)}
+    try:
+        subject_dict = subject.dict()
+        subject_id = await mongodb.get_collection("subjects").insert_one(subject_dict)
+        return {"message": "Materia creada", "subject_id": str(subject_id.inserted_id)}
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=str(e))
 
 @router.get("/subjects/{subject_id}/")
 async def get_subject(subject_id: str):

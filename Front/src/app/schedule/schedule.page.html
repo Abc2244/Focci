@@ -1,0 +1,207 @@
+<ion-content class="schedule-content">
+  <div class="page-container">
+    <!-- Loading indicator -->
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner></ion-spinner>
+      <p>Cargando horario...</p>
+    </div>
+
+    <!-- Week view -->
+    <div *ngIf="!isLoading" class="week-view-container">
+      <!-- Day selector header -->
+      <div class="week-header">
+        <div class="week-nav">
+          <ion-button fill="clear" (click)="previousWeek()">
+            <ion-icon name="chevron-back-outline"></ion-icon>
+          </ion-button>
+          <h2>{{ currentWeekLabel }}</h2>
+          <ion-button fill="clear" (click)="nextWeek()">
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </ion-button>
+        </div>
+        <ion-button fill="clear" (click)="goToToday()">Hoy</ion-button>
+      </div>
+
+      <!-- Days of week header -->
+      <div class="days-header">
+        <div class="time-column-header"></div>
+        <div
+          *ngFor="let day of daysOfWeek"
+          class="day-header"
+          [class.today]="day.isToday"
+        >
+          <div class="day-name">{{ day.shortName }}</div>
+          <div class="day-number">{{ day.date }}</div>
+        </div>
+      </div>
+
+      <!-- Calendar grid with time slots -->
+      <div class="calendar-grid">
+        <!-- Time labels column -->
+        <div class="time-column">
+          <div *ngFor="let hour of timeSlots" class="time-slot-label">
+            <span>{{ formatHour(hour) }}</span>
+          </div>
+        </div>
+
+        <!-- Calendar content -->
+        <div class="calendar-content">
+          <!-- Horizontal grid lines -->
+          <div *ngFor="let hour of timeSlots" class="time-slot-line"></div>
+
+          <!-- Vertical grid lines -->
+          <div
+            *ngFor="let day of daysOfWeek; let i = index"
+            class="day-column-line"
+            [style.left]="(i / 7) * 100 + '%'"
+          ></div>
+
+          <!-- Events -->
+          <div
+            *ngFor="let event of events"
+            class="calendar-event"
+            [ngStyle]="getEventStyle(event)"
+            (click)="onEventClick(event)"
+          >
+            <div
+              class="event-title"
+              [class.reminder]="event.type === 'reminder'"
+            >
+              {{ event.title }}
+            </div>
+            <div class="event-time">{{ event.startTime | date:'HH:mm' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating action button to add event -->
+      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button (click)="openAddEventModal()">
+          <ion-icon name="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </div>
+  </div>
+</ion-content>
+
+<!-- Event details modal -->
+<ion-modal #eventModal>
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Detalles del evento</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeEventModal()">
+            <ion-icon name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding" *ngIf="selectedEvent">
+      <h2>{{ selectedEvent.title }}</h2>
+      <p
+        class="event-time"
+        *ngIf="selectedEvent.startTime && selectedEvent.endTime"
+      >
+        {{ selectedEvent.startTime | date : "EEEE, d MMM y, h:mm a" }} - {{
+        selectedEvent.endTime | date : "h:mm a" }}
+      </p>
+
+      <div class="event-details" *ngIf="selectedEvent.description">
+        <p>{{ selectedEvent.description }}</p>
+      </div>
+
+      <div class="event-actions">
+        <ion-button (click)="editEvent()">
+          <ion-icon name="create-outline" slot="start"></ion-icon>
+          Editar
+        </ion-button>
+        <ion-button color="danger" (click)="deleteEvent()">
+          <ion-icon name="trash-outline" slot="start"></ion-icon>
+          Eliminar
+        </ion-button>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- Add/Edit Event Modal -->
+<ion-modal #addEventModal>
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title
+          >{{ isEditMode ? "Editar evento" : "Nuevo evento" }}</ion-title
+        >
+        <ion-buttons slot="end">
+          <ion-button (click)="closeAddEventModal()">
+            <ion-icon name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <form [formGroup]="eventForm" (ngSubmit)="onSubmitEvent()">
+        <ion-item>
+          <ion-label position="floating">Título</ion-label>
+          <ion-input formControlName="title" type="text"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Fecha</ion-label>
+          <ion-datetime-button datetime="startDate"></ion-datetime-button>
+          <ion-modal [keepContentsMounted]="true">
+            <ng-template>
+              <ion-datetime
+                id="startDate"
+                formControlName="startDate"
+                presentation="date"
+                locale="es-ES"
+              >
+              </ion-datetime>
+            </ng-template>
+          </ion-modal>
+        </ion-item>
+
+        <div class="time-inputs">
+          <ion-item>
+            <ion-label position="floating">Hora inicio</ion-label>
+            <ion-input formControlName="startTime" type="time"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Hora fin</ion-label>
+            <ion-input formControlName="endTime" type="time"></ion-input>
+          </ion-item>
+        </div>
+
+        <ion-item>
+          <ion-label position="floating">Descripción</ion-label>
+          <ion-textarea formControlName="description" rows="3"></ion-textarea>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Color</ion-label>
+          <ion-select formControlName="color">
+            <ion-select-option
+              *ngFor="let color of eventColors"
+              [value]="color.value"
+            >
+              {{ color.name }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <div class="form-actions">
+          <ion-button
+            type="submit"
+            expand="block"
+            [disabled]="eventForm.invalid"
+          >
+            {{ isEditMode ? "Actualizar" : "Crear" }} evento
+          </ion-button>
+        </div>
+      </form>
+    </ion-content>
+  </ng-template>
+</ion-modal>

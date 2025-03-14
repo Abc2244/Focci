@@ -204,8 +204,9 @@
               <ion-datetime
                 formControlName="due_date"
                 displayFormat="DD/MM/YYYY HH:mm"
-                presentation="date-time"
                 [min]="minDate"
+                [hourValues]="hourValues"
+                [minuteValues]="minuteValues"
                 locale="es-ES"
                 class="large-input"
               ></ion-datetime>

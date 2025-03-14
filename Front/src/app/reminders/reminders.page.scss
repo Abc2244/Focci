@@ -105,7 +105,7 @@ $task-color: #673ab7; // Púrpura para tareas
     background: white;
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    max-height: 220px;
+    max-height: none;
 
     &:hover {
       transform: translateY(-2px);
@@ -172,6 +172,22 @@ $task-color: #673ab7; // Púrpura para tareas
 
     ion-card-content {
       padding: 12px 16px;
+
+      .reminder-message {
+        margin-bottom: 12px;
+        padding: 10px;
+        background-color: rgba(33, 150, 243, 0.05);
+        border-left: 3px solid var(--ion-color-primary);
+        border-radius: 4px;
+
+        p {
+          margin: 0;
+          color: #000000;
+          font-size: 0.9rem;
+          line-height: 1.4;
+          font-weight: 400;
+        }
+      }
 
       .reminder-info {
         display: flex;
@@ -332,11 +348,15 @@ $task-color: #673ab7; // Púrpura para tareas
         display: flex;
         justify-content: flex-end;
         gap: 4px;
+        margin-top: 8px;
+        position: relative;
+        z-index: 2;
 
         .action-button {
           --padding-start: 8px;
           --padding-end: 8px;
           height: 36px;
+          opacity: 1 !important;
 
           ion-icon {
             font-size: 1.2rem;
@@ -459,6 +479,27 @@ $task-color: #673ab7; // Púrpura para tareas
           font-weight: 500;
         }
 
+        // Asegurar que el texto en los inputs sea visible
+        ion-input,
+        ion-textarea,
+        ion-select,
+        ion-datetime {
+          --color: #000000 !important;
+          color: #000000 !important;
+          --placeholder-color: #666666;
+        }
+
+        // Específicamente para el textarea del mensaje
+        ion-textarea {
+          --color: #000000 !important;
+          color: #000000 !important;
+          --placeholder-color: #666666;
+
+          &::part(text) {
+            color: #000000 !important;
+          }
+        }
+
         &.datetime-input {
           .custom-datetime {
             margin-top: 16px;
@@ -501,6 +542,19 @@ $task-color: #673ab7; // Púrpura para tareas
       }
     }
   }
+}
+
+// Asegurar que el texto en los select options sea visible
+ion-select::part(text),
+ion-select::part(placeholder),
+ion-datetime::part(text),
+ion-datetime::part(placeholder),
+ion-textarea::part(text) {
+  color: #000000 !important;
+}
+
+ion-select-option {
+  color: #000000 !important;
 }
 
 // Estilos globales para el calendario

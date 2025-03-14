@@ -3,7 +3,8 @@ from typing import List
 
 class ScheduleItem(BaseModel):
     day: str  # Día de la semana (ej. "Lunes", "Martes", etc.)
-    time: str  # Hora (ej. "4:00 PM", "8:00 AM", etc.)
+    startTime: str  # Hora de inicio (ej. "4:00 PM")
+    endTime: str  # Hora de fin (ej. "6:00 PM")
 
 class Subject(BaseModel):
     user_id: str  # ID del usuario

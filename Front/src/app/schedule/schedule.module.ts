@@ -4,10 +4,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { WeekPageRoutingModule } from './week-routing.module';
+import { SchedulePageRoutingModule } from './schedule-routing.module';
 
-import { WeekPage } from './week.page';
-import { SharedModule } from '../shared/shared.module';
+import { SchedulePage } from './schedule.page';
 
 @NgModule({
   imports: [
@@ -15,9 +14,8 @@ import { SharedModule } from '../shared/shared.module';
     FormsModule,
     ReactiveFormsModule,
     IonicModule,
-    WeekPageRoutingModule,
-    SharedModule,
+    SchedulePageRoutingModule,
   ],
-  declarations: [WeekPage],
+  declarations: [SchedulePage],
 })
-export class WeekPageModule {}
+export class SchedulePageModule {}

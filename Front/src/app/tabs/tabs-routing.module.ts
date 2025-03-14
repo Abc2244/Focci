@@ -54,6 +54,13 @@ const routes: Routes = [
           import('../smart/smart.module').then((m) => m.SmartPageModule),
       },
       {
+        path: 'schedule',
+        loadChildren: () =>
+          import('../schedule/schedule.module').then(
+            (m) => m.SchedulePageModule
+          ),
+      },
+      {
         path: '',
         redirectTo: '/tabs/week',
         pathMatch: 'full',

@@ -1,0 +1,363 @@
+.schedule-content {
+  --background: linear-gradient(
+    135deg,
+    #f5f7fa 0%,
+    var(--ion-color-primary-tint) 100%
+  );
+  --padding-top: 0px;
+
+  &::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(30, 136, 229, 0.05)" stroke-width="2"/></svg>');
+    background-size: 300px 300px;
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .page-container {
+    padding: 16px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .page-title {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+
+      .title-icon {
+        font-size: 28px;
+        margin-right: 12px;
+        color: var(--ion-color-primary);
+      }
+
+      h1 {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+        color: #333333;
+      }
+    }
+
+    .loading-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      ion-spinner {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 16px;
+        color: var(--ion-color-primary);
+      }
+
+      p {
+        color: #666666;
+        font-size: 16px;
+      }
+    }
+
+    .week-view-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+      .week-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e0e0e0;
+
+        .week-nav {
+          display: flex;
+          align-items: center;
+
+          h2 {
+            margin: 0 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333333;
+          }
+        }
+      }
+
+      .days-header {
+        display: flex;
+        border-bottom: 1px solid #e0e0e0;
+
+        .time-column-header {
+          min-width: 60px;
+          border-right: 1px solid #e0e0e0;
+        }
+
+        .day-header {
+          flex: 1;
+          text-align: center;
+          padding: 8px 0;
+
+          .day-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #666666;
+            text-transform: capitalize;
+          }
+
+          .day-number {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333333;
+          }
+
+          &.today {
+            background-color: rgba(25, 118, 210, 0.1);
+
+            .day-name,
+            .day-number {
+              color: #1976d2;
+              font-weight: 700;
+            }
+          }
+        }
+      }
+
+      .calendar-grid {
+        display: flex;
+        flex: 1;
+        overflow-y: auto;
+        position: relative;
+
+        .time-column {
+          min-width: 60px;
+          position: sticky;
+          left: 0;
+          background: white;
+          z-index: 2;
+
+          .time-slot-label {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #666666;
+            border-bottom: 1px solid #f0f0f0;
+          }
+        }
+
+        .calendar-content {
+          flex: 1;
+          position: relative;
+          min-height: 1440px; // 24 horas * 60px
+
+          .time-slot-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: #f0f0f0;
+
+            &:nth-child(1) {
+              top: 0px;
+            }
+            &:nth-child(2) {
+              top: 60px;
+            }
+            &:nth-child(3) {
+              top: 120px;
+            }
+            &:nth-child(4) {
+              top: 180px;
+            }
+            &:nth-child(5) {
+              top: 240px;
+            }
+            &:nth-child(6) {
+              top: 300px;
+            }
+            &:nth-child(7) {
+              top: 360px;
+            }
+            &:nth-child(8) {
+              top: 420px;
+            }
+            &:nth-child(9) {
+              top: 480px;
+            }
+            &:nth-child(10) {
+              top: 540px;
+            }
+            &:nth-child(11) {
+              top: 600px;
+            }
+            &:nth-child(12) {
+              top: 660px;
+            }
+            &:nth-child(13) {
+              top: 720px;
+            }
+            &:nth-child(14) {
+              top: 780px;
+            }
+            &:nth-child(15) {
+              top: 840px;
+            }
+            &:nth-child(16) {
+              top: 900px;
+            }
+          }
+
+          .day-column-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background-color: #e0e0e0;
+            z-index: 0;
+          }
+
+          .calendar-event {
+            position: absolute;
+            border-radius: 4px;
+            padding: 4px 8px;
+            overflow: hidden;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 1;
+
+            &:hover {
+              filter: brightness(1.1);
+              transform: scale(1.02);
+            }
+
+            .event-title {
+              font-weight: 500;
+              margin-bottom: 2px;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+
+              &.reminder {
+                font-style: italic;
+              }
+            }
+
+            .event-time {
+              font-size: 11px;
+              opacity: 0.9;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Estilos para el modal de evento
+.event-modal-content {
+  padding: 16px;
+
+  .event-header {
+    margin-bottom: 24px;
+
+    .event-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333333;
+    }
+
+    .event-time {
+      display: flex;
+      align-items: center;
+      color: #666666;
+      font-size: 14px;
+
+      ion-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+
+  .event-details {
+    margin-bottom: 24px;
+
+    p {
+      color: #333333;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+  }
+
+  .event-actions {
+    display: flex;
+    gap: 12px;
+  }
+}
+
+// Estilos para el formulario de eventos
+.time-inputs {
+  display: flex;
+  gap: 12px;
+
+  ion-item {
+    flex: 1;
+  }
+}
+
+.form-actions {
+  margin-top: 24px;
+}
+
+// Asegurarse de que los textos sean visibles
+ion-item {
+  --color: #333333;
+
+  ion-label {
+    color: #333333 !important;
+  }
+
+  ion-input,
+  ion-textarea,
+  ion-select {
+    --color: #333333;
+  }
+}
+
+ion-datetime {
+  color: #333333;
+}
+
+ion-button {
+  font-weight: 500;
+}
+
+// Corregir problemas de visualización en la parte superior izquierda
+ion-header ion-toolbar {
+  --background: white;
+  --color: #333333;
+}
+
+ion-title {
+  color: #333333;
+}
+
+// Asegurar que los modales tengan fondo blanco
+ion-modal ion-content {
+  --background: white;
+}

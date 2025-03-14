@@ -22,6 +22,10 @@ export class TaskPage implements OnInit {
   currentTaskId: string | null = null;
   minDate: string;
 
+  // Modificar estas propiedades para permitir todas las horas
+  hourValues: number[] = Array.from({ length: 24 }, (_, i) => i); // 0-23 horas
+  minuteValues: number[] = [0, 15, 30, 45]; // Intervalos de 15 minutos
+
   get incompleteTasks() {
     return this.tasks.filter((task) => !task.completed);
   }
@@ -49,6 +53,9 @@ export class TaskPage implements OnInit {
   ngOnInit() {
     this.loadSubjects();
     this.loadTasks();
+
+    // Asegurarse de que los valores de hora estén correctamente inicializados
+    this.hourValues = Array.from({ length: 24 }, (_, i) => i);
   }
 
   loadSubjects() {
@@ -132,6 +139,16 @@ export class TaskPage implements OnInit {
     this.isEditing = false;
     this.currentTaskId = null;
     this.taskForm.reset();
+
+    // Establecer una fecha predeterminada (ahora + 1 día)
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(12, 0, 0, 0); // Mediodía por defecto
+
+    this.taskForm.patchValue({
+      due_date: tomorrow.toISOString(),
+    });
+
     this.showModal = true;
   }
 
@@ -159,7 +176,7 @@ export class TaskPage implements OnInit {
         }
 
         this.dismissModal();
-        await this.loadTasks();
+        this.loadTasks();
       } catch (error) {
         this.toastService.showToast('Error al guardar la tarea', 'error');
         console.error('Error:', error);
@@ -176,6 +193,9 @@ export class TaskPage implements OnInit {
   editTask(task: Task) {
     this.isEditing = true;
     this.currentTaskId = task._id || null;
+
+    // Asegurarse de que los valores de hora estén correctamente configurados
+    this.hourValues = Array.from({ length: 24 }, (_, i) => i);
 
     this.taskForm.patchValue({
       description: task.description,

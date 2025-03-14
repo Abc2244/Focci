@@ -31,6 +31,14 @@
         </ion-card-header>
 
         <ion-card-content>
+          <!-- Mostrar el mensaje del recordatorio si existe -->
+          <div
+            class="reminder-message"
+            *ngIf="reminder.message && reminder.message.trim() !== ''"
+          >
+            <p>{{ reminder.message }}</p>
+          </div>
+
           <div class="reminder-info">
             <ion-chip
               class="priority-chip"
@@ -133,6 +141,14 @@
           </ion-card-header>
 
           <ion-card-content>
+            <!-- Mostrar el mensaje del recordatorio si existe -->
+            <div
+              class="reminder-message"
+              *ngIf="reminder.message && reminder.message.trim() !== ''"
+            >
+              <p>{{ reminder.message }}</p>
+            </div>
+
             <div class="reminder-info">
               <ion-chip color="success">
                 <ion-icon name="checkmark-done-outline"></ion-icon>
@@ -197,6 +213,14 @@
           </ion-card-header>
 
           <ion-card-content>
+            <!-- Mostrar el mensaje del recordatorio si existe -->
+            <div
+              class="reminder-message"
+              *ngIf="reminder.message && reminder.message.trim() !== ''"
+            >
+              <p>{{ reminder.message }}</p>
+            </div>
+
             <div class="reminder-info">
               <ion-chip color="medium">
                 <ion-icon name="ban-outline"></ion-icon>
@@ -304,6 +328,17 @@
                   {{ task.description }}
                 </ion-select-option>
               </ion-select>
+            </ion-item>
+
+            <ion-item class="custom-input">
+              <ion-label position="floating" class="form-label"
+                >Mensaje</ion-label
+              >
+              <ion-textarea
+                formControlName="message"
+                placeholder="Escribe un mensaje para este recordatorio"
+                rows="3"
+              ></ion-textarea>
             </ion-item>
 
             <ion-item class="custom-input datetime-input">
