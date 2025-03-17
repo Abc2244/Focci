@@ -6,6 +6,7 @@ import { ToastService } from '../services/toast.service';
 import { Task, CreateTaskDTO } from '../interfaces/task.interface';
 import { Subject, ScheduleItem } from '../interfaces/subject.interface';
 import { IonModal } from '@ionic/angular';
+import { firstValueFrom } from 'rxjs';
 
 interface WeekDay {
   name: string;
@@ -106,6 +107,11 @@ export class WeekPage implements OnInit {
     this.loadUserData();
   }
 
+  ionViewWillEnter() {
+    // Este método se llama cada vez que la página está a punto de ser mostrada
+    this.loadUserData(); // Recargar los datos del usuario
+  }
+
   setupWeekDays() {
     this.weekDays = [];
     const today = new Date();
@@ -149,12 +155,9 @@ export class WeekPage implements OnInit {
 
   async loadUserData() {
     this.isLoading = true;
-
-    // Obtener el ID del usuario
     const userId = this.authService.getCurrentUserId();
 
     if (!userId) {
-      console.error('Error: ID de usuario no encontrado');
       this.toastService.showToast(
         'Error: ID de usuario no encontrado',
         'error'
@@ -163,46 +166,43 @@ export class WeekPage implements OnInit {
       return;
     }
 
-    this.userId = userId;
+    try {
+      // Cargar materias primero
+      const subjects = await firstValueFrom(
+        this.apiService.getUserSubjects(userId)
+      );
+      this.subjects = subjects || [];
+      this.generateEventsFromSubjects(this.subjects);
 
-    // Cargar materias y tareas
-    this.apiService.getUserSubjects(userId).subscribe({
-      next: (subjects: Subject[]) => {
-        this.subjects = subjects;
-        this.generateEventsFromSubjects(subjects);
+      // Cargar todas las tareas
+      const tasks = await firstValueFrom(this.apiService.getUserTasks(userId));
+      this.tasks = tasks || [];
+      this.filterTasksForSelectedDay(); // Filtrar tareas para el día seleccionado
 
-        // Cargar tareas después de obtener las materias
-        this.apiService.getTasks(userId).subscribe({
-          next: (tasks: Task[]) => {
-            this.tasks = tasks.filter((task: Task) => {
-              // Solo mostrar tareas no completadas o completadas hoy
-              if (!task.completed) return true;
+      // Cargar recordatorios
+      try {
+        const reminders = await firstValueFrom(
+          this.apiService.getUserReminders(userId)
+        );
+        // Procesar recordatorios si es necesario
+      } catch (reminderError) {
+        console.warn('No se pudieron cargar los recordatorios:', reminderError);
+      }
+    } catch (error) {
+      console.error('Error al cargar datos:', error);
+      this.toastService.showToast(
+        'Error al cargar los datos. Por favor, intente más tarde',
+        'error'
+      );
+    } finally {
+      this.isLoading = false;
+    }
+  }
 
-              const completedDate = new Date(task.completed_date || '');
-              const today = new Date();
-              return (
-                completedDate.getDate() === today.getDate() &&
-                completedDate.getMonth() === today.getMonth() &&
-                completedDate.getFullYear() === today.getFullYear()
-              );
-            });
-
-            this.filterTasksForSelectedDay();
-            this.isLoading = false;
-          },
-          error: (error: any) => {
-            console.error('Error al cargar tareas:', error);
-            this.toastService.showToast('Error al cargar tareas', 'error');
-            this.isLoading = false;
-          },
-        });
-      },
-      error: (error: any) => {
-        console.error('Error al cargar materias:', error);
-        this.toastService.showToast('Error al cargar materias', 'error');
-        this.isLoading = false;
-      },
-    });
+  selectDay(index: number) {
+    this.selectedDay = index;
+    this.filterTasksForSelectedDay();
+    this.generateEventsFromSubjects(this.subjects); // Regenerar eventos para el día seleccionado
   }
 
   filterTasksForSelectedDay() {
@@ -211,23 +211,32 @@ export class WeekPage implements OnInit {
       return;
     }
 
-    const selectedDate = this.weekDays[this.selectedDay].date;
-    const startOfDay = new Date(selectedDate);
-    startOfDay.setHours(0, 0, 0, 0);
-
-    const endOfDay = new Date(selectedDate);
-    endOfDay.setHours(23, 59, 59, 999);
-
-    // Filtrar a un nuevo array en lugar de modificar el original
+    const selectedDate = new Date(this.weekDays[this.selectedDay].date);
     this.filteredTasks = this.tasks.filter((task) => {
       const taskDate = new Date(task.due_date);
-      return taskDate >= startOfDay && taskDate <= endOfDay;
+      return (
+        taskDate.getFullYear() === selectedDate.getFullYear() &&
+        taskDate.getMonth() === selectedDate.getMonth() &&
+        taskDate.getDate() === selectedDate.getDate()
+      );
     });
+
+    // Ordenar las tareas filtradas por la hora de entrega
+    this.filteredTasks.sort((a, b) => {
+      const timeA = new Date(a.due_date).getTime();
+      const timeB = new Date(b.due_date).getTime();
+      return timeA - timeB;
+    });
+
+    // Debug para verificar el filtrado
+    console.log('Fecha seleccionada:', selectedDate);
+    console.log('Tareas filtradas:', this.filteredTasks);
   }
 
   generateEventsFromSubjects(subjects: Subject[]): void {
     // Limpiar eventos existentes
     this.morningEvents = [];
+    this.afternoonEvents = [];
 
     const selectedDate = this.weekDays[this.selectedDay].date;
     const selectedDayNumber = selectedDate.getDay();
@@ -313,30 +322,27 @@ export class WeekPage implements OnInit {
     }
   }
 
-  selectDay(index: number) {
-    this.selectedDay = index;
-    this.loadEventsForSelectedDay();
-  }
-
-  private loadEventsForSelectedDay() {
-    // Limpiar eventos actuales
-    this.morningEvents = [];
-    this.afternoonEvents = [];
-
-    // Cargar eventos para el día seleccionado
-    const selectedDate = this.weekDays[this.selectedDay].date;
-    this.generateEventsFromSubjects(this.subjects);
-  }
-
   getSubjectName(subjectId: string): string | null {
     const subject = this.subjects.find((s) => s._id === subjectId);
     return subject ? subject.name : null;
   }
 
-  completeTask(taskId: string) {
+  async completeTask(taskId: string | undefined) {
+    if (!taskId) return;
+
     const task = this.tasks.find((t) => t._id === taskId);
     if (task) {
       task.completed = !task.completed;
+      this.apiService.completeTask(taskId).subscribe({
+        next: () => {
+          this.toastService.showToast('Tarea completada', 'success');
+          this.loadUserData(); // Refrescar datos
+        },
+        error: (error) => {
+          console.error('Error al completar tarea:', error);
+          this.toastService.showToast('Error al completar la tarea', 'error');
+        },
+      });
     }
   }
 
@@ -358,11 +364,9 @@ export class WeekPage implements OnInit {
   }
 
   saveTask() {
-    console.log('Guardando tarea...');
     if (this.taskForm.valid) {
       const userId = this.authService.getCurrentUserId();
       if (!userId) {
-        console.error('No se encontró ID de usuario');
         this.toastService.showToast(
           'Error: No se encontró ID de usuario',
           'error'
@@ -371,42 +375,28 @@ export class WeekPage implements OnInit {
       }
 
       const formData = this.taskForm.value;
-      console.log('Datos del formulario:', formData);
-
-      // Asegurarse de que la fecha esté en formato ISO
-      let dueDate = formData.due_date;
-      if (dueDate && typeof dueDate === 'string' && !dueDate.includes('Z')) {
-        dueDate = new Date(dueDate).toISOString();
-      }
-
       const taskData = {
         user_id: userId,
         description: formData.description,
         subject_id: formData.subject_id,
-        due_date: dueDate,
+        due_date: new Date(formData.due_date).toISOString(),
         completed: false,
       };
 
-      console.log('Datos a enviar:', taskData);
-
       this.apiService.createTask(taskData).subscribe({
-        next: (response) => {
-          console.log('Tarea creada:', response);
+        next: async () => {
           this.toastService.showToast('Tarea creada con éxito', 'success');
           this.dismissTaskModal();
-          this.loadUserData();
+          await this.loadUserData();
         },
         error: (error) => {
           console.error('Error al crear tarea:', error);
-          this.toastService.showToast('Error al crear la tarea', 'error');
+          this.toastService.showToast(
+            'Error al crear la tarea. Por favor, intente nuevamente',
+            'error'
+          );
         },
       });
-    } else {
-      console.log('Formulario inválido:', this.taskForm.errors);
-      this.toastService.showToast(
-        'Por favor complete todos los campos requeridos',
-        'warning'
-      );
     }
   }
 
@@ -480,11 +470,9 @@ export class WeekPage implements OnInit {
   }
 
   saveSubject() {
-    console.log('Guardando materia...');
     if (this.subjectForm.valid) {
       const userId = this.authService.getCurrentUserId();
       if (!userId) {
-        console.error('No se encontró ID de usuario');
         this.toastService.showToast(
           'Error: No se encontró ID de usuario',
           'error'
@@ -493,8 +481,6 @@ export class WeekPage implements OnInit {
       }
 
       const formData = this.subjectForm.value;
-      console.log('Datos del formulario:', formData);
-
       const subjectData = {
         user_id: userId,
         name: formData.name,
@@ -502,14 +488,11 @@ export class WeekPage implements OnInit {
         schedule: this.selectedScheduleItems,
       };
 
-      console.log('Datos a enviar:', subjectData);
-
       this.apiService.createSubject(subjectData).subscribe({
-        next: (response) => {
-          console.log('Materia creada:', response);
+        next: async (response) => {
           this.toastService.showToast('Materia creada con éxito', 'success');
           this.dismissSubjectModal();
-          this.loadUserData();
+          await this.loadUserData(); // Recargar todos los datos
         },
         error: (error) => {
           console.error('Error al crear materia:', error);
@@ -517,7 +500,6 @@ export class WeekPage implements OnInit {
         },
       });
     } else {
-      console.log('Formulario inválido:', this.subjectForm.errors);
       this.toastService.showToast(
         'Por favor complete todos los campos requeridos',
         'warning'
@@ -562,5 +544,13 @@ export class WeekPage implements OnInit {
     const [h2, m2] = time2.split(':').map(Number);
     if (h1 !== h2) return h1 - h2;
     return m1 - m2;
+  }
+
+  private isSameDay(date1: Date, date2: Date): boolean {
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
   }
 }

@@ -9,6 +9,7 @@ import { Task, CreateTaskDTO } from './interfaces/task.interface';
 import { Subject, ScheduleItem } from './interfaces/subject.interface';
 import { environment } from '../environments/environment';
 import { catchError } from 'rxjs/operators';
+import { TaskStats } from './interfaces/stats.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -200,6 +201,46 @@ export class ApiService {
   getUserReminders(userId: string) {
     return this.http
       .get<any[]>(`${this.apiUrl}/users/${userId}/reminders`)
+      .pipe(catchError(this.handleError));
+  }
+
+  // Limpiar todos los datos del usuario
+  cleanAllUserData(userId: string): Observable<any> {
+    return this.http
+      .delete(`${this.apiUrl}/users/${userId}/clean-all/`)
+      .pipe(catchError(this.handleError));
+  }
+
+  // Crear datos de prueba (opcional, si quieres hacerlo desde el frontend)
+  createTestData(userId: string): Observable<any> {
+    return this.http
+      .post(`${this.apiUrl}/users/${userId}/create-test-data/`, {})
+      .pipe(catchError(this.handleError));
+  }
+
+  // Obtener estadísticas de tareas
+  getStats(userId: string, period: string): Observable<TaskStats> {
+    return this.http
+      .get<TaskStats>(`${this.apiUrl}/stats/users/${userId}/tasks/${period}`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(catchError(this.handleError));
+  }
+
+  getTasksCompletionStats(userId: string): Observable<any> {
+    return this.http
+      .get(`${this.apiUrl}/stats/users/${userId}/completion`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(catchError(this.handleError));
+  }
+
+  // Obtener estadísticas de tiempo
+  getTasksTimeStats(userId: string): Observable<any> {
+    return this.http
+      .get(`${this.apiUrl}/stats/users/${userId}/time-stats`, {
+        headers: this.getAuthHeaders(),
+      })
       .pipe(catchError(this.handleError));
   }
 

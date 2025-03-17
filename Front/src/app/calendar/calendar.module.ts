@@ -19,5 +19,6 @@ import { SharedModule } from '../shared/shared.module';
     SharedModule,
   ],
   declarations: [CalendarPage],
+  exports: [CalendarPage],
 })
 export class CalendarPageModule {}

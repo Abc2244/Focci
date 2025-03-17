@@ -7,13 +7,11 @@ import { Router } from '@angular/router';
   styleUrls: ['./tab-bar.component.scss'],
 })
 export class TabBarComponent {
-  @Input() activeTab: string = 'week';
+  @Input() activeTab: string = 'schedule';
   @Output() tabChange = new EventEmitter<{ tab: string }>();
 
   tabs = [
-    { id: 'week', icon: 'calendar-outline', label: 'Semana' },
     { id: 'schedule', icon: 'time-outline', label: 'Horario' },
-    { id: 'calendar', icon: 'calendar-number-outline', label: 'Calendario' },
     { id: 'stats', icon: 'bar-chart-outline', label: 'Estadísticas' },
     { id: 'smart', icon: 'bulb-outline', label: 'Inteligente' },
   ];
@@ -21,10 +19,7 @@ export class TabBarComponent {
   constructor(private router: Router) {}
 
   onTabChange(tabId: string) {
-    // Navegar a la ruta correspondiente
     this.router.navigate(['/tabs', tabId]);
-
-    // Emitir el evento con la estructura correcta
     this.tabChange.emit({ tab: tabId });
   }
 }

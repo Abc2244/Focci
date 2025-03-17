@@ -101,4 +101,17 @@ export class AuthService {
   logout() {
     localStorage.removeItem(this.tokenKey);
   }
+
+  async getUserId(): Promise<string | null> {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+
+    try {
+      const decodedToken: any = jwtDecode(token);
+      return decodedToken.user_id;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;
+    }
+  }
 }

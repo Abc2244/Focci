@@ -8,6 +8,12 @@ import { SchedulePageRoutingModule } from './schedule-routing.module';
 
 import { SchedulePage } from './schedule.page';
 
+import { SharedModule } from '../shared/shared.module';
+
+// Importar los módulos en lugar de los componentes
+import { CalendarPageModule } from '../calendar/calendar.module';
+import { WeekPageModule } from '../week/week.module';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -15,6 +21,9 @@ import { SchedulePage } from './schedule.page';
     ReactiveFormsModule,
     IonicModule,
     SchedulePageRoutingModule,
+    SharedModule,
+    CalendarPageModule, // Importar el módulo completo
+    WeekPageModule, // Importar el módulo completo
   ],
   declarations: [SchedulePage],
 })

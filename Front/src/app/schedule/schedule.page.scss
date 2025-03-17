@@ -4,7 +4,10 @@
     #f5f7fa 0%,
     var(--ion-color-primary-tint) 100%
   );
-  --padding-top: 0px;
+  --padding-top: 0;
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-bottom: 0;
 
   &::before {
     content: "";
@@ -21,27 +24,47 @@
   }
 
   .page-container {
-    padding: 16px;
     height: 100%;
     display: flex;
     flex-direction: column;
+    position: relative;
+    padding: 0;
+    margin: 0;
+    background: transparent;
 
-    .page-title {
-      display: flex;
-      align-items: center;
-      margin-bottom: 20px;
+    .floating-view-selector {
+      position: fixed;
+      top: 8px;
+      right: 16px;
+      z-index: 1000;
 
-      .title-icon {
-        font-size: 28px;
-        margin-right: 12px;
+      .view-selector {
+        min-width: 140px;
+        --padding-end: 8px;
+        --padding-start: 8px;
+        font-size: 14px;
+        font-weight: 500;
         color: var(--ion-color-primary);
       }
+    }
 
-      h1 {
-        font-size: 28px;
-        font-weight: 700;
-        margin: 0;
-        color: #333333;
+    .views-wrapper {
+      height: 100%;
+      padding: 0;
+      margin: 0;
+
+      .view-container {
+        height: 100%;
+        overflow: hidden;
+        background: transparent;
+
+        app-calendar,
+        app-week {
+          height: 100%;
+          display: block;
+          background: transparent;
+          box-shadow: none;
+        }
       }
     }
 
@@ -65,248 +88,315 @@
       }
     }
 
-    .week-view-container {
-      flex: 1;
+    .schedule-layout {
       display: flex;
-      flex-direction: column;
-      background-color: white;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      height: 100%;
 
-      .week-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 16px;
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #e0e0e0;
-
-        .week-nav {
-          display: flex;
-          align-items: center;
-
-          h2 {
-            margin: 0 12px;
-            font-size: 18px;
-            font-weight: 600;
-            color: #333333;
-          }
-        }
-      }
-
-      .days-header {
-        display: flex;
-        border-bottom: 1px solid #e0e0e0;
-
-        .time-column-header {
-          min-width: 60px;
-          border-right: 1px solid #e0e0e0;
-        }
-
-        .day-header {
-          flex: 1;
-          text-align: center;
-          padding: 8px 0;
-
-          .day-name {
-            font-size: 14px;
-            font-weight: 500;
-            color: #666666;
-            text-transform: capitalize;
-          }
-
-          .day-number {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333333;
-          }
-
-          &.today {
-            background-color: rgba(25, 118, 210, 0.1);
-
-            .day-name,
-            .day-number {
-              color: #1976d2;
-              font-weight: 700;
-            }
-          }
-        }
-      }
-
-      .calendar-grid {
-        display: flex;
+      .week-view-container {
         flex: 1;
-        overflow-y: auto;
-        position: relative;
+        display: flex;
+        flex-direction: column;
+        background-color: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
-        .time-column {
-          min-width: 60px;
-          position: sticky;
-          left: 0;
-          background: white;
-          z-index: 2;
+        .week-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px 16px;
+          background-color: #f8f9fa;
+          border-bottom: 1px solid #e0e0e0;
 
-          .time-slot-label {
-            height: 60px;
+          .week-nav {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: #666666;
-            border-bottom: 1px solid #f0f0f0;
+
+            h2 {
+              margin: 0 12px;
+              font-size: 18px;
+              font-weight: 600;
+              color: #333333;
+            }
           }
         }
 
-        .calendar-content {
-          flex: 1;
-          position: relative;
-          min-height: 1440px; // 24 horas * 60px
+        .days-header {
+          display: flex;
+          border-bottom: 1px solid #e0e0e0;
 
-          .time-slot-line {
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background-color: #f0f0f0;
-
-            &:nth-child(1) {
-              top: 0px;
-            }
-            &:nth-child(2) {
-              top: 60px;
-            }
-            &:nth-child(3) {
-              top: 120px;
-            }
-            &:nth-child(4) {
-              top: 180px;
-            }
-            &:nth-child(5) {
-              top: 240px;
-            }
-            &:nth-child(6) {
-              top: 300px;
-            }
-            &:nth-child(7) {
-              top: 360px;
-            }
-            &:nth-child(8) {
-              top: 420px;
-            }
-            &:nth-child(9) {
-              top: 480px;
-            }
-            &:nth-child(10) {
-              top: 540px;
-            }
-            &:nth-child(11) {
-              top: 600px;
-            }
-            &:nth-child(12) {
-              top: 660px;
-            }
-            &:nth-child(13) {
-              top: 720px;
-            }
-            &:nth-child(14) {
-              top: 780px;
-            }
-            &:nth-child(15) {
-              top: 840px;
-            }
-            &:nth-child(16) {
-              top: 900px;
-            }
+          .time-column-header {
+            min-width: 60px;
+            border-right: 1px solid #e0e0e0;
           }
 
-          .day-column-line {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 1px;
-            background-color: #e0e0e0;
-            z-index: 0;
-          }
+          .day-header {
+            flex: 1;
+            text-align: center;
+            padding: 8px 0;
 
-          .calendar-event {
-            position: absolute;
-            border-radius: 4px;
-            padding: 4px 8px;
-            overflow: hidden;
-            color: white;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            z-index: 1;
-
-            &:hover {
-              filter: brightness(1.1);
-              transform: scale(1.02);
-            }
-
-            .event-title {
+            .day-name {
+              font-size: 14px;
               font-weight: 500;
-              margin-bottom: 2px;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
+              color: #666666;
+              text-transform: capitalize;
+            }
 
-              &.reminder {
-                font-style: italic;
+            .day-number {
+              font-size: 18px;
+              font-weight: 600;
+              color: #333333;
+            }
+
+            &.today {
+              background-color: rgba(25, 118, 210, 0.1);
+
+              .day-name,
+              .day-number {
+                color: #1976d2;
+                font-weight: 700;
+              }
+            }
+          }
+        }
+
+        .calendar-grid {
+          display: flex;
+          flex: 1;
+          overflow-y: auto;
+          position: relative;
+
+          .time-column {
+            min-width: 60px;
+            position: sticky;
+            left: 0;
+            background: white;
+            z-index: 2;
+
+            .time-slot-label {
+              height: 60px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 12px;
+              color: #666666;
+              border-bottom: 1px solid #f0f0f0;
+            }
+          }
+
+          .calendar-content {
+            flex: 1;
+            position: relative;
+            min-height: 1440px; // 24 horas * 60px
+
+            .time-slot-line {
+              position: absolute;
+              left: 0;
+              right: 0;
+              height: 1px;
+              background-color: #f0f0f0;
+
+              &:nth-child(1) {
+                top: 0px;
+              }
+              &:nth-child(2) {
+                top: 60px;
+              }
+              &:nth-child(3) {
+                top: 120px;
+              }
+              &:nth-child(4) {
+                top: 180px;
+              }
+              &:nth-child(5) {
+                top: 240px;
+              }
+              &:nth-child(6) {
+                top: 300px;
+              }
+              &:nth-child(7) {
+                top: 360px;
+              }
+              &:nth-child(8) {
+                top: 420px;
+              }
+              &:nth-child(9) {
+                top: 480px;
+              }
+              &:nth-child(10) {
+                top: 540px;
+              }
+              &:nth-child(11) {
+                top: 600px;
+              }
+              &:nth-child(12) {
+                top: 660px;
+              }
+              &:nth-child(13) {
+                top: 720px;
+              }
+              &:nth-child(14) {
+                top: 780px;
+              }
+              &:nth-child(15) {
+                top: 840px;
+              }
+              &:nth-child(16) {
+                top: 900px;
               }
             }
 
-            .event-time {
-              font-size: 11px;
-              opacity: 0.9;
+            .day-column-line {
+              position: absolute;
+              top: 0;
+              bottom: 0;
+              width: 1px;
+              background-color: #e0e0e0;
+              z-index: 0;
+            }
+
+            .calendar-event {
+              position: absolute;
+              border-radius: 4px;
+              padding: 4px 8px;
+              overflow: hidden;
+              color: white;
+              font-size: 12px;
+              cursor: pointer;
+              transition: all 0.2s ease;
+              z-index: 1;
+
+              &:hover {
+                filter: brightness(1.1);
+                transform: scale(1.02);
+              }
+
+              .event-title {
+                font-weight: 500;
+                margin-bottom: 2px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+
+                &.reminder {
+                  font-style: italic;
+                }
+              }
+
+              .event-time {
+                font-size: 11px;
+                opacity: 0.9;
+              }
             }
           }
         }
       }
     }
+  }
+
+  .view-selector {
+    margin-bottom: 20px;
+    background: white;
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    .view-options {
+      display: flex;
+      justify-content: space-around;
+      gap: 8px;
+
+      .view-option {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        ion-icon {
+          font-size: 24px;
+          margin-bottom: 4px;
+          color: var(--ion-color-medium);
+        }
+
+        span {
+          font-size: 14px;
+          color: var(--ion-color-medium);
+        }
+
+        &:hover {
+          background: rgba(var(--ion-color-primary-rgb), 0.1);
+
+          ion-icon,
+          span {
+            color: var(--ion-color-primary);
+          }
+        }
+
+        &.active {
+          background: var(--ion-color-primary);
+
+          ion-icon,
+          span {
+            color: white;
+          }
+        }
+      }
+    }
+  }
+
+  .calendar-view,
+  .schedule-view,
+  .week-view {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    height: calc(100% - 100px); // Adjust based on your needs
+    overflow-y: auto;
   }
 }
 
 // Estilos para el modal de evento
 .event-modal-content {
-  padding: 16px;
+  padding: 20px;
+  color: #333;
 
   .event-header {
     margin-bottom: 24px;
 
     .event-title {
-      font-size: 20px;
+      font-size: 24px;
       font-weight: 600;
+      color: #333;
       margin-bottom: 8px;
-      color: #333333;
     }
 
     .event-time {
+      color: #666;
+      font-size: 14px;
       display: flex;
       align-items: center;
-      color: #666666;
-      font-size: 14px;
-
-      ion-icon {
-        margin-right: 8px;
-      }
+      gap: 8px;
     }
   }
 
   .event-details {
+    background: #f5f5f5;
+    padding: 16px;
+    border-radius: 8px;
     margin-bottom: 24px;
 
     p {
-      color: #333333;
-      font-size: 16px;
+      color: #333;
+      margin: 0;
       line-height: 1.5;
     }
-  }
-
-  .event-actions {
-    display: flex;
-    gap: 12px;
   }
 }
 
@@ -358,6 +448,80 @@ ion-title {
 }
 
 // Asegurar que los modales tengan fondo blanco
-ion-modal ion-content {
+ion-modal {
   --background: white;
+
+  ion-content {
+    --background: white;
+  }
+}
+
+// Mejorar la visualización de eventos en el calendario
+.calendar-event {
+  border-left: 4px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &.subject {
+    background-color: #1976d2;
+  }
+
+  &.task {
+    background-color: #f57c00;
+  }
+
+  &.reminder {
+    background-color: #9c27b0;
+    border-style: dashed;
+  }
+
+  .event-title {
+    font-weight: 500;
+    font-size: 12px;
+    margin-bottom: 4px;
+    color: white;
+  }
+
+  .event-time {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+// Mejorar el panel lateral
+.side-events-panel {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  .panel-section {
+    padding: 16px;
+    border-bottom: 1px solid #eee;
+
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+}
+
+// Estilo para el selector de vistas
+ion-select.view-selector {
+  --placeholder-color: var(--ion-color-primary);
+  --placeholder-opacity: 1;
+  background: transparent;
+
+  &::part(icon) {
+    color: var(--ion-color-primary);
+    opacity: 1;
+  }
+
+  &::part(text) {
+    color: var(--ion-color-primary);
+    font-weight: 500;
+  }
 }

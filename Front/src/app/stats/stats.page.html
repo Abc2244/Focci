@@ -4,168 +4,32 @@
       <h1>Estadísticas</h1>
     </div>
 
-    <!-- Selector de período -->
-    <div class="period-selector">
-      <ion-segment value="week">
-        <ion-segment-button value="week">
-          <ion-label>Semana</ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="month">
-          <ion-label>Mes</ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="semester">
-          <ion-label>Semestre</ion-label>
-        </ion-segment-button>
-      </ion-segment>
-    </div>
-
-    <!-- Tarjetas de resumen -->
-    <div class="stats-summary">
-      <div class="stat-card">
-        <div
-          class="stat-icon"
-          style="background-color: rgba(var(--ion-color-primary-rgb), 0.1)"
-        >
-          <ion-icon
-            name="checkmark-circle"
-            style="color: var(--ion-color-primary)"
-          ></ion-icon>
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">85%</div>
-          <div class="stat-label">Tareas completadas</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div
-          class="stat-icon"
-          style="background-color: rgba(var(--ion-color-success-rgb), 0.1)"
-        >
-          <ion-icon
-            name="time"
-            style="color: var(--ion-color-success)"
-          ></ion-icon>
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">24h</div>
-          <div class="stat-label">Tiempo de estudio</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div
-          class="stat-icon"
-          style="background-color: rgba(var(--ion-color-warning-rgb), 0.1)"
-        >
-          <ion-icon
-            name="star"
-            style="color: var(--ion-color-warning)"
-          ></ion-icon>
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">4.2</div>
-          <div class="stat-label">Promedio</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Gráfico de actividad -->
-    <div class="chart-container">
-      <h2>Actividad semanal</h2>
-      <div class="chart-placeholder">
-        <div class="bar-chart">
-          <div class="chart-bar" style="height: 30%">
-            <div class="bar-label">Lun</div>
-          </div>
-          <div class="chart-bar" style="height: 60%">
-            <div class="bar-label">Mar</div>
-          </div>
-          <div class="chart-bar" style="height: 45%">
-            <div class="bar-label">Mié</div>
-          </div>
-          <div class="chart-bar" style="height: 80%">
-            <div class="bar-label">Jue</div>
-          </div>
-          <div class="chart-bar" style="height: 50%">
-            <div class="bar-label">Vie</div>
-          </div>
-          <div class="chart-bar" style="height: 20%">
-            <div class="bar-label">Sáb</div>
-          </div>
-          <div class="chart-bar" style="height: 10%">
-            <div class="bar-label">Dom</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Distribución por materias -->
-    <div class="subjects-distribution">
-      <h2>Distribución por materias</h2>
-      <div class="subject-progress">
-        <div class="subject-info">
-          <div class="subject-name">Matemáticas</div>
-          <div class="subject-percentage">35%</div>
-        </div>
-        <div class="progress-bar">
-          <div
-            class="progress"
-            style="width: 35%; background-color: var(--ion-color-primary)"
-          ></div>
-        </div>
-      </div>
-
-      <div class="subject-progress">
-        <div class="subject-info">
-          <div class="subject-name">Física</div>
-          <div class="subject-percentage">25%</div>
-        </div>
-        <div class="progress-bar">
-          <div
-            class="progress"
-            style="width: 25%; background-color: var(--ion-color-success)"
-          ></div>
-        </div>
-      </div>
-
-      <div class="subject-progress">
-        <div class="subject-info">
-          <div class="subject-name">Programación</div>
-          <div class="subject-percentage">20%</div>
-        </div>
-        <div class="progress-bar">
-          <div
-            class="progress"
-            style="width: 20%; background-color: var(--ion-color-warning)"
-          ></div>
-        </div>
-      </div>
-
-      <div class="subject-progress">
-        <div class="subject-info">
-          <div class="subject-name">Química</div>
-          <div class="subject-percentage">15%</div>
-        </div>
-        <div class="progress-bar">
-          <div
-            class="progress"
-            style="width: 15%; background-color: var(--ion-color-danger)"
-          ></div>
-        </div>
-      </div>
-
-      <div class="subject-progress">
-        <div class="subject-info">
-          <div class="subject-name">Historia</div>
-          <div class="subject-percentage">5%</div>
-        </div>
-        <div class="progress-bar">
-          <div
-            class="progress"
-            style="width: 5%; background-color: var(--ion-color-tertiary)"
-          ></div>
-        </div>
+    <div class="development-container">
+      <ion-icon name="construct-outline"></ion-icon>
+      <h2 class="development-title">En Desarrollo</h2>
+      <p class="development-text">
+        Estamos trabajando para traerte estadísticas detalladas de tus tareas.
+      </p>
+      <div class="features-coming">
+        <h3 class="features-title">Próximamente:</h3>
+        <ul>
+          <li>
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <span>Análisis de tareas completadas</span>
+          </li>
+          <li>
+            <ion-icon name="time-outline"></ion-icon>
+            <span>Tiempo promedio de completación</span>
+          </li>
+          <li>
+            <ion-icon name="bar-chart-outline"></ion-icon>
+            <span>Distribución por materias</span>
+          </li>
+          <li>
+            <ion-icon name="calendar-outline"></ion-icon>
+            <span>Actividad semanal</span>
+          </li>
+        </ul>
       </div>
     </div>
   </div>

@@ -80,7 +80,7 @@
 
         <!-- Lista de tareas -->
         <div class="task-card" *ngFor="let task of filteredTasks">
-          <div class="task-checkbox" (click)="completeTask(task._id)">
+          <div class="task-checkbox" (click)="completeTask(task._id!)">
             <ion-icon
               [name]="task.completed ? 'checkmark-circle' : 'ellipse-outline'"
             ></ion-icon>

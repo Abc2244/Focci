@@ -19,5 +19,6 @@ import { SharedModule } from '../shared/shared.module';
     SharedModule,
   ],
   declarations: [WeekPage],
+  exports: [WeekPage],
 })
 export class WeekPageModule {}

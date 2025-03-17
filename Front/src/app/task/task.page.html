@@ -41,7 +41,7 @@
           <div class="task-actions">
             <ion-button
               fill="clear"
-              (click)="completeTask(task._id)"
+              (click)="completeTask(task._id!)"
               class="action-button"
             >
               <ion-icon
@@ -58,7 +58,7 @@
             </ion-button>
             <ion-button
               fill="clear"
-              (click)="deleteTask(task._id)"
+              (click)="deleteTask(task._id!)"
               class="action-button"
             >
               <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
@@ -96,16 +96,38 @@
 
           <ion-card-content>
             <div class="task-info">
-              <ion-chip color="success">
-                <ion-icon name="checkmark-done-outline"></ion-icon>
-                Completada: {{ task.completed_date | date:'medium' }}
+              <ion-chip class="date-chip">
+                <ion-icon name="calendar-outline" class="chip-icon"></ion-icon>
+                <span class="chip-text"
+                  >Creada: {{ task.created_at | date:'shortDate' }}</span
+                >
+              </ion-chip>
+
+              <ion-chip
+                [class]="{'date-chip': true, 'late-chip': isTaskLate(task)}"
+              >
+                <ion-icon name="alarm-outline" class="chip-icon"></ion-icon>
+                <span class="chip-text"
+                  >Límite: {{ task.due_date | date:'shortDate' }}</span
+                >
+              </ion-chip>
+
+              <ion-chip *ngIf="task.completed" class="completion-chip">
+                <ion-icon
+                  name="checkmark-circle-outline"
+                  class="chip-icon"
+                ></ion-icon>
+                <span class="chip-text"
+                  >Completada: {{ task.completed_date | date:'shortDate'
+                  }}</span
+                >
               </ion-chip>
             </div>
 
             <div class="task-actions">
               <ion-button
                 fill="clear"
-                (click)="uncompleteTask(task._id)"
+                (click)="uncompleteTask(task._id!)"
                 class="action-button"
               >
                 <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>

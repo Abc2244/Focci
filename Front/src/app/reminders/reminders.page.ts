@@ -48,6 +48,11 @@ export class RemindersPage implements OnInit {
     this.loadTasks();
   }
 
+  ionViewWillEnter() {
+    this.loadReminders();
+    this.loadTasks();
+  }
+
   loadReminders(): void {
     this.isLoading = true;
     const userId = this.authService.getCurrentUserId();
