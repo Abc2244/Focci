@@ -29,6 +29,7 @@ interface DayHeader {
   shortName: string;
   date: string;
   isToday: boolean;
+  fullDate: Date;
 }
 
 export interface CalendarEvent {
@@ -95,57 +96,57 @@ export class SchedulePage implements OnInit {
     this.updateCurrentWeekLabel();
   }
 
+  ionViewWillEnter() {
+    // Este método se llama cada vez que la página está a punto de ser mostrada
+    this.loadData(); // Recargar los datos
+  }
+
   loadData() {
     const userId = this.authService.getCurrentUserId();
     if (userId) {
-      try {
-        this.apiService.getUserSubjects(userId).subscribe({
-          next: (subjects) => {
-            this.subjects = subjects;
-            this.processSubjectsToEvents();
-            this.updateCalendarView();
-          },
-          error: (error) => {
-            console.error('Error al cargar materias:', error);
-            this.toastService.showToast('Error al cargar materias', 'error');
-          },
-        });
+      this.isLoading = true;
 
-        this.apiService.getUserTasks(userId).subscribe({
-          next: (tasks) => {
-            this.tasks = tasks;
-            this.processTasksToEvents();
-            this.updateCalendarView();
-          },
-          error: (error) => {
-            console.error('Error al cargar tareas:', error);
-            this.toastService.showToast('Error al cargar tareas', 'error');
-          },
+      // Usar Promise.all para manejar todas las peticiones en paralelo
+      Promise.all([
+        this.apiService.getUserSubjects(userId).toPromise(),
+        this.apiService.getUserTasks(userId).toPromise(),
+        this.apiService.getUpcomingReminders(userId).toPromise(),
+      ])
+        .then(([subjects, tasks, reminders]) => {
+          this.subjects = subjects || [];
+          this.tasks = tasks || [];
+          this.reminders = reminders || [];
+
+          // Actualizar todos los eventos una vez que tengamos los datos
+          this.updateEventsForCurrentWeek();
+          this.isLoading = false;
+        })
+        .catch((error) => {
+          console.error('Error loading data:', error);
+          this.toastService.showToast('Error al cargar los datos', 'error');
+          this.isLoading = false;
         });
-      } catch (error) {
-        this.toastService.showToast('Error al cargar datos', 'error');
-      }
     } else {
       this.toastService.showToast('Usuario no autenticado', 'error');
+      this.isLoading = false;
     }
   }
 
   processSubjectsToEvents() {
     this.events = []; // Limpiar eventos existentes
 
-    // Procesar materias
     if (this.subjects && this.subjects.length > 0) {
       this.subjects.forEach((subject) => {
         if (subject.schedule && subject.schedule.length > 0) {
           subject.schedule.forEach((scheduleItem: ScheduleItem) => {
             const dayMap: { [key: string]: number } = {
-              Domingo: 0,
-              Lunes: 1,
-              Martes: 2,
-              Miércoles: 3,
-              Jueves: 4,
-              Viernes: 5,
-              Sábado: 6,
+              Domingo: 6,
+              Lunes: 0,
+              Martes: 1,
+              Miércoles: 2,
+              Jueves: 3,
+              Viernes: 4,
+              Sábado: 5,
             };
 
             const day = dayMap[scheduleItem.day];
@@ -154,11 +155,17 @@ export class SchedulePage implements OnInit {
                 scheduleItem.startTime.split(':');
               const [endHour, endMinute] = scheduleItem.endTime.split(':');
 
-              const startTime = new Date();
-              startTime.setHours(parseInt(startHour), parseInt(startMinute));
+              const currentWeekDay = this.daysOfWeek[day].fullDate;
 
-              const endTime = new Date();
-              endTime.setHours(parseInt(endHour), parseInt(endMinute));
+              const startTime = setMinutes(
+                setHours(currentWeekDay, parseInt(startHour)),
+                parseInt(startMinute)
+              );
+
+              const endTime = setMinutes(
+                setHours(currentWeekDay, parseInt(endHour)),
+                parseInt(endMinute)
+              );
 
               this.events.push({
                 id: `${subject._id}-${day}`,
@@ -176,56 +183,67 @@ export class SchedulePage implements OnInit {
         }
       });
     }
-
-    // Procesar tareas
-    if (this.tasks && this.tasks.length > 0) {
-      this.tasks.forEach((task) => {
-        const dueDate = new Date(task.due_date);
-        const day = dueDate.getDay();
-
-        const endTime = new Date(dueDate);
-        endTime.setHours(dueDate.getHours() + 1);
-
-        this.events.push({
-          id: task._id || '',
-          title: task.description,
-          startTime: dueDate,
-          endTime: endTime,
-          day: day,
-          description: task.description,
-          color: '#f57c00',
-          type: 'task',
-          taskId: task._id,
-        });
-      });
-    }
   }
 
   processTasksToEvents() {
     if (this.tasks && this.tasks.length > 0) {
-      this.tasks.forEach((task) => {
-        const dueDate = new Date(task.due_date);
-        const day = getDay(dueDate);
+      const weekStart = startOfWeek(this.currentDate, { weekStartsOn: 1 });
+      const weekEnd = endOfWeek(this.currentDate, { weekStartsOn: 1 });
 
-        this.events.push({
-          id: task._id || '',
-          title: task.description,
-          startTime: dueDate,
-          endTime: new Date(dueDate.getTime() + 60 * 60 * 1000), // 1 hora de duración
-          day: day,
-          description: task.description,
-          color: '#f57c00',
-          type: 'task',
-          taskId: task._id,
-        });
+      this.tasks.forEach((task) => {
+        const taskDate = parseISO(task.due_date);
+
+        if (taskDate >= weekStart && taskDate <= weekEnd) {
+          const day = getDay(taskDate);
+
+          this.events.push({
+            id: task._id || '',
+            title: task.description,
+            startTime: taskDate,
+            endTime: new Date(taskDate.getTime() + 60 * 60 * 1000),
+            day: day === 0 ? 6 : day - 1,
+            description: task.description,
+            color: '#f57c00',
+            type: 'task',
+            taskId: task._id,
+          });
+        }
       });
     }
   }
 
-  updateCalendarView() {
-    this.isLoading = false;
-    this.updateDaysOfWeek();
-    this.updateCurrentWeekLabel();
+  processRemindersToEvents() {
+    if (this.reminders && this.reminders.length > 0) {
+      const weekStart = startOfWeek(this.currentDate, { weekStartsOn: 1 });
+      const weekEnd = endOfWeek(this.currentDate, { weekStartsOn: 1 });
+
+      this.reminders.forEach((reminder) => {
+        const reminderDate = parseISO(reminder.reminder_date);
+
+        if (reminderDate >= weekStart && reminderDate <= weekEnd) {
+          const day = getDay(reminderDate);
+
+          this.events.push({
+            id: reminder._id || '',
+            title: reminder.message,
+            startTime: reminderDate,
+            endTime: new Date(reminderDate.getTime() + 30 * 60 * 1000),
+            day: day === 0 ? 6 : day - 1,
+            description: `Recordatorio: ${reminder.message}`,
+            color: '#9c27b0',
+            type: 'reminder',
+            reminderId: reminder._id,
+          });
+        }
+      });
+    }
+  }
+
+  updateEventsForCurrentWeek() {
+    this.events = []; // Limpiar eventos existentes
+    this.processSubjectsToEvents();
+    this.processTasksToEvents();
+    this.processRemindersToEvents();
   }
 
   updateDaysOfWeek() {
@@ -237,8 +255,12 @@ export class SchedulePage implements OnInit {
         shortName: format(date, 'EEE', { locale: es }),
         date: format(date, 'd'),
         isToday: isToday(date),
+        fullDate: date,
       };
     });
+
+    // En lugar de llamar a loadData(), llamamos a procesar los eventos existentes
+    this.updateEventsForCurrentWeek();
   }
 
   updateCurrentWeekLabel() {
@@ -250,21 +272,24 @@ export class SchedulePage implements OnInit {
   }
 
   previousWeek() {
-    this.currentDate = addDays(this.currentDate, -7);
+    this.currentDate = subWeeks(this.currentDate, 1);
     this.updateDaysOfWeek();
     this.updateCurrentWeekLabel();
+    this.loadData(); // Llamar a loadData solo una vez al cambiar de semana
   }
 
   nextWeek() {
-    this.currentDate = addDays(this.currentDate, 7);
+    this.currentDate = addWeeks(this.currentDate, 1);
     this.updateDaysOfWeek();
     this.updateCurrentWeekLabel();
+    this.loadData(); // Llamar a loadData solo una vez al cambiar de semana
   }
 
   goToToday() {
     this.currentDate = new Date();
     this.updateDaysOfWeek();
     this.updateCurrentWeekLabel();
+    this.loadData(); // Llamar a loadData solo una vez al ir a hoy
   }
 
   formatHour(hour: number): string {
@@ -337,7 +362,7 @@ export class SchedulePage implements OnInit {
       }
 
       this.closeAddEventModal();
-      this.updateCalendarView();
+      this.updateEventsForCurrentWeek();
     }
   }
 
@@ -360,7 +385,7 @@ export class SchedulePage implements OnInit {
     if (this.selectedEvent) {
       this.events = this.events.filter((e) => e.id !== this.selectedEvent!.id);
       this.closeEventModal();
-      this.updateCalendarView();
+      this.updateEventsForCurrentWeek();
     }
   }
 

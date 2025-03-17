@@ -117,6 +117,8 @@ export class CalendarPage implements OnInit {
         events: [],
       });
     }
+
+    this.loadEventsForMonth();
   }
 
   // Verificar si una fecha es hoy
@@ -417,5 +419,63 @@ export class CalendarPage implements OnInit {
   getTaskName(taskId: string): string {
     const task = this.tasks.find((t) => t._id === taskId);
     return task ? task.description : 'Sin tarea';
+  }
+
+  loadEventsForMonth() {
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) {
+      this.toastService.showToast(
+        'Error: ID de usuario no encontrado',
+        'error'
+      );
+      return;
+    }
+
+    // Cargar recordatorios
+    this.apiService.getUpcomingReminders(userId).subscribe({
+      next: (reminders) => {
+        this.reminders = reminders;
+        console.log('Recordatorios cargados:', reminders.length, reminders);
+        this.updateCalendarEvents();
+      },
+      error: (error) => {
+        console.error('Error al cargar recordatorios:', error);
+        this.toastService.showToast('Error al cargar recordatorios', 'error');
+      },
+    });
+
+    // Cargar tareas
+    this.apiService.getUserTasks(userId).subscribe({
+      next: (tasks) => {
+        this.tasks = tasks;
+        console.log('Tareas cargadas:', tasks.length, tasks);
+        this.updateCalendarEvents();
+      },
+      error: (error) => {
+        console.error('Error al cargar tareas:', error);
+        this.toastService.showToast('Error al cargar tareas', 'error');
+      },
+    });
+  }
+
+  updateCalendarWithEvents() {
+    this.calendarDays.forEach((day) => {
+      day.events = [
+        ...this.tasks.filter((task) => this.isSameDay(task.due_date, day.date)),
+        ...this.reminders.filter((reminder) =>
+          this.isSameDay(reminder.reminder_date, day.date)
+        ),
+      ];
+      day.hasEvents = day.events.length > 0;
+    });
+  }
+
+  isSameDay(date1: any, date2: Date): boolean {
+    const d1 = new Date(date1);
+    return (
+      d1.getFullYear() === date2.getFullYear() &&
+      d1.getMonth() === date2.getMonth() &&
+      d1.getDate() === date2.getDate()
+    );
   }
 }

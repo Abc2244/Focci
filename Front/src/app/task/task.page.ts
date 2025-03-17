@@ -58,6 +58,12 @@ export class TaskPage implements OnInit {
     this.hourValues = Array.from({ length: 24 }, (_, i) => i);
   }
 
+  ionViewWillEnter() {
+    // Este método se llama cada vez que la página está a punto de ser mostrada
+    this.loadSubjects(); // Recargar las materias
+    this.loadTasks(); // Recargar las tareas
+  }
+
   loadSubjects() {
     const userId = this.authService.getCurrentUserId();
     if (userId) {

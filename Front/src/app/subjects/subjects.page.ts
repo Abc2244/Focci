@@ -94,6 +94,11 @@ export class SubjectsPage implements OnInit {
     this.loadSubjects();
   }
 
+  ionViewWillEnter() {
+    // Este método se llama cada vez que la página está a punto de ser mostrada
+    this.loadSubjects(); // Recargar las materias
+  }
+
   // Método para ordenar los horarios por día de la semana
   sortScheduleByDay(schedule: ScheduleItem[]): ScheduleItem[] {
     const dayOrder: { [key: string]: number } = {

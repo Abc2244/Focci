@@ -7,57 +7,7 @@
     </div>
 
     <div *ngIf="!isLoading" class="schedule-layout">
-      <!-- Panel lateral para Tasks y Reminders -->
-      <div class="side-events-panel">
-        <div class="panel-section">
-          <h3>
-            <ion-icon name="checkmark-circle-outline"></ion-icon>
-            Tareas del día
-          </h3>
-          <div class="event-list">
-            <div
-              *ngFor="let task of getDayTasks()"
-              class="side-event-card task"
-            >
-              <div class="event-time">{{ formatTime(task.due_date) }}</div>
-              <div class="event-content">
-                <div class="event-title">{{ task.description }}</div>
-                <div class="event-subject">
-                  {{ getSubjectName(task.subject_id) }}
-                </div>
-              </div>
-              <div class="event-status" *ngIf="task.completed">
-                <ion-icon name="checkmark-circle"></ion-icon>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel-section">
-          <h3>
-            <ion-icon name="notifications-outline"></ion-icon>
-            Recordatorios
-          </h3>
-          <div class="event-list">
-            <div
-              *ngFor="let reminder of getDayReminders()"
-              class="side-event-card reminder"
-            >
-              <div class="event-time">
-                {{ formatTime(reminder.reminder_date) }}
-              </div>
-              <div class="event-content">
-                <div class="event-title">{{ reminder.message }}</div>
-                <div class="event-details">
-                  {{ getTaskName(reminder.task_id) }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Vista de semana original -->
+      <!-- Week view container (update to take full width) -->
       <div class="week-view-container">
         <!-- Day selector header -->
         <div class="week-header">
