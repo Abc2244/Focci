@@ -221,6 +221,18 @@
         border: 1px solid rgba(45, 211, 111, 0.2);
       }
 
+      &.late-chip {
+        --background: rgba(244, 67, 54, 0.1);
+        --color: #f44336;
+        border-color: rgba(244, 67, 54, 0.2);
+      }
+
+      &.completion-chip {
+        --background: rgba(76, 175, 80, 0.1);
+        --color: #4caf50;
+        border-color: rgba(76, 175, 80, 0.2);
+      }
+
       ion-icon {
         margin-right: 4px;
         color: var(--ion-color-secondary);

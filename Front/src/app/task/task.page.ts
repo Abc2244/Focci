@@ -102,20 +102,31 @@ export class TaskPage implements OnInit {
     return subject ? subject.name : 'Materia no encontrada';
   }
 
-  completeTask(taskId: string) {
+  isTaskLate(task: Task): boolean {
+    if (task.completed) {
+      return new Date(task.completed_date!) > new Date(task.due_date);
+    }
+    return new Date() > new Date(task.due_date);
+  }
+
+  async completeTask(taskId: string | undefined) {
+    if (!taskId) return;
+
     this.apiService.completeTask(taskId).subscribe({
       next: () => {
         this.loadTasks();
-        this.toastService.showToast('Tarea completada', 'success');
+        this.toastService.showToast('Tarea completada exitosamente', 'success');
       },
       error: (error) => {
         this.toastService.showToast('Error al completar la tarea', 'error');
-        console.error('Error al completar la tarea:', error);
+        console.error('Error:', error);
       },
     });
   }
 
-  uncompleteTask(taskId: string) {
+  uncompleteTask(taskId: string | undefined) {
+    if (!taskId) return;
+
     this.apiService.uncompleteTask(taskId).subscribe({
       next: () => {
         this.loadTasks();
@@ -128,7 +139,9 @@ export class TaskPage implements OnInit {
     });
   }
 
-  deleteTask(taskId: string) {
+  deleteTask(taskId: string | undefined) {
+    if (!taskId) return;
+
     this.apiService.deleteTask(taskId).subscribe({
       next: () => {
         this.loadTasks();
@@ -166,7 +179,9 @@ export class TaskPage implements OnInit {
       const formData = this.taskForm.value;
       const taskData: CreateTaskDTO = {
         user_id: userId,
-        ...formData,
+        subject_id: formData.subject_id,
+        description: formData.description,
+        due_date: new Date(formData.due_date).toISOString(),
         completed: false,
       };
 

@@ -217,6 +217,34 @@ export class ApiService {
       .pipe(catchError(this.handleError));
   }
 
+  // Actualizar los métodos de estadísticas para que coincidan con tu estructura
+  getTasksStats(
+    userId: string,
+    period: 'week' | 'month' | 'semester'
+  ): Observable<any> {
+    return this.http
+      .get(`${this.apiUrl}/stats/users/${userId}/tasks/${period}`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(catchError(this.handleError));
+  }
+
+  getTasksCompletionStats(userId: string): Observable<any> {
+    return this.http
+      .get(`${this.apiUrl}/stats/users/${userId}/completion`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(catchError(this.handleError));
+  }
+
+  getTasksTimeStats(userId: string): Observable<any> {
+    return this.http
+      .get(`${this.apiUrl}/stats/users/${userId}/time`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(catchError(this.handleError));
+  }
+
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
     return new HttpHeaders({

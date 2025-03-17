@@ -327,7 +327,9 @@ export class WeekPage implements OnInit {
     return subject ? subject.name : null;
   }
 
-  completeTask(taskId: string) {
+  async completeTask(taskId: string | undefined) {
+    if (!taskId) return;
+
     const task = this.tasks.find((t) => t._id === taskId);
     if (task) {
       task.completed = !task.completed;

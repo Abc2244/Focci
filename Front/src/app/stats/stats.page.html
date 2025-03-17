@@ -6,7 +6,10 @@
 
     <!-- Selector de período -->
     <div class="period-selector">
-      <ion-segment value="week">
+      <ion-segment
+        [(ngModel)]="selectedPeriod"
+        (ionChange)="segmentChanged($event)"
+      >
         <ion-segment-button value="week">
           <ion-label>Semana</ion-label>
         </ion-segment-button>
@@ -19,8 +22,15 @@
       </ion-segment>
     </div>
 
-    <!-- Tarjetas de resumen -->
-    <div class="stats-summary">
+    <!-- Loading spinner -->
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner></ion-spinner>
+      <p>Cargando estadísticas...</p>
+    </div>
+
+    <!-- Estadísticas -->
+    <div *ngIf="!isLoading" class="stats-summary">
+      <!-- Tareas Completadas vs Creadas -->
       <div class="stat-card">
         <div
           class="stat-icon"
@@ -32,11 +42,17 @@
           ></ion-icon>
         </div>
         <div class="stat-content">
-          <div class="stat-value">85%</div>
-          <div class="stat-label">Tareas completadas</div>
+          <div class="stat-value">
+            {{stats.completionRate | number:'1.0-0'}}%
+          </div>
+          <div class="stat-label">Tareas Completadas</div>
+          <div class="stat-detail">
+            {{stats.tasksCompleted}}/{{stats.tasksCreated}}
+          </div>
         </div>
       </div>
 
+      <!-- Tareas a Tiempo -->
       <div class="stat-card">
         <div
           class="stat-icon"
@@ -48,122 +64,66 @@
           ></ion-icon>
         </div>
         <div class="stat-content">
-          <div class="stat-value">24h</div>
-          <div class="stat-label">Tiempo de estudio</div>
+          <div class="stat-value">{{stats.onTimeRate | number:'1.0-0'}}%</div>
+          <div class="stat-label">A Tiempo</div>
+          <div class="stat-detail">
+            vs {{stats.lateTasksRate | number:'1.0-0'}}% Retrasadas
+          </div>
         </div>
       </div>
 
+      <!-- Promedio de Días -->
       <div class="stat-card">
         <div
           class="stat-icon"
           style="background-color: rgba(var(--ion-color-warning-rgb), 0.1)"
         >
           <ion-icon
-            name="star"
+            name="calendar"
             style="color: var(--ion-color-warning)"
           ></ion-icon>
         </div>
         <div class="stat-content">
-          <div class="stat-value">4.2</div>
-          <div class="stat-label">Promedio</div>
+          <div class="stat-value">
+            {{stats.averageCompletionDays | number:'1.1-1'}}
+          </div>
+          <div class="stat-label">Días Promedio</div>
+          <div class="stat-detail">para completar</div>
         </div>
       </div>
     </div>
 
     <!-- Gráfico de actividad -->
-    <div class="chart-container">
+    <div class="chart-container" *ngIf="!isLoading">
       <h2>Actividad semanal</h2>
       <div class="chart-placeholder">
         <div class="bar-chart">
-          <div class="chart-bar" style="height: 30%">
-            <div class="bar-label">Lun</div>
-          </div>
-          <div class="chart-bar" style="height: 60%">
-            <div class="bar-label">Mar</div>
-          </div>
-          <div class="chart-bar" style="height: 45%">
-            <div class="bar-label">Mié</div>
-          </div>
-          <div class="chart-bar" style="height: 80%">
-            <div class="bar-label">Jue</div>
-          </div>
-          <div class="chart-bar" style="height: 50%">
-            <div class="bar-label">Vie</div>
-          </div>
-          <div class="chart-bar" style="height: 20%">
-            <div class="bar-label">Sáb</div>
-          </div>
-          <div class="chart-bar" style="height: 10%">
-            <div class="bar-label">Dom</div>
+          <div
+            class="chart-bar"
+            *ngFor="let activity of weeklyActivity"
+            [style.height]="activity.percentage + '%'"
+          >
+            <div class="bar-label">{{activity.day}}</div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Distribución por materias -->
-    <div class="subjects-distribution">
+    <div class="subjects-distribution" *ngIf="!isLoading">
       <h2>Distribución por materias</h2>
-      <div class="subject-progress">
+      <div class="subject-progress" *ngFor="let subject of subjectDistribution">
         <div class="subject-info">
-          <div class="subject-name">Matemáticas</div>
-          <div class="subject-percentage">35%</div>
+          <div class="subject-name">{{subject.name}}</div>
+          <div class="subject-percentage">
+            {{subject.percentage | number:'1.0-0'}}%
+          </div>
         </div>
         <div class="progress-bar">
           <div
             class="progress"
-            style="width: 35%; background-color: var(--ion-color-primary)"
-          ></div>
-        </div>
-      </div>
-
-      <div class="subject-progress">
-        <div class="subject-info">
-          <div class="subject-name">Física</div>
-          <div class="subject-percentage">25%</div>
-        </div>
-        <div class="progress-bar">
-          <div
-            class="progress"
-            style="width: 25%; background-color: var(--ion-color-success)"
-          ></div>
-        </div>
-      </div>
-
-      <div class="subject-progress">
-        <div class="subject-info">
-          <div class="subject-name">Programación</div>
-          <div class="subject-percentage">20%</div>
-        </div>
-        <div class="progress-bar">
-          <div
-            class="progress"
-            style="width: 20%; background-color: var(--ion-color-warning)"
-          ></div>
-        </div>
-      </div>
-
-      <div class="subject-progress">
-        <div class="subject-info">
-          <div class="subject-name">Química</div>
-          <div class="subject-percentage">15%</div>
-        </div>
-        <div class="progress-bar">
-          <div
-            class="progress"
-            style="width: 15%; background-color: var(--ion-color-danger)"
-          ></div>
-        </div>
-      </div>
-
-      <div class="subject-progress">
-        <div class="subject-info">
-          <div class="subject-name">Historia</div>
-          <div class="subject-percentage">5%</div>
-        </div>
-        <div class="progress-bar">
-          <div
-            class="progress"
-            style="width: 5%; background-color: var(--ion-color-tertiary)"
+            [style.width]="subject.percentage + '%'"
+            [style.backgroundColor]="subject.color"
           ></div>
         </div>
       </div>

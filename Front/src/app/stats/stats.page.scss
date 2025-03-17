@@ -5,7 +5,6 @@
     padding: 20px;
 
     .page-title {
-
       margin-bottom: 20px;
       text-align: center;
       h1 {
@@ -122,7 +121,8 @@
             border-radius: 8px 8px 0 0;
             position: relative;
             min-height: 5%;
-            transition: height 0.3s ease;
+            transition: height 0.3s ease-in-out;
+            opacity: 0.8;
 
             .bar-label {
               position: absolute;
@@ -132,6 +132,11 @@
               font-size: 12px;
               color: var(--ion-color-medium);
               white-space: nowrap;
+            }
+
+            &:hover {
+              opacity: 1;
+              transform: scaleY(1.02);
             }
           }
         }
@@ -186,11 +191,30 @@
           .progress {
             height: 100%;
             border-radius: 4px;
+            transition: width 0.3s ease-in-out;
           }
         }
       }
     }
   }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+
+  ion-spinner {
+    margin-bottom: 1rem;
+  }
+}
+
+.stat-detail {
+  font-size: 11px;
+  color: var(--ion-color-medium);
+  margin-top: 4px;
 }
 
 // Responsive adjustments
