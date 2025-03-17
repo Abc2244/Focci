@@ -203,6 +203,20 @@ export class ApiService {
       .pipe(catchError(this.handleError));
   }
 
+  // Limpiar todos los datos del usuario
+  cleanAllUserData(userId: string): Observable<any> {
+    return this.http
+      .delete(`${this.apiUrl}/users/${userId}/clean-all/`)
+      .pipe(catchError(this.handleError));
+  }
+
+  // Crear datos de prueba (opcional, si quieres hacerlo desde el frontend)
+  createTestData(userId: string): Observable<any> {
+    return this.http
+      .post(`${this.apiUrl}/users/${userId}/create-test-data/`, {})
+      .pipe(catchError(this.handleError));
+  }
+
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
     return new HttpHeaders({

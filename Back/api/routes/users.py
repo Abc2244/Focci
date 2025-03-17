@@ -37,6 +37,39 @@ async def delete_user_data(user_id: str):
         "message": f"Se eliminaron {tasks_result.deleted_count} tareas y {reminders_result.deleted_count} recordatorios del usuario"
     }
 
+@router.delete("/users/{user_id}/clean-all/")
+async def clean_all_user_data(user_id: str):
+    """Elimina todos los datos relacionados con un usuario"""
+    try:
+        # Eliminar recordatorios
+        reminders_result = await mongodb.get_collection("reminders").delete_many(
+            {"user_id": user_id}
+        )
+        
+        # Eliminar tareas
+        tasks_result = await mongodb.get_collection("tasks").delete_many(
+            {"user_id": user_id}
+        )
+        
+        # Eliminar materias
+        subjects_result = await mongodb.get_collection("subjects").delete_many(
+            {"user_id": user_id}
+        )
+        
+        return {
+            "message": "Datos eliminados correctamente",
+            "deleted": {
+                "reminders": reminders_result.deleted_count,
+                "tasks": tasks_result.deleted_count,
+                "subjects": subjects_result.deleted_count
+            }
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error al limpiar los datos: {str(e)}"
+        )
+
 class UpdatePassword(BaseModel):
     old_password: str
     new_password: str

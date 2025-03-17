@@ -53,6 +53,7 @@ export interface CalendarEvent {
 })
 export class SchedulePage implements OnInit {
   @ViewChild(IonModal) modal!: IonModal;
+  @ViewChild('addEventModal') addEventModal!: IonModal;
 
   subjects: Subject[] = [];
   tasks: Task[] = [];
@@ -361,5 +362,59 @@ export class SchedulePage implements OnInit {
       this.closeEventModal();
       this.updateCalendarView();
     }
+  }
+
+  // Nuevos métodos para filtrar eventos del día
+  getDayTasks() {
+    const today = new Date();
+    return this.tasks.filter((task) => {
+      const taskDate = new Date(task.due_date);
+      return (
+        taskDate.getDate() === today.getDate() &&
+        taskDate.getMonth() === today.getMonth() &&
+        taskDate.getFullYear() === today.getFullYear()
+      );
+    });
+  }
+
+  getDayReminders() {
+    const today = new Date();
+    return this.reminders.filter((reminder) => {
+      const reminderDate = new Date(reminder.reminder_date);
+      return (
+        reminderDate.getDate() === today.getDate() &&
+        reminderDate.getMonth() === today.getMonth() &&
+        reminderDate.getFullYear() === today.getFullYear()
+      );
+    });
+  }
+
+  // Formatear hora
+  formatTime(timeString: string): string {
+    if (timeString && timeString.includes('T')) {
+      try {
+        const date = new Date(timeString);
+        return date.toLocaleTimeString('es-ES', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true,
+        });
+      } catch (e) {
+        return timeString;
+      }
+    }
+    return timeString;
+  }
+
+  // Obtener nombre de materia
+  getSubjectName(subjectId: string): string {
+    const subject = this.subjects.find((s) => s._id === subjectId);
+    return subject ? subject.name : 'Sin materia';
+  }
+
+  // Obtener nombre de tarea
+  getTaskName(taskId: string): string {
+    const task = this.tasks.find((t) => t._id === taskId);
+    return task ? task.description : 'Sin tarea';
   }
 }

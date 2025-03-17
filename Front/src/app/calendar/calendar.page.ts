@@ -52,6 +52,11 @@ export class CalendarPage implements OnInit {
     this.loadUserData();
   }
 
+  ionViewWillEnter() {
+    // Este método se llama cada vez que la página está a punto de ser mostrada
+    this.loadUserData(); // Recargar los datos del usuario
+  }
+
   // Generar el calendario para el mes actual
   generateCalendar() {
     this.calendarDays = [];
@@ -129,60 +134,64 @@ export class CalendarPage implements OnInit {
     this.isLoading = true;
     const userId = this.authService.getCurrentUserId();
 
-    if (userId) {
-      this.userId = userId;
-
-      // Cargar materias
-      this.apiService.getUserSubjects(this.userId).subscribe({
-        next: (subjects) => {
-          this.subjects = subjects;
-          console.log('Materias cargadas:', subjects.length);
-
-          // Cargar tareas
-          this.apiService.getUserTasks(this.userId).subscribe({
-            next: (tasks) => {
-              this.tasks = tasks;
-              console.log('Tareas cargadas:', tasks.length);
-
-              // Cargar recordatorios
-              this.apiService.getUpcomingReminders(this.userId).subscribe({
-                next: (reminders) => {
-                  this.reminders = reminders;
-                  console.log(
-                    'Recordatorios cargados:',
-                    reminders.length,
-                    reminders
-                  );
-                  this.updateCalendarEvents();
-                  this.isLoading = false;
-                },
-                error: (error) => {
-                  console.error('Error al cargar recordatorios:', error);
-                  this.toastService.showToast(
-                    'Error al cargar recordatorios',
-                    'error'
-                  );
-                  this.isLoading = false;
-                },
-              });
-            },
-            error: (error) => {
-              console.error('Error al cargar tareas:', error);
-              this.toastService.showToast('Error al cargar tareas', 'error');
-              this.isLoading = false;
-            },
-          });
-        },
-        error: (error) => {
-          console.error('Error al cargar materias:', error);
-          this.toastService.showToast('Error al cargar materias', 'error');
-          this.isLoading = false;
-        },
-      });
-    } else {
-      this.toastService.showToast('Usuario no autenticado', 'error');
+    if (!userId) {
+      this.toastService.showToast(
+        'Error: ID de usuario no encontrado',
+        'error'
+      );
       this.isLoading = false;
+      return;
     }
+
+    this.userId = userId;
+
+    // Cargar materias
+    this.apiService.getUserSubjects(this.userId).subscribe({
+      next: (subjects) => {
+        this.subjects = subjects;
+        console.log('Materias cargadas:', subjects.length);
+
+        // Cargar tareas
+        this.apiService.getUserTasks(this.userId).subscribe({
+          next: (tasks) => {
+            this.tasks = tasks;
+            console.log('Tareas cargadas:', tasks.length);
+
+            // Cargar recordatorios
+            this.apiService.getUpcomingReminders(this.userId).subscribe({
+              next: (reminders) => {
+                this.reminders = reminders;
+                console.log(
+                  'Recordatorios cargados:',
+                  reminders.length,
+                  reminders
+                );
+                this.updateCalendarEvents();
+                this.isLoading = false;
+              },
+              error: (error) => {
+                console.error('Error al cargar recordatorios:', error);
+                this.toastService.showToast(
+                  'Error al cargar recordatorios',
+                  'error'
+                );
+                this.isLoading = false;
+              },
+            });
+          },
+          error: (error) => {
+            console.error('Error al cargar tareas:', error);
+            this.toastService.showToast('Error al cargar tareas', 'error');
+            this.isLoading = false;
+          },
+        });
+      },
+      error: (error) => {
+        console.error('Error al cargar materias:', error);
+        this.toastService.showToast('Error al cargar materias', 'error');
+        this.isLoading = false;
+      },
+    });
   }
 
   // Actualizar eventos del calendario según el filtro seleccionado
@@ -270,7 +279,7 @@ export class CalendarPage implements OnInit {
                 details: this.getTaskName(reminder.task_id),
                 time: this.formatTime(reminder.reminder_date),
                 type: 'reminder',
-                color: 'danger',
+                color: 'tertiary',
                 status: reminder.status,
               });
             }

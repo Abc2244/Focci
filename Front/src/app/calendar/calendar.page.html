@@ -114,7 +114,13 @@
             {{ event.title }}
           </div>
           <div class="event-details">
-            <span class="event-type"
+            <span
+              class="event-type"
+              [ngStyle]="{
+                'color': event.type === 'class' ? 'var(--ion-color-primary)' : 
+                         event.type === 'task' ? 'var(--ion-color-secondary)' : 
+                         'var(--ion-color-tertiary)'
+              }"
               >{{ event.type === 'class' ? 'Clase' : event.type === 'task' ?
               'Tarea' : 'Recordatorio' }}</span
             >
@@ -123,7 +129,10 @@
               class="event-status completed"
               >Completada</span
             >
-            <span *ngIf="event.type === 'reminder'" class="event-status"
+            <span
+              *ngIf="event.type === 'reminder'"
+              class="event-status"
+              [ngStyle]="{'color': 'var(--ion-color-tertiary)'}"
               >{{ event.status }}</span
             >
           </div>

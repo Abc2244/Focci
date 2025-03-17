@@ -6,80 +6,132 @@
       <p>Cargando horario...</p>
     </div>
 
-    <!-- Week view -->
-    <div *ngIf="!isLoading" class="week-view-container">
-      <!-- Day selector header -->
-      <div class="week-header">
-        <div class="week-nav">
-          <ion-button fill="clear" (click)="previousWeek()">
-            <ion-icon name="chevron-back-outline"></ion-icon>
-          </ion-button>
-          <h2>{{ currentWeekLabel }}</h2>
-          <ion-button fill="clear" (click)="nextWeek()">
-            <ion-icon name="chevron-forward-outline"></ion-icon>
-          </ion-button>
-        </div>
-        <ion-button fill="clear" (click)="goToToday()">Hoy</ion-button>
-      </div>
-
-      <!-- Days of week header -->
-      <div class="days-header">
-        <div class="time-column-header"></div>
-        <div
-          *ngFor="let day of daysOfWeek"
-          class="day-header"
-          [class.today]="day.isToday"
-        >
-          <div class="day-name">{{ day.shortName }}</div>
-          <div class="day-number">{{ day.date }}</div>
-        </div>
-      </div>
-
-      <!-- Calendar grid with time slots -->
-      <div class="calendar-grid">
-        <!-- Time labels column -->
-        <div class="time-column">
-          <div *ngFor="let hour of timeSlots" class="time-slot-label">
-            <span>{{ formatHour(hour) }}</span>
-          </div>
-        </div>
-
-        <!-- Calendar content -->
-        <div class="calendar-content">
-          <!-- Horizontal grid lines -->
-          <div *ngFor="let hour of timeSlots" class="time-slot-line"></div>
-
-          <!-- Vertical grid lines -->
-          <div
-            *ngFor="let day of daysOfWeek; let i = index"
-            class="day-column-line"
-            [style.left]="(i / 7) * 100 + '%'"
-          ></div>
-
-          <!-- Events -->
-          <div
-            *ngFor="let event of events"
-            class="calendar-event"
-            [ngStyle]="getEventStyle(event)"
-            (click)="onEventClick(event)"
-          >
+    <div *ngIf="!isLoading" class="schedule-layout">
+      <!-- Panel lateral para Tasks y Reminders -->
+      <div class="side-events-panel">
+        <div class="panel-section">
+          <h3>
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            Tareas del día
+          </h3>
+          <div class="event-list">
             <div
-              class="event-title"
-              [class.reminder]="event.type === 'reminder'"
+              *ngFor="let task of getDayTasks()"
+              class="side-event-card task"
             >
-              {{ event.title }}
+              <div class="event-time">{{ formatTime(task.due_date) }}</div>
+              <div class="event-content">
+                <div class="event-title">{{ task.description }}</div>
+                <div class="event-subject">
+                  {{ getSubjectName(task.subject_id) }}
+                </div>
+              </div>
+              <div class="event-status" *ngIf="task.completed">
+                <ion-icon name="checkmark-circle"></ion-icon>
+              </div>
             </div>
-            <div class="event-time">{{ event.startTime | date:'HH:mm' }}</div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h3>
+            <ion-icon name="notifications-outline"></ion-icon>
+            Recordatorios
+          </h3>
+          <div class="event-list">
+            <div
+              *ngFor="let reminder of getDayReminders()"
+              class="side-event-card reminder"
+            >
+              <div class="event-time">
+                {{ formatTime(reminder.reminder_date) }}
+              </div>
+              <div class="event-content">
+                <div class="event-title">{{ reminder.message }}</div>
+                <div class="event-details">
+                  {{ getTaskName(reminder.task_id) }}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Floating action button to add event -->
-      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-        <ion-fab-button (click)="openAddEventModal()">
-          <ion-icon name="add"></ion-icon>
-        </ion-fab-button>
-      </ion-fab>
+      <!-- Vista de semana original -->
+      <div class="week-view-container">
+        <!-- Day selector header -->
+        <div class="week-header">
+          <div class="week-nav">
+            <ion-button fill="clear" (click)="previousWeek()">
+              <ion-icon name="chevron-back-outline"></ion-icon>
+            </ion-button>
+            <h2>{{ currentWeekLabel }}</h2>
+            <ion-button fill="clear" (click)="nextWeek()">
+              <ion-icon name="chevron-forward-outline"></ion-icon>
+            </ion-button>
+          </div>
+          <ion-button fill="clear" (click)="goToToday()">Hoy</ion-button>
+        </div>
+
+        <!-- Days of week header -->
+        <div class="days-header">
+          <div class="time-column-header"></div>
+          <div
+            *ngFor="let day of daysOfWeek"
+            class="day-header"
+            [class.today]="day.isToday"
+          >
+            <div class="day-name">{{ day.shortName }}</div>
+            <div class="day-number">{{ day.date }}</div>
+          </div>
+        </div>
+
+        <!-- Calendar grid with time slots -->
+        <div class="calendar-grid">
+          <!-- Time labels column -->
+          <div class="time-column">
+            <div *ngFor="let hour of timeSlots" class="time-slot-label">
+              <span>{{ formatHour(hour) }}</span>
+            </div>
+          </div>
+
+          <!-- Calendar content -->
+          <div class="calendar-content">
+            <!-- Horizontal grid lines -->
+            <div *ngFor="let hour of timeSlots" class="time-slot-line"></div>
+
+            <!-- Vertical grid lines -->
+            <div
+              *ngFor="let day of daysOfWeek; let i = index"
+              class="day-column-line"
+              [style.left]="(i / 7) * 100 + '%'"
+            ></div>
+
+            <!-- Events -->
+            <div
+              *ngFor="let event of events"
+              class="calendar-event"
+              [ngStyle]="getEventStyle(event)"
+              (click)="onEventClick(event)"
+            >
+              <div
+                class="event-title"
+                [class.reminder]="event.type === 'reminder'"
+              >
+                {{ event.title }}
+              </div>
+              <div class="event-time">{{ event.startTime | date:'HH:mm' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating action button to add event -->
+        <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+          <ion-fab-button (click)="openAddEventModal()">
+            <ion-icon name="add"></ion-icon>
+          </ion-fab-button>
+        </ion-fab>
+      </div>
     </div>
   </div>
 </ion-content>

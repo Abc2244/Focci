@@ -469,18 +469,12 @@
               --highlight-color-focused: var(--ion-color-primary);
               margin-bottom: 15px;
 
-              ion-label {
-                color: #333333 !important;
-                font-weight: 500;
-              }
-
-              ion-input,
-              ion-textarea,
+              ion-label,
               ion-select,
-              ion-datetime {
+              ion-datetime,
+              ion-input {
                 --color: #333333 !important;
                 color: #333333 !important;
-                --placeholder-color: #666666;
               }
             }
           }
@@ -552,18 +546,12 @@
             --highlight-color-focused: var(--ion-color-primary);
             margin-bottom: 15px;
 
-            ion-label {
-              color: #333333 !important;
-              font-weight: 500;
-            }
-
-            ion-input,
-            ion-textarea,
+            ion-label,
             ion-select,
-            ion-datetime {
+            ion-datetime,
+            ion-input {
               --color: #333333 !important;
               color: #333333 !important;
-              --placeholder-color: #666666;
             }
           }
         }

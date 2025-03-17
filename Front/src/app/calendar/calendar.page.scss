@@ -1,9 +1,5 @@
 .calendar-content {
-  --background: linear-gradient(
-    135deg,
-    #f5f7fa 0%,
-    var(--ion-color-primary-tint) 100%
-  );
+  --background: var(--app-background-light);
   --padding-top: 20px;
 
   &::before {
@@ -63,7 +59,7 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 20px;
-      background: rgba(255, 255, 255, 0.9);
+      background: white;
       padding: 12px 16px;
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -98,8 +94,46 @@
       .current-month {
         font-size: 18px;
         font-weight: 600;
-        color: var(--ion-color-medium);
+        color: var(--app-text-color);
         text-transform: capitalize;
+      }
+    }
+
+    .event-filter {
+      background: white;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      .filter-title {
+        color: var(--app-text-color);
+        margin-bottom: 8px;
+      }
+
+      .filter-options {
+        display: flex;
+        gap: 10px;
+
+        .filter-option {
+          padding: 8px 12px;
+          border-radius: 8px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          color: var(--app-text-color);
+          transition: all 0.3s ease;
+
+          &.active {
+            background: var(--ion-color-primary);
+            color: white;
+          }
+
+          ion-icon {
+            font-size: 18px;
+          }
+        }
       }
     }
 
@@ -108,7 +142,7 @@
       grid-template-columns: repeat(7, 1fr);
       gap: 8px;
       margin-bottom: 30px;
-      background: rgba(255, 255, 255, 0.9);
+      background: white;
       padding: 16px;
       border-radius: 12px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -131,17 +165,50 @@
         width: 40px;
         font-size: 16px;
         font-weight: 500;
-        color: var(--ion-color-medium);
+        color: var(--app-text-color);
         background: white;
         border-radius: 50%;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         cursor: pointer;
         transition: all 0.3s ease;
+
+        &.disabled {
+          color: var(--app-color-medium);
+          opacity: 0.5;
+        }
+
+        &.active {
+          background: var(--ion-color-primary);
+          color: white;
+        }
+
+        &.today {
+          border: 2px solid var(--ion-color-primary);
+        }
+
+        .event-indicators {
+          position: absolute;
+          bottom: 2px;
+          display: flex;
+          gap: 2px;
+          justify-content: center;
+
+          .event-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+          }
+
+          .event-more {
+            font-size: 8px;
+            color: var(--app-text-color);
+          }
+        }
       }
     }
 
     .day-events {
-      background: rgba(255, 255, 255, 0.9);
+      background: white;
       border-radius: 12px;
       padding: 16px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -149,31 +216,86 @@
       h2 {
         font-size: 20px;
         font-weight: 600;
-        color: var(--ion-color-medium);
+        color: var(--app-text-color);
         margin-bottom: 20px;
         text-transform: capitalize;
       }
-    }
 
-    .event-card {
-      display: flex;
-      background: #f8faff;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      position: relative;
-      overflow: hidden;
+      .event-card {
+        background: white;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-radius: 8px;
 
-      .event-title {
-        font-size: 16px;
-        font-weight: 600;
-        color: var(--ion-color-medium);
-        margin-bottom: 4px;
+        .event-color {
+          width: 4px;
+          height: 40px;
+          border-radius: 2px;
+          margin-right: 12px;
+        }
 
-        &.completed {
-          text-decoration: line-through;
-          color: #95a5a6;
+        .event-content {
+          flex: 1;
+
+          .event-time {
+            color: var(--ion-color-primary);
+            font-weight: 500;
+            font-size: 14px;
+          }
+
+          .event-title {
+            color: var(--app-text-color);
+            font-weight: 500;
+            margin: 4px 0;
+
+            &.completed {
+              text-decoration: line-through;
+              color: var(--app-color-medium);
+            }
+          }
+
+          .event-details {
+            font-size: 12px;
+            color: var(--app-color-medium);
+
+            .event-type {
+              background: transparent;
+              padding: 2px 6px;
+              border-radius: 4px;
+              margin-right: 8px;
+              font-weight: 500;
+              font-size: 12px;
+
+              &:has(+ .event-status.completed) {
+                color: var(--ion-color-secondary);
+              }
+            }
+
+            .event-type:has(+ span:not(.completed):not(.reminder)) {
+              color: var(--ion-color-primary);
+            }
+
+            .event-type:has(+ .event-status.completed) {
+              color: var(--ion-color-secondary);
+            }
+
+            .event-type:has(+ .event-status:not(.completed)) {
+              color: var(--ion-color-tertiary);
+            }
+
+            .event-status {
+              &.completed {
+                color: var(--ion-color-secondary);
+              }
+
+              &.reminder {
+                color: var(--ion-color-tertiary);
+              }
+            }
+          }
         }
       }
     }
