@@ -9,6 +9,7 @@ import { Task, CreateTaskDTO } from './interfaces/task.interface';
 import { Subject, ScheduleItem } from './interfaces/subject.interface';
 import { environment } from '../environments/environment';
 import { catchError } from 'rxjs/operators';
+import { TaskStats } from './interfaces/stats.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -217,13 +218,10 @@ export class ApiService {
       .pipe(catchError(this.handleError));
   }
 
-  // Actualizar los métodos de estadísticas para que coincidan con tu estructura
-  getTasksStats(
-    userId: string,
-    period: 'week' | 'month' | 'semester'
-  ): Observable<any> {
+  // Obtener estadísticas de tareas
+  getStats(userId: string, period: string): Observable<TaskStats> {
     return this.http
-      .get(`${this.apiUrl}/stats/users/${userId}/tasks/${period}`, {
+      .get<TaskStats>(`${this.apiUrl}/stats/users/${userId}/tasks/${period}`, {
         headers: this.getAuthHeaders(),
       })
       .pipe(catchError(this.handleError));
@@ -237,9 +235,10 @@ export class ApiService {
       .pipe(catchError(this.handleError));
   }
 
+  // Obtener estadísticas de tiempo
   getTasksTimeStats(userId: string): Observable<any> {
     return this.http
-      .get(`${this.apiUrl}/stats/users/${userId}/time`, {
+      .get(`${this.apiUrl}/stats/users/${userId}/time-stats`, {
         headers: this.getAuthHeaders(),
       })
       .pipe(catchError(this.handleError));

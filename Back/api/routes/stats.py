@@ -29,11 +29,36 @@ async def get_tasks_stats(user_id: str, period: str):
     
     total_tasks = len(tasks)
     completed_tasks = sum(1 for task in tasks if task.get("completed", False))
+    on_time = 0
+    late = 0
+    
+    # Calcular tareas a tiempo y retrasadas
+    for task in tasks:
+        if task.get("completed") and task.get("completed_date") and task.get("due_date"):
+            completed_date = datetime.fromisoformat(task["completed_date"].replace('Z', '+00:00'))
+            due_date = datetime.fromisoformat(task["due_date"].replace('Z', '+00:00'))
+            if completed_date <= due_date:
+                on_time += 1
+            else:
+                late += 1
+    
+    # Calcular actividad semanal
+    weekly_activity = calculate_weekly_activity(tasks)
+    
+    # Calcular distribución por materias
+    subject_distribution = await calculate_subject_distribution(tasks)
     
     return {
         "created": total_tasks,
         "completed": completed_tasks,
-        "completionRate": round((completed_tasks / total_tasks * 100) if total_tasks > 0 else 0, 2)
+        "completionRate": round((completed_tasks / total_tasks * 100) if total_tasks > 0 else 0, 2),
+        "onTimeRate": round((on_time / completed_tasks * 100) if completed_tasks > 0 else 0, 2),
+        "lateRate": round((late / completed_tasks * 100) if completed_tasks > 0 else 0, 2),
+        "tasksCompleted": completed_tasks,
+        "tasksCreated": total_tasks,
+        "lateTasksRate": round((late / completed_tasks * 100) if completed_tasks > 0 else 0, 2),
+        "weeklyActivity": weekly_activity,
+        "subjectDistribution": subject_distribution
     }
 
 @router.get("/users/{user_id}/completion")
@@ -81,4 +106,46 @@ async def get_time_stats(user_id: str):
     
     return {
         "averageDays": round(total_days / count if count > 0 else 0, 1)
-    } 
+    }
+
+# Agregar estas funciones auxiliares
+def calculate_weekly_activity(tasks):
+    days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+    activity = {day: 0 for day in days}
+    
+    for task in tasks:
+        if task.get("completed") and task.get("completed_date"):
+            completed_date = datetime.fromisoformat(task["completed_date"].replace('Z', '+00:00'))
+            day = days[completed_date.weekday()]
+            activity[day] += 1
+    
+    max_activity = max(activity.values()) if activity.values() else 1
+    return [
+        {"day": day, "percentage": round((count / max_activity * 100) if max_activity > 0 else 0)}
+        for day, count in activity.items()
+    ]
+
+async def calculate_subject_distribution(tasks):
+    subject_counts = {}
+    total_tasks = len(tasks)
+    
+    for task in tasks:
+        subject_id = task.get("subject_id")
+        if subject_id:
+            if subject_id not in subject_counts:
+                subject = await mongodb.get_collection("subjects").find_one({"_id": ObjectId(subject_id)})
+                subject_counts[subject_id] = {
+                    "name": subject["name"] if subject else "Sin materia",
+                    "color": subject["color"] if subject else "#808080",
+                    "count": 0
+                }
+            subject_counts[subject_id]["count"] += 1
+    
+    return [
+        {
+            "name": data["name"],
+            "color": data["color"],
+            "percentage": round((data["count"] / total_tasks * 100) if total_tasks > 0 else 0)
+        }
+        for data in subject_counts.values()
+    ] 

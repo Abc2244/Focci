@@ -28,8 +28,15 @@
       <p>Cargando estadísticas...</p>
     </div>
 
+    <!-- Error message -->
+    <div *ngIf="error" class="error-container">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <p>{{error}}</p>
+      <ion-button (click)="loadStats()">Reintentar</ion-button>
+    </div>
+
     <!-- Estadísticas -->
-    <div *ngIf="!isLoading" class="stats-summary">
+    <div *ngIf="!isLoading && !error && stats" class="stats-summary">
       <!-- Tareas Completadas vs Creadas -->
       <div class="stat-card">
         <div

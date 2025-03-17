@@ -14,18 +14,12 @@ import {
   styleUrls: ['./stats.page.scss'],
 })
 export class StatsPage implements OnInit {
-  selectedPeriod: 'week' | 'month' | 'semester' = 'week';
-  stats = {
-    tasksCreated: 0,
-    tasksCompleted: 0,
-    completionRate: 0,
-    onTimeRate: 0,
-    averageCompletionDays: 0,
-    lateTasksRate: 0,
-  };
+  selectedPeriod: string = 'week';
+  isLoading: boolean = true;
+  stats: TaskStats | null = null;
+  error: string | null = null;
   weeklyActivity: WeeklyActivity[] = [];
   subjectDistribution: SubjectDistribution[] = [];
-  isLoading = true;
 
   constructor(
     private apiService: ApiService,
@@ -38,53 +32,44 @@ export class StatsPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    this.loadStats(); // Recargar cuando la página se vuelve a mostrar
-  }
-
-  segmentChanged(event: any) {
-    this.selectedPeriod = event.detail.value;
     this.loadStats();
   }
 
-  private async loadStats() {
-    this.isLoading = true;
-    const userId = this.authService.getCurrentUserId();
+  async segmentChanged(event: any) {
+    this.selectedPeriod = event.detail.value;
+    await this.loadStats();
+  }
 
-    if (!userId) {
-      this.toastService.showToast(
-        'No se pudo obtener el ID del usuario',
-        'error'
-      );
-      this.isLoading = false;
-      return;
-    }
-
+  async loadStats() {
     try {
-      const [tasksStats, completionStats, timeStats] = await Promise.all([
-        this.apiService.getTasksStats(userId, this.selectedPeriod).toPromise(),
-        this.apiService.getTasksCompletionStats(userId).toPromise(),
-        this.apiService.getTasksTimeStats(userId).toPromise(),
-      ]);
+      this.isLoading = true;
+      this.error = null;
 
-      this.stats = {
-        tasksCreated: tasksStats.created || 0,
-        tasksCompleted: tasksStats.completed || 0,
-        completionRate: tasksStats.completionRate || 0,
-        onTimeRate: completionStats.onTimeRate || 0,
-        averageCompletionDays: timeStats.averageDays || 0,
-        lateTasksRate: completionStats.lateRate || 0,
-      };
+      const userId = await this.authService.getUserId();
+      if (!userId) {
+        throw new Error('No user ID found');
+      }
 
-      // Procesar datos de actividad semanal
-      this.weeklyActivity = tasksStats.weeklyActivity || [];
+      const stats = await this.apiService
+        .getStats(userId, this.selectedPeriod)
+        .toPromise();
 
-      // Procesar distribución por materias
-      this.subjectDistribution = tasksStats.subjectDistribution || [];
-
-      console.log('Stats loaded:', this.stats); // Para debugging
-    } catch (error) {
+      if (stats) {
+        this.stats = stats;
+        this.weeklyActivity = stats.weeklyActivity;
+        this.subjectDistribution = stats.subjectDistribution;
+      } else {
+        this.stats = null;
+        this.weeklyActivity = [];
+        this.subjectDistribution = [];
+      }
+    } catch (error: any) {
       console.error('Error loading stats:', error);
-      this.toastService.showToast('Error al cargar las estadísticas', 'error');
+      this.error =
+        'No se pudieron cargar las estadísticas. Por favor intenta más tarde.';
+      this.stats = null;
+      this.weeklyActivity = [];
+      this.subjectDistribution = [];
     } finally {
       this.isLoading = false;
     }
