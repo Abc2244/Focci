@@ -13,20 +13,17 @@ def serialize_mongo_document(doc):
 
 @router.post("/tasks/")
 async def create_task(task: Task):
-    task_dict = task.dict()
-    task_dict["created_at"] = datetime.utcnow()
-    task_id = await mongodb.get_collection("tasks").insert_one(task_dict)
+    task_id = await mongodb.get_collection("tasks").insert_one(task.dict())
     return {"message": "Tarea creada", "task_id": str(task_id.inserted_id)}
 
 @router.patch("/tasks/{task_id}/complete/")
 async def complete_task(task_id: str):
-    completion_date = datetime.utcnow()
     result = await mongodb.get_collection("tasks").update_one(
         {"_id": ObjectId(task_id)},
         {
             "$set": {
                 "completed": True,
-                "completed_date": completion_date
+                "completed_date": datetime.datetime.utcnow().isoformat()
             }
         }
     )
