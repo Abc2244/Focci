@@ -23,6 +23,7 @@ import {
   getDay,
 } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { Router } from '@angular/router';
 
 interface DayHeader {
   name: string;
@@ -73,12 +74,14 @@ export class SchedulePage implements OnInit {
   ];
   timeSlots = Array.from({ length: 24 }, (_, i) => i);
   currentWeekLabel: string = '';
+  currentView = 'schedule'; // 'calendar', 'schedule', 'week'
 
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
     private toastService: ToastService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private router: Router
   ) {
     this.eventForm = this.fb.group({
       title: ['', Validators.required],
@@ -441,5 +444,9 @@ export class SchedulePage implements OnInit {
   getTaskName(taskId: string): string {
     const task = this.tasks.find((t) => t._id === taskId);
     return task ? task.description : 'Sin tarea';
+  }
+
+  changeView(view: string) {
+    this.currentView = view;
   }
 }
