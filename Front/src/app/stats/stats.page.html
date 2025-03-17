@@ -4,135 +4,32 @@
       <h1>Estadísticas</h1>
     </div>
 
-    <!-- Selector de período -->
-    <div class="period-selector">
-      <ion-segment
-        [(ngModel)]="selectedPeriod"
-        (ionChange)="segmentChanged($event)"
-      >
-        <ion-segment-button value="week">
-          <ion-label>Semana</ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="month">
-          <ion-label>Mes</ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="semester">
-          <ion-label>Semestre</ion-label>
-        </ion-segment-button>
-      </ion-segment>
-    </div>
-
-    <!-- Loading spinner -->
-    <div *ngIf="isLoading" class="loading-container">
-      <ion-spinner></ion-spinner>
-      <p>Cargando estadísticas...</p>
-    </div>
-
-    <!-- Error message -->
-    <div *ngIf="error" class="error-container">
-      <ion-icon name="alert-circle-outline"></ion-icon>
-      <p>{{error}}</p>
-      <ion-button (click)="loadStats()">Reintentar</ion-button>
-    </div>
-
-    <!-- Estadísticas -->
-    <div *ngIf="!isLoading && !error && stats" class="stats-summary">
-      <!-- Tareas Completadas vs Creadas -->
-      <div class="stat-card">
-        <div
-          class="stat-icon"
-          style="background-color: rgba(var(--ion-color-primary-rgb), 0.1)"
-        >
-          <ion-icon
-            name="checkmark-circle"
-            style="color: var(--ion-color-primary)"
-          ></ion-icon>
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">
-            {{stats.completionRate | number:'1.0-0'}}%
-          </div>
-          <div class="stat-label">Tareas Completadas</div>
-          <div class="stat-detail">
-            {{stats.tasksCompleted}}/{{stats.tasksCreated}}
-          </div>
-        </div>
-      </div>
-
-      <!-- Tareas a Tiempo -->
-      <div class="stat-card">
-        <div
-          class="stat-icon"
-          style="background-color: rgba(var(--ion-color-success-rgb), 0.1)"
-        >
-          <ion-icon
-            name="time"
-            style="color: var(--ion-color-success)"
-          ></ion-icon>
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">{{stats.onTimeRate | number:'1.0-0'}}%</div>
-          <div class="stat-label">A Tiempo</div>
-          <div class="stat-detail">
-            vs {{stats.lateTasksRate | number:'1.0-0'}}% Retrasadas
-          </div>
-        </div>
-      </div>
-
-      <!-- Promedio de Días -->
-      <div class="stat-card">
-        <div
-          class="stat-icon"
-          style="background-color: rgba(var(--ion-color-warning-rgb), 0.1)"
-        >
-          <ion-icon
-            name="calendar"
-            style="color: var(--ion-color-warning)"
-          ></ion-icon>
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">
-            {{stats.averageCompletionDays | number:'1.1-1'}}
-          </div>
-          <div class="stat-label">Días Promedio</div>
-          <div class="stat-detail">para completar</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Gráfico de actividad -->
-    <div class="chart-container" *ngIf="!isLoading">
-      <h2>Actividad semanal</h2>
-      <div class="chart-placeholder">
-        <div class="bar-chart">
-          <div
-            class="chart-bar"
-            *ngFor="let activity of weeklyActivity"
-            [style.height]="activity.percentage + '%'"
-          >
-            <div class="bar-label">{{activity.day}}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Distribución por materias -->
-    <div class="subjects-distribution" *ngIf="!isLoading">
-      <h2>Distribución por materias</h2>
-      <div class="subject-progress" *ngFor="let subject of subjectDistribution">
-        <div class="subject-info">
-          <div class="subject-name">{{subject.name}}</div>
-          <div class="subject-percentage">
-            {{subject.percentage | number:'1.0-0'}}%
-          </div>
-        </div>
-        <div class="progress-bar">
-          <div
-            class="progress"
-            [style.width]="subject.percentage + '%'"
-            [style.backgroundColor]="subject.color"
-          ></div>
-        </div>
+    <div class="development-container">
+      <ion-icon name="construct-outline"></ion-icon>
+      <h2 class="development-title">En Desarrollo</h2>
+      <p class="development-text">
+        Estamos trabajando para traerte estadísticas detalladas de tus tareas.
+      </p>
+      <div class="features-coming">
+        <h3 class="features-title">Próximamente:</h3>
+        <ul>
+          <li>
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <span>Análisis de tareas completadas</span>
+          </li>
+          <li>
+            <ion-icon name="time-outline"></ion-icon>
+            <span>Tiempo promedio de completación</span>
+          </li>
+          <li>
+            <ion-icon name="bar-chart-outline"></ion-icon>
+            <span>Distribución por materias</span>
+          </li>
+          <li>
+            <ion-icon name="calendar-outline"></ion-icon>
+            <span>Actividad semanal</span>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
