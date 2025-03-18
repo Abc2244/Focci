@@ -34,17 +34,18 @@
 
     .floating-view-selector {
       position: fixed;
-      top: 8px;
+      top: 70px;
       right: 16px;
-      z-index: 1000;
+      z-index: 1001;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
-      .view-selector {
-        min-width: 140px;
-        --padding-end: 8px;
-        --padding-start: 8px;
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--ion-color-primary);
+      ion-select {
+        --padding-top: 8px;
+        --padding-bottom: 8px;
+        --padding-start: 12px;
+        --padding-end: 12px;
       }
     }
 
@@ -523,5 +524,107 @@ ion-select.view-selector {
   &::part(text) {
     color: var(--ion-color-primary);
     font-weight: 500;
+  }
+}
+
+// Mejoramos el FAB con efecto de brillo
+.glowing-fab {
+  ion-fab-button.main-fab {
+    --background: var(--ion-color-primary) !important;
+    --background-activated: var(--ion-color-primary-shade) !important;
+    --background-hover: var(--ion-color-primary-tint) !important;
+    position: relative;
+    overflow: hidden;
+    border-radius: 50% !important;
+
+    // Efecto de brillo
+    &::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(30deg);
+      animation: shimmer 3s infinite;
+      z-index: 1;
+      pointer-events: none;
+      border-radius: 50%;
+    }
+
+    ion-icon {
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      position: relative;
+      z-index: 2;
+    }
+  }
+
+  // Estilo para los botones secundarios del FAB
+  ion-fab-list {
+    .fab-button-secondary {
+      --background: var(--ion-color-primary-tint);
+      --background-activated: var(--ion-color-primary);
+      --background-hover: var(--ion-color-primary);
+      --border-radius: 50%;
+      --border-width: 0;
+      --box-shadow: none;
+      position: relative;
+      overflow: hidden;
+      margin: 8px 0;
+      width: 40px;
+      height: 40px;
+
+      // Efecto de brillo para botones secundarios
+      &::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          to right,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.3) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        transform: rotate(30deg);
+        animation: shimmer 3s infinite;
+        z-index: 1;
+        pointer-events: none;
+        border-radius: 50%;
+      }
+
+      ion-icon {
+        color: white;
+        font-size: 20px;
+        position: relative;
+        z-index: 2;
+      }
+
+      &::part(native) {
+        border-radius: 50% !important;
+        background: var(--background);
+        overflow: hidden;
+      }
+    }
+  }
+}
+
+// Animación de brillo
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) rotate(30deg);
+  }
+  100% {
+    transform: translateX(100%) rotate(30deg);
   }
 }
