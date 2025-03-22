@@ -8,7 +8,6 @@ import { RemindersPageRoutingModule } from './reminders-routing.module';
 
 import { RemindersPage } from './reminders.page';
 import { NotificationsService } from '../services/notifications.service';
-
 @NgModule({
   imports: [
     CommonModule,
