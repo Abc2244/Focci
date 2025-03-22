@@ -1,5 +1,6 @@
 :host {
   --header-height: 60px;
+  --header-padding-top: max(var(--ion-safe-area-top), 16px);
 }
 
 // Estilos para la barra de navegación superior moderna
@@ -8,18 +9,37 @@
   z-index: 10;
 
   ion-toolbar {
-    --background: white;
+    --padding-top: var(--header-padding-top);
+    --min-height: calc(var(--header-height) + var(--header-padding-top));
+    --background: transparent;
     --color: var(--ion-color-primary);
     --border-width: 0;
-    --min-height: var(--header-height);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    position: relative;
+    box-shadow: none;
+    padding-top: var(--header-padding-top);
+  }
+}
+
+// Añadir estilos específicos para el ion-header
+ion-header {
+  position: relative !important;
+  background-color: transparent;
+  z-index: 1000;
+
+  &::after {
+    display: none; // Eliminar la línea inferior
+  }
+
+  ion-toolbar {
+    --background: transparent;
+    --border-width: 0;
+    box-shadow: none;
   }
 }
 
 // Estilos para el botón de menú azul
 .blue-menu-button {
   --color: var(--ion-color-primary) !important;
+  margin-top: 8px; // Añadir margen superior para separarlo un poco
 
   .menu-icon {
     span {

@@ -7,30 +7,28 @@
 }
 
 // Estilos mejorados para la barra de tabs
-ion-tab-bar.custom-tabs {
+ion-tab-bar {
   --background: white;
-  box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.05);
-  height: 60px;
-  padding: 0 10px;
+  height: calc(var(--tab-height) + var(--ion-safe-area-bottom));
+  padding: 0 10px var(--ion-safe-area-bottom);
   border: none;
+  box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.05);
 
-  ion-tab-button.tab-button {
-    position: relative;
+  ion-tab-button {
     --color: var(--ion-color-medium);
     --color-selected: var(--ion-color-primary);
     --background: transparent;
-    --ripple-color: var(--ion-color-primary);
-    transition: all 0.3s ease;
+    position: relative;
+    transition: var(--default-transition);
 
     ion-icon {
       font-size: 24px;
-      transition: all 0.3s ease;
+      transition: var(--default-transition);
     }
 
     span {
       font-size: 12px;
       margin-top: 4px;
-      transition: all 0.3s ease;
     }
 
     .tab-indicator {
@@ -38,17 +36,15 @@ ion-tab-bar.custom-tabs {
       bottom: 0;
       left: 50%;
       width: 0;
-      height: 4px;
+      height: 5px;
       background: var(--ion-color-primary);
-      border-radius: 4px 4px 0 0;
+      border-radius: 5px 5px 0 0;
       transform: translateX(-50%);
-      transition: width 0.3s ease;
+      transition: var(--default-transition);
       opacity: 0;
     }
 
     &.tab-selected {
-      --color: var(--ion-color-primary);
-
       ion-icon {
         transform: translateY(-4px) scale(1.2);
       }
@@ -56,6 +52,11 @@ ion-tab-bar.custom-tabs {
       .tab-indicator {
         width: 30px;
         opacity: 1;
+      }
+
+      &::before {
+        width: 40px;
+        height: 40px;
       }
     }
 
@@ -69,13 +70,8 @@ ion-tab-bar.custom-tabs {
       background: rgba(var(--ion-color-primary-rgb), 0.1);
       border-radius: 50%;
       transform: translate(-50%, -50%);
-      transition: all 0.3s ease;
+      transition: var(--default-transition);
       z-index: -1;
-    }
-
-    &.tab-selected::before {
-      width: 40px;
-      height: 40px;
     }
   }
 }

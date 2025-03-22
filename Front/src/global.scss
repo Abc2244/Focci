@@ -138,6 +138,20 @@
   --app-spacing-md: 16px;
   --app-spacing-lg: 24px;
   --app-spacing-xl: 32px;
+
+  // Componentes comunes
+  --header-height: 60px;
+  --header-padding-top: max(var(--ion-safe-area-top), 16px);
+  --tab-height: 65px;
+  --menu-width: 280px;
+
+  // Transiciones
+  --default-transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+
+  // Glassmorphism
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-blur: blur(10px);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 // Estilos para los alerts personalizados
