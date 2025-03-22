@@ -4,6 +4,7 @@ import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
 import { ToastController } from '@ionic/angular';
 import { ToastService } from '../services/toast.service';
+import { NotificationsService } from '../services/notifications.service';
 
 @Component({
   selector: 'app-reminders',
@@ -28,7 +29,8 @@ export class RemindersPage implements OnInit {
     private authService: AuthService,
     private fb: FormBuilder,
     private toastController: ToastController,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private notificationsService: NotificationsService
   ) {
     this.reminderForm = this.fb.group({
       reminder_date: ['', Validators.required],
@@ -57,13 +59,16 @@ export class RemindersPage implements OnInit {
     this.isLoading = true;
     const userId = this.authService.getCurrentUserId();
     if (userId) {
+      console.log('Fetching reminders for user:', userId);
       this.apiService.getUpcomingReminders(userId).subscribe(
         (data: any) => {
+          console.log('Received reminders:', data);
           this.reminders = data;
           this.filterReminders();
           this.isLoading = false;
         },
         (error: any) => {
+          console.error('Error loading reminders:', error);
           this.isLoading = false;
           this.toastService.showToast('Error al cargar recordatorios', 'error');
         }
@@ -75,9 +80,11 @@ export class RemindersPage implements OnInit {
   }
 
   filterReminders(): void {
+    console.log('Filtering reminders. Total:', this.reminders.length);
     this.pendingReminders = this.reminders.filter(
       (reminder) => reminder.status === 'pendiente'
     );
+    console.log('Pending reminders:', this.pendingReminders.length);
     this.completedReminders = this.reminders.filter(
       (reminder) => reminder.status === 'completado'
     );
@@ -179,10 +186,7 @@ export class RemindersPage implements OnInit {
 
   saveReminder(): void {
     if (this.reminderForm.invalid) {
-      this.toastService.showToast(
-        'Por favor complete todos los campos',
-        'warning'
-      );
+      console.log('Form invalid:', this.reminderForm.errors);
       return;
     }
 
@@ -192,39 +196,44 @@ export class RemindersPage implements OnInit {
       return;
     }
 
-    const reminderData = { ...this.reminderForm.value, user_id: userId };
+    const reminderData = {
+      ...this.reminderForm.value,
+      user_id: userId,
+      taskName: this.getTaskName(this.reminderForm.value.task_id),
+    };
+    console.log('Saving reminder:', reminderData);
 
     if (this.isEditing && this.currentReminderId) {
+      this.notificationsService.cancelNotification(this.currentReminderId);
+
       this.apiService
         .updateReminder(this.currentReminderId, reminderData)
         .subscribe(
-          () => {
+          (updatedReminder) => {
+            console.log('Reminder updated:', updatedReminder);
+            this.notificationsService.scheduleNotification(reminderData);
             this.loadReminders();
             this.showModal = false;
             this.toastService.showToast('Recordatorio actualizado', 'success');
           },
-          () => {
-            this.toastService.showToast(
-              'Error al actualizar recordatorio',
-              'error'
-            );
-          }
+          (error) => console.error('Error updating reminder:', error)
         );
     } else {
       this.apiService.createReminder(reminderData).subscribe(
-        () => {
+        (newReminder) => {
+          console.log('Reminder created:', newReminder);
+          this.notificationsService.scheduleNotification(reminderData);
           this.loadReminders();
           this.showModal = false;
           this.toastService.showToast('Recordatorio creado', 'success');
         },
-        () => {
-          this.toastService.showToast('Error al crear recordatorio', 'error');
-        }
+        (error) => console.error('Error creating reminder:', error)
       );
     }
   }
 
   deleteReminder(reminderId: string): void {
+    this.notificationsService.cancelNotification(reminderId);
     this.apiService.deleteReminder(reminderId).subscribe(
       () => {
         this.loadReminders();
@@ -237,6 +246,7 @@ export class RemindersPage implements OnInit {
   }
 
   completeReminder(reminderId: string): void {
+    this.notificationsService.cancelNotification(reminderId);
     const reminder = this.reminders.find((r) => r._id === reminderId);
     if (!reminder) return;
 

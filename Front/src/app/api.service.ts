@@ -8,7 +8,7 @@ import { Observable, throwError } from 'rxjs';
 import { Task, CreateTaskDTO } from './interfaces/task.interface';
 import { Subject, ScheduleItem } from './interfaces/subject.interface';
 import { environment } from '../environments/environment';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { TaskStats } from './interfaces/stats.interface';
 
 @Injectable({
@@ -153,8 +153,16 @@ export class ApiService {
   // Obtener recordatorios próximos de un usuario
   getUpcomingReminders(userId: string): Observable<any[]> {
     const url = `${this.apiUrl}/users/${userId}/reminders/upcoming/`;
-    console.log('Calling API URL:', url);
-    return this.http.get<any[]>(url);
+    console.log('Fetching upcoming reminders from:', url);
+    return this.http.get<any[]>(url).pipe(
+      tap((reminders) =>
+        console.log('Received reminders from API:', reminders)
+      ),
+      catchError((error) => {
+        console.error('Error fetching reminders:', error);
+        return throwError(error);
+      })
+    );
   }
 
   // Obtener recordatorios por prioridad

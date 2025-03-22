@@ -6,8 +6,8 @@
     <!-- Componente del header -->
     <app-header [pageTitle]="pageTitle" (menuToggle)="openMenu()"></app-header>
 
-    <!-- Estructura de tabs de Ionic -->
-    <ion-tabs (ionTabsDidChange)="tabChanged($event)">
+    <!-- Estructura de tabs de Ionic con clase para ajustar el margen superior -->
+    <ion-tabs (ionTabsDidChange)="tabChanged($event)" class="app-tabs">
       <ion-router-outlet></ion-router-outlet>
 
       <!-- Componente de la barra de tabs -->
