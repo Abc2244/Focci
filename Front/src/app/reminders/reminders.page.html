@@ -269,6 +269,15 @@
         </ion-button>
       </div>
     </div>
+
+    <!-- Añade esto temporalmente para debug -->
+    <div *ngIf="isLoading">Cargando recordatorios...</div>
+    <div *ngIf="!isLoading && reminders.length === 0">No hay recordatorios</div>
+    <div *ngIf="!isLoading && reminders.length > 0">
+      Recordatorios totales: {{reminders.length}} Pendientes:
+      {{pendingReminders.length}} Completados: {{completedReminders.length}}
+      Cancelados: {{canceledReminders.length}}
+    </div>
   </div>
 
   <!-- Botón flotante para agregar -->

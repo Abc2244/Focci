@@ -44,15 +44,16 @@ async def delete_reminder(reminder_id: str):
 @router.get("/users/{user_id}/reminders/upcoming/")
 async def get_upcoming_reminders(user_id: str):
     print(f"Buscando recordatorios para el usuario: {user_id}")
-    current_time = datetime.datetime.utcnow()
-    print(f"Fecha actual: {current_time}")
     
+    # Modificamos la consulta para traer todos los recordatorios del usuario
     reminders = await mongodb.get_collection("reminders").find({
-        "user_id": user_id,
-        "reminder_date": {"$gte": current_time}
+        "user_id": user_id
     }).to_list(length=100)
     
     print(f"Recordatorios encontrados: {len(reminders)}")
+    for reminder in reminders:
+        print(f"Recordatorio: {reminder}")
+        
     return [serialize_mongo_document(reminder) for reminder in reminders]
 
 @router.get("/users/{user_id}/reminders/priority/{level}/")
@@ -68,3 +69,11 @@ async def get_tasks(user_id: str):
     if not tasks:
         raise HTTPException(status_code=404, detail="No se encontraron tareas para este usuario")
     return [serialize_mongo_document(task) for task in tasks]
+
+@router.get("/users/{user_id}/reminders/")
+async def get_all_reminders(user_id: str):
+    reminders = await mongodb.get_collection("reminders").find({
+        "user_id": user_id
+    }).to_list(length=100)
+    
+    return [serialize_mongo_document(reminder) for reminder in reminders]
