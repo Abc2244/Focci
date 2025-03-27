@@ -291,4 +291,16 @@ export class RemindersPage implements OnInit {
   dismissModal(): void {
     this.showModal = false;
   }
+
+  testNotification(): void {
+    this.notificationsService
+      .sendTestNotification()
+      .then(() => {
+        this.toastService.showToast('Notificación de prueba enviada', 'info');
+      })
+      .catch((error) => {
+        console.error('Error al enviar notificación de prueba:', error);
+        this.toastService.showToast('Error al enviar notificación', 'error');
+      });
+  }
 }

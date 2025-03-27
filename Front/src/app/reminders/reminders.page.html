@@ -278,6 +278,14 @@
       {{pendingReminders.length}} Completados: {{completedReminders.length}}
       Cancelados: {{canceledReminders.length}}
     </div>
+
+    <!-- Añadir justo después del div de debug en la línea 281 -->
+    <div class="test-notification-container">
+      <ion-button expand="block" (click)="testNotification()" color="tertiary">
+        <ion-icon name="notifications-outline" slot="start"></ion-icon>
+        Probar Notificaciones
+      </ion-button>
+    </div>
   </div>
 
   <!-- Botón flotante para agregar -->
