@@ -19,6 +19,32 @@ export class NotificationsService {
     }
   }
 
+  // Método de prueba para enviar una notificación inmediata
+  async sendTestNotification() {
+    if (!this.platform.is('capacitor')) {
+      console.log('Las notificaciones solo funcionan en dispositivos nativos');
+      return;
+    }
+
+    try {
+      await LocalNotifications.schedule({
+        notifications: [
+          {
+            id: 999,
+            title: 'Notificación de prueba',
+            body: 'Esta es una notificación de prueba para verificar que funcionan correctamente',
+            schedule: { at: new Date(Date.now() + 3000) }, // Se mostrará en 3 segundos
+            sound: undefined,
+            actionTypeId: 'TEST_ACTION',
+          },
+        ],
+      });
+      console.log('Notificación de prueba programada');
+    } catch (error) {
+      console.error('Error al programar notificación de prueba:', error);
+    }
+  }
+
   async scheduleNotification(reminder: any) {
     if (!this.platform.is('capacitor')) return;
 
