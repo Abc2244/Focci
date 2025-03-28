@@ -44,6 +44,11 @@ const routes: Routes = [
     loadChildren: () =>
       import('./smart/smart.module').then((m) => m.SmartPageModule),
   },
+  {
+    path: 'reminders',
+    loadChildren: () =>
+      import('./reminders/reminders.module').then((m) => m.RemindersPageModule),
+  },
 ];
 
 @NgModule({
