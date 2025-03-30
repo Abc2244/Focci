@@ -10,6 +10,7 @@ export interface TaskStats {
   averageCompletionDays: number;
   weeklyActivity: WeeklyActivity[];
   subjectDistribution: SubjectDistribution[];
+  averageDays?: number;
 }
 
 export interface WeeklyActivity {

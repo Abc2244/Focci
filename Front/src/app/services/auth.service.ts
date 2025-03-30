@@ -103,9 +103,9 @@ export class AuthService {
   }
 
   async getUserId(): Promise<string | null> {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem(this.tokenKey); // ✅ Usamos la misma clave 'auth_token'
     if (!token) return null;
-
+  
     try {
       const decodedToken: any = jwtDecode(token);
       return decodedToken.user_id;
@@ -114,4 +114,5 @@ export class AuthService {
       return null;
     }
   }
+  
 }

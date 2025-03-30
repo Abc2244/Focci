@@ -1,35 +1,75 @@
 <ion-content class="stats-content">
   <div class="page-container">
+
     <div class="page-title">
       <h1>Estadísticas</h1>
     </div>
 
-    <div class="development-container">
-      <ion-icon name="construct-outline"></ion-icon>
-      <h2 class="development-title">En Desarrollo</h2>
-      <p class="development-text">
-        Estamos trabajando para traerte estadísticas detalladas de tus tareas.
-      </p>
-      <div class="features-coming">
-        <h3 class="features-title">Próximamente:</h3>
-        <ul>
-          <li>
-            <ion-icon name="checkmark-circle-outline"></ion-icon>
-            <span>Análisis de tareas completadas</span>
-          </li>
-          <li>
-            <ion-icon name="time-outline"></ion-icon>
-            <span>Tiempo promedio de completación</span>
-          </li>
-          <li>
-            <ion-icon name="bar-chart-outline"></ion-icon>
-            <span>Distribución por materias</span>
-          </li>
-          <li>
-            <ion-icon name="calendar-outline"></ion-icon>
-            <span>Actividad semanal</span>
-          </li>
-        </ul>
+    <!-- Filtros por periodo -->
+    <div class="filters-container">
+      <ion-segment value="week" (ionChange)="segmentChanged($event)">
+        <ion-segment-button value="week">Semana</ion-segment-button>
+        <ion-segment-button value="month">Mes</ion-segment-button>
+        <ion-segment-button value="semester">Semestre</ion-segment-button>
+      </ion-segment>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando estadísticas...</p>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error" class="error-container">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <p>{{ error }}</p>
+    </div>
+
+    <!-- Datos principales -->
+    <div *ngIf="stats && !isLoading && !error">
+
+      <div class="stats-overview">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Tareas completadas</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <h2>{{ stats?.tasksCompleted }} / {{ stats?.tasksCreated }}</h2>
+            <p>{{ stats?.completionRate }}% completadas</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Entregas a tiempo</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <h2>{{ stats?.onTimeRate }}%</h2>
+            <p>{{ stats?.lateRate }}% con retraso</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Tiempo promedio</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <h2>{{ stats?.averageDays || '–' }} días</h2>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <!-- Gráfico de actividad semanal -->
+      <div class="chart-container">
+        <h3>Actividad Semanal</h3>
+        <canvas id="weeklyChart"></canvas>
+      </div>
+
+      <!-- Gráfico de distribución por materia -->
+      <div class="chart-container">
+        <h3>Distribución por Materias</h3>
+        <canvas id="subjectChart"></canvas>
       </div>
     </div>
   </div>

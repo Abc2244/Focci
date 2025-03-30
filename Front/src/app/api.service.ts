@@ -243,14 +243,14 @@ export class ApiService {
       .pipe(catchError(this.handleError));
   }
 
-  // Obtener estadísticas de tiempo
-  getTasksTimeStats(userId: string): Observable<any> {
+  getTimeStats(userId: string): Observable<{ averageDays: number }> {
     return this.http
-      .get(`${this.apiUrl}/stats/users/${userId}/time-stats`, {
+      .get<{ averageDays: number }>(`${this.apiUrl}/stats/users/${userId}/time`, {
         headers: this.getAuthHeaders(),
       })
       .pipe(catchError(this.handleError));
   }
+  
 
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');

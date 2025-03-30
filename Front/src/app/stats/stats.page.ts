@@ -46,6 +46,8 @@ export class StatsPage implements OnInit {
       this.error = null;
 
       const userId = await this.authService.getUserId();
+      console.log('User ID:', userId);
+
       if (!userId) {
         throw new Error('No user ID found');
       }
@@ -54,14 +56,19 @@ export class StatsPage implements OnInit {
         .getStats(userId, this.selectedPeriod)
         .toPromise();
 
+        const timeStats = await this.apiService
+        .getTimeStats(userId)
+        .toPromise();      
+
       if (stats) {
-        this.stats = stats;
+        this.stats = {
+          ...stats,
+          averageDays: timeStats?.averageDays || 0,
+        };
         this.weeklyActivity = stats.weeklyActivity;
         this.subjectDistribution = stats.subjectDistribution;
       } else {
-        this.stats = null;
-        this.weeklyActivity = [];
-        this.subjectDistribution = [];
+        throw new Error('No stats received');
       }
     } catch (error: any) {
       console.error('Error loading stats:', error);

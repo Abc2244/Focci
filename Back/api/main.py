@@ -5,6 +5,7 @@ from .routes.reminders import router as reminders_router
 from .routes.users import router as users_router
 from .routes.subjects import router as subjects_router
 from .routes.tasks import router as tasks_router
+from .routes.stats import router as stats_router
 
 app = FastAPI()
 
@@ -23,6 +24,8 @@ app.include_router(reminders_router)
 app.include_router(users_router)
 app.include_router(subjects_router)
 app.include_router(tasks_router)
+app.include_router(stats_router)
+
 
 ##Después de incluir todas las rutas
 for route in app.routes:
