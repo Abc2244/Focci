@@ -5,6 +5,7 @@ import { AuthService } from '../services/auth.service';
 import { ToastController } from '@ionic/angular';
 import { ToastService } from '../services/toast.service';
 import { NotificationsService } from '../services/notifications.service';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 @Component({
   selector: 'app-reminders',
@@ -48,6 +49,7 @@ export class RemindersPage implements OnInit {
   ngOnInit() {
     this.loadReminders();
     this.loadTasks();
+    this.requestNotificationPermissions();
   }
 
   ionViewWillEnter() {
@@ -292,15 +294,32 @@ export class RemindersPage implements OnInit {
     this.showModal = false;
   }
 
-  testNotification(): void {
-    this.notificationsService
-      .sendTestNotification()
-      .then(() => {
-        this.toastService.showToast('Notificación de prueba enviada', 'info');
-      })
-      .catch((error) => {
-        console.error('Error al enviar notificación de prueba:', error);
-        this.toastService.showToast('Error al enviar notificación', 'error');
-      });
+  async testNotification() {
+    try {
+      await this.notificationsService.sendTestNotification();
+      this.toastService.showToast('Notificación de prueba enviada', 'success');
+    } catch (error) {
+      console.error('Error al enviar notificación de prueba:', error);
+      this.toastService.showToast('Error al enviar notificación', 'error');
+    }
+  }
+
+  async requestNotificationPermissions() {
+    try {
+      const permStatus = await LocalNotifications.checkPermissions();
+      if (permStatus.display !== 'granted') {
+        await LocalNotifications.requestPermissions();
+        this.toastService.showToast(
+          'Permisos de notificaciones concedidos',
+          'success'
+        );
+      }
+    } catch (error) {
+      console.error('Error al solicitar permisos:', error);
+      this.toastService.showToast(
+        'Error al solicitar permisos de notificaciones',
+        'error'
+      );
+    }
   }
 }
