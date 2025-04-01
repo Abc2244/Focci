@@ -5,17 +5,14 @@
   "bundledWebRuntime": false,
   "plugins": {
     "SplashScreen": {
-      "launchShowDuration": 0,
+      "launchShowDuration": 2000,
       "launchAutoHide": true,
       "backgroundColor": "#1e88e5",
       "androidSplashResourceName": "splash",
       "androidScaleType": "CENTER_CROP",
       "showSpinner": false,
-      "androidSpinnerStyle": "large",
-      "iosSpinnerStyle": "small",
-      "spinnerColor": "#999999",
       "splashFullScreen": false,
-      "splashImmersive": false,
+      "splashImmersive": true,
       "layoutName": "launch_screen",
       "useDialog": false
     }

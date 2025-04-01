@@ -14,12 +14,11 @@ import {
 })
 export class AppComponent {
   constructor() {
-    this.showSplash();
+    this.initializeApp();
   }
-  async showSplash() {
-    await SplashScreen.show({
-      showDuration: 3000,
-      autoHide: true,
-    });
+
+  initializeApp() {
+    // No es necesario mostrar el splash screen manualmente si autoHide está en true
+    // SplashScreen.show();
   }
 }
