@@ -6,8 +6,8 @@ import { SmartPage } from './smart.page';
 const routes: Routes = [
   {
     path: '',
-    component: SmartPage
-  }
+    component: SmartPage,
+  },
 ];
 
 @NgModule({

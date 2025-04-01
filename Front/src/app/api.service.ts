@@ -55,23 +55,35 @@ export class ApiService {
   // Tareas
   // -----------------------------------------
 
-  createTask(taskData: any): Observable<any> {
+  createTask(taskData: CreateTaskDTO): Observable<TaskResponse> {
     console.log('API createTask called with:', taskData);
     return this.http
-      .post(`${this.apiUrl}/tasks`, taskData, {
+      .post<TaskResponse>(`${this.apiUrl}/tasks`, taskData, {
         headers: this.getAuthHeaders(),
       })
-      .pipe(catchError(this.handleError));
+      .pipe(
+        tap((response) => console.log('Task creation response:', response)),
+        catchError(this.handleError)
+      );
   }
 
   getUserTasks(user_id: string): Observable<Task[]> {
-    return this.http.get<Task[]>(`${this.apiUrl}/users/${user_id}/tasks/`);
+    return this.http
+      .get<Task[]>(`${this.apiUrl}/users/${user_id}/tasks/`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(
+        tap((tasks) => console.log('Retrieved tasks:', tasks)),
+        catchError(this.handleError)
+      );
   }
 
   getPendingTasks(user_id: string): Observable<Task[]> {
-    return this.http.get<Task[]>(
-      `${this.apiUrl}/users/${user_id}/tasks/pending/`
-    );
+    return this.http
+      .get<Task[]>(`${this.apiUrl}/users/${user_id}/tasks/pending/`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(catchError(this.handleError));
   }
 
   getCompletedTasks(user_id: string): Observable<Task[]> {
@@ -85,7 +97,11 @@ export class ApiService {
   }
 
   updateTask(task_id: string, taskData: Partial<Task>): Observable<any> {
-    return this.http.put(`${this.apiUrl}/tasks/${task_id}/`, taskData);
+    return this.http
+      .put(`${this.apiUrl}/tasks/${task_id}/`, taskData, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(catchError(this.handleError));
   }
 
   deleteTask(task_id: string): Observable<any> {

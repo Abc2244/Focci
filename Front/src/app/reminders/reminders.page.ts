@@ -202,8 +202,14 @@ export class RemindersPage implements OnInit {
       ...this.reminderForm.value,
       user_id: userId,
       taskName: this.getTaskName(this.reminderForm.value.task_id),
+      reminder_date: new Date(
+        this.reminderForm.value.reminder_date
+      ).toISOString(),
+      priority: parseInt(this.reminderForm.value.priority),
+      insistence_level: parseInt(this.reminderForm.value.insistence_level),
+      _id: this.currentReminderId || `temp_${Date.now()}`,
     };
-    console.log('Saving reminder:', reminderData);
+    console.log('Saving reminder with formatted data:', reminderData);
 
     if (this.isEditing && this.currentReminderId) {
       this.notificationsService.cancelNotification(this.currentReminderId);
@@ -213,7 +219,7 @@ export class RemindersPage implements OnInit {
         .subscribe(
           (updatedReminder) => {
             console.log('Reminder updated:', updatedReminder);
-            this.notificationsService.scheduleNotification(reminderData);
+            this.notificationsService.scheduleNotification(updatedReminder);
             this.loadReminders();
             this.showModal = false;
             this.toastService.showToast('Recordatorio actualizado', 'success');
@@ -224,10 +230,13 @@ export class RemindersPage implements OnInit {
       this.apiService.createReminder(reminderData).subscribe(
         (newReminder) => {
           console.log('Reminder created:', newReminder);
-          this.notificationsService.scheduleNotification(reminderData);
+          this.notificationsService.scheduleNotification(newReminder);
           this.loadReminders();
           this.showModal = false;
-          this.toastService.showToast('Recordatorio creado', 'success');
+          this.toastService.showToast(
+            'Recordatorio creado y notificación programada',
+            'success'
+          );
         },
         (error) => console.error('Error creating reminder:', error)
       );

@@ -23,7 +23,14 @@ class TaskService:
         self.task_scheduler = TaskScheduler()
 
 
-    async def process_task(self, user_id: str, subject_id: str, task_description: str, due_date: str) -> Optional[Dict]:
+    async def process_task(
+        self, 
+        user_id: str, 
+        subject_id: str, 
+        task_description: str, 
+        due_date: str,
+        estimated_time: Optional[int] = None
+    ) -> Optional[Dict]:
         """
         Procesa una tarea, ajusta la prioridad según la descripción y la materia, genera recordatorios, etc.
         """
@@ -67,30 +74,33 @@ class TaskService:
             "subject_id": subject_id,
             "description": task_description,
             "due_date": due_date_dt,
-            "completed": False
+            "completed": False,
+            "task_type": task_type,
+            "priority": adjusted_priority,
+            "estimated_time": estimated_time
         }
         task_id = await mongodb.get_collection("tasks").insert_one(task_data)
 
-    # Guardar cada recordatorio en la colección de recordatorios
-    for reminder_date in reminders:
-        reminder_data = {
-            "user_id": user_id,
-            "task_id": str(task_id.inserted_id),
-            "reminder_date": reminder_date,
-            "status": "pendiente",
-            "priority": adjusted_priority,
-            "insistence_level": insistence_level
-        }
-        await mongodb.get_collection("reminders").insert_one(reminder_data)
+        # Guardar cada recordatorio en la colección de recordatorios
+        for reminder_date in reminders:
+            reminder_data = {
+                "user_id": user_id,
+                "task_id": str(task_id.inserted_id),
+                "reminder_date": reminder_date,
+                "status": "pendiente",
+                "priority": adjusted_priority,
+                "insistence_level": insistence_level
+            }
+            await mongodb.get_collection("reminders").insert_one(reminder_data)
 
-    return {
-        "task_id": str(task_id.inserted_id),
-        "keywords": keywords,
-        "adjusted_priority": adjusted_priority,
-        "insistence_level": insistence_level,
-        "task_type": task_type,
-        "reminders": reminders
-    }
+        return {
+            "task_id": str(task_id.inserted_id),
+            "keywords": keywords,
+            "adjusted_priority": adjusted_priority,
+            "insistence_level": insistence_level,
+            "task_type": task_type,
+            "reminders": reminders
+        }
 
     def extract_keywords(self, doc) -> list:
         return [token.text for token in doc if not token.is_stop and not token.is_punct]

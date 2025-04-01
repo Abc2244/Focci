@@ -121,20 +121,50 @@ export class NotificationsService {
   }
 
   async scheduleNotification(reminder: any) {
-    if (!this.isNativePlatform) return;
+    if (!this.isNativePlatform) {
+      console.log('Las notificaciones solo funcionan en dispositivos nativos');
+      return;
+    }
 
     try {
-      const reminderDate = new Date(reminder.reminder_date);
+      // Asegurarse de que reminder_date sea un objeto Date
+      let reminderDate: Date;
+      if (typeof reminder.reminder_date === 'string') {
+        reminderDate = new Date(reminder.reminder_date);
+      } else {
+        reminderDate = reminder.reminder_date;
+      }
+      
       const now = new Date();
 
-      // Si la fecha del recordatorio ya pasó, no programar
-      if (reminderDate < now) {
-        console.log('La fecha del recordatorio ya pasó, no se programará');
+      // Verificar si la fecha es válida
+      if (isNaN(reminderDate.getTime())) {
+        console.error('Fecha de recordatorio inválida:', reminder.reminder_date);
         return;
       }
 
-      const insistenceLevel = parseInt(reminder.insistence_level);
-      const uniqueIdBase = parseInt(reminder._id.substring(0, 8), 16) % 100000;
+      // Si la fecha del recordatorio ya pasó, no programar
+      if (reminderDate < now) {
+        console.log('La fecha del recordatorio ya pasó, no se programará:', reminderDate);
+        return;
+      }
+
+      console.log('Programando notificación para:', reminderDate);
+
+      // Asegurarse de que insistence_level sea un número
+      const insistenceLevel = typeof reminder.insistence_level === 'string' 
+        ? parseInt(reminder.insistence_level) 
+        : reminder.insistence_level;
+
+      // Generar un ID único basado en el ID del recordatorio
+      let uniqueIdBase: number;
+      if (reminder._id) {
+        // Usar los primeros 8 caracteres del ID como número hexadecimal
+        uniqueIdBase = parseInt(reminder._id.substring(0, 8), 16) % 100000;
+      } else {
+        // Si no hay ID, usar timestamp actual
+        uniqueIdBase = Math.floor(Date.now() % 100000);
+      }
 
       // Crear notificaciones según el nivel de insistencia
       const notifications = [];
@@ -142,7 +172,7 @@ export class NotificationsService {
       // Notificación principal con sonido y vibración para mayor atención
       notifications.push({
         id: uniqueIdBase,
-        title: `Recordatorio: ${reminder.taskName}`,
+        title: `Recordatorio: ${reminder.taskName || 'Tarea'}`,
         body: reminder.message || 'Es hora de tu recordatorio',
         schedule: { at: reminderDate },
         sound: 'default',
@@ -169,7 +199,7 @@ export class NotificationsService {
           );
           notifications.push({
             id: uniqueIdBase + i,
-            title: `⚠️ Recordatorio Pendiente: ${reminder.taskName}`,
+            title: `⚠️ Recordatorio Pendiente: ${reminder.taskName || 'Tarea'}`,
             body: `${reminder.message || 'Recordatorio pendiente'} (${i + 1}/${
               repeatCount + 1
             })`,
@@ -183,7 +213,9 @@ export class NotificationsService {
         }
       }
 
+      console.log('Notificaciones a programar:', notifications);
       await LocalNotifications.schedule({ notifications });
+      console.log('Notificaciones programadas con éxito');
     } catch (error) {
       console.error('Error al programar notificación:', error);
     }

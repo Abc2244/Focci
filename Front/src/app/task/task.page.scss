@@ -1321,3 +1321,27 @@ ion-tab-bar {
     }
   }
 }
+
+.type-chip {
+  &.type-examen {
+    --background: rgba(244, 67, 54, 0.1);
+    --color: #f44336;
+  }
+  &.type-proyecto {
+    --background: rgba(33, 150, 243, 0.1);
+    --color: #2196f3;
+  }
+  &.type-lectura {
+    --background: rgba(76, 175, 80, 0.1);
+    --color: #4caf50;
+  }
+}
+
+.priority-chip {
+  @for $i from 1 through 5 {
+    &.priority-#{$i} {
+      --background: rgba(255, #{51 + ($i * 40)}, 0, 0.1);
+      --color: rgb(255, #{51 + ($i * 40)}, 0);
+    }
+  }
+}

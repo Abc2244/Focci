@@ -4,8 +4,10 @@ from fastapi import APIRouter, HTTPException
 
 from config.database import mongodb
 from models.task import Task
+from services.task_service import TaskService
 
 router = APIRouter()
+task_service = TaskService()
 
 def serialize_mongo_document(doc):
     doc["_id"] = str(doc["_id"])
@@ -13,8 +15,28 @@ def serialize_mongo_document(doc):
 
 @router.post("/tasks/")
 async def create_task(task: Task):
-    task_id = await mongodb.get_collection("tasks").insert_one(task.dict())
-    return {"message": "Tarea creada", "task_id": str(task_id.inserted_id)}
+    try:
+        result = await task_service.process_task(
+            user_id=task.user_id,
+            subject_id=task.subject_id,
+            task_description=task.description,
+            due_date=task.due_date,
+            estimated_time=task.estimated_time
+        )
+        
+        if not result:
+            raise HTTPException(status_code=400, detail="Error al procesar la tarea")
+            
+        return {
+            "message": "Tarea creada",
+            "task_id": result["task_id"],
+            "task_type": result["task_type"],
+            "adjusted_priority": result["adjusted_priority"],
+            "reminders": result["reminders"]
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.patch("/tasks/{task_id}/complete/")
 async def complete_task(task_id: str):

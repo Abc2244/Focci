@@ -3,7 +3,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
 import { AlertController } from '@ionic/angular';
-import { Task, CreateTaskDTO } from '../interfaces/task.interface';
+import {
+  Task,
+  CreateTaskDTO,
+  TaskResponse,
+} from '../interfaces/task.interface';
 import { Subject } from '../interfaces/subject.interface';
 import { ToastService } from '../services/toast.service';
 
@@ -45,6 +49,7 @@ export class TaskPage implements OnInit {
       description: ['', Validators.required],
       due_date: ['', Validators.required],
       subject_id: ['', Validators.required],
+      estimated_time: [30, [Validators.required, Validators.min(0)]],
     });
 
     this.minDate = new Date().toISOString();
@@ -183,17 +188,24 @@ export class TaskPage implements OnInit {
         description: formData.description,
         due_date: new Date(formData.due_date).toISOString(),
         completed: false,
+        estimated_time: formData.estimated_time,
       };
 
       try {
         if (this.isEditing && this.currentTaskId) {
+          const updateData = { ...taskData };
           await this.apiService
-            .updateTask(this.currentTaskId, taskData)
+            .updateTask(this.currentTaskId, updateData)
             .toPromise();
           this.toastService.showToast('Tarea actualizada con éxito', 'success');
         } else {
-          await this.apiService.createTask(taskData).toPromise();
-          this.toastService.showToast('Tarea creada con éxito', 'success');
+          const response: TaskResponse = await this.apiService
+            .createTask(taskData)
+            .toPromise();
+          this.toastService.showToast(
+            `Tarea creada: ${response.task_type} (Prioridad: ${response.adjusted_priority})`,
+            'success'
+          );
         }
 
         this.dismissModal();
@@ -222,6 +234,7 @@ export class TaskPage implements OnInit {
       description: task.description,
       due_date: task.due_date,
       subject_id: task.subject_id,
+      estimated_time: task.estimated_time,
     });
 
     this.showModal = true;
