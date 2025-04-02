@@ -187,7 +187,6 @@ export class TaskPage implements OnInit {
         subject_id: formData.subject_id,
         description: formData.description,
         due_date: new Date(formData.due_date).toISOString(),
-        completed: false,
         estimated_time: formData.estimated_time,
       };
 
@@ -199,13 +198,16 @@ export class TaskPage implements OnInit {
             .toPromise();
           this.toastService.showToast('Tarea actualizada con éxito', 'success');
         } else {
-          const response: TaskResponse = await this.apiService
+          const response = await this.apiService
             .createTask(taskData)
             .toPromise();
-          this.toastService.showToast(
-            `Tarea creada: ${response.task_type} (Prioridad: ${response.adjusted_priority})`,
-            'success'
-          );
+
+          if (response) {
+            this.toastService.showToast(
+              `Tarea creada: ${response.task_type} (Prioridad: ${response.adjusted_priority})`,
+              'success'
+            );
+          }
         }
 
         this.dismissModal();

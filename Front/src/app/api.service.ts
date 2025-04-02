@@ -5,7 +5,7 @@ import {
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { Task, CreateTaskDTO } from './interfaces/task.interface';
+import { Task, CreateTaskDTO, TaskResponse } from './interfaces/task.interface';
 import { Subject, ScheduleItem } from './interfaces/subject.interface';
 import { environment } from '../environments/environment';
 import { catchError, tap } from 'rxjs/operators';
