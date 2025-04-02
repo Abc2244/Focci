@@ -56,14 +56,19 @@ export class ApiService {
   // -----------------------------------------
 
   createTask(taskData: CreateTaskDTO): Observable<TaskResponse> {
-    console.log('API createTask called with:', taskData);
+    console.log('Creating task with data:', taskData);
     return this.http
-      .post<TaskResponse>(`${this.apiUrl}/tasks/`, taskData, {
+      .post<TaskResponse>(`${this.apiUrl}/tasks`, taskData, {
         headers: this.getAuthHeaders(),
       })
       .pipe(
         tap((response) => console.log('Task creation response:', response)),
-        catchError(this.handleError)
+        catchError((error) => {
+          console.error('Error creating task:', error);
+          return throwError(
+            () => new Error(error.error?.detail || 'Error al crear la tarea')
+          );
+        })
       );
   }
 

@@ -13,12 +13,21 @@ def serialize_mongo_document(doc):
     doc["_id"] = str(doc["_id"])
     return doc
 
-@router.post("/tasks/")
+@router.post("/tasks/", response_model=dict)
 async def create_task(task: Task):
     try:
+        if not task.user_id or not task.subject_id:
+            raise HTTPException(status_code=400, detail="user_id y subject_id son requeridos")
+
+        try:
+            user_id_obj = ObjectId(task.user_id)
+            subject_id_obj = ObjectId(task.subject_id)
+        except:
+            raise HTTPException(status_code=400, detail="ID inválido")
+
         result = await task_service.process_task(
-            user_id=task.user_id,
-            subject_id=task.subject_id,
+            user_id=str(user_id_obj),
+            subject_id=str(subject_id_obj),
             task_description=task.description,
             due_date=task.due_date,
             estimated_time=task.estimated_time

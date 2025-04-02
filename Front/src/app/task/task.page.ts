@@ -193,6 +193,8 @@ export class TaskPage implements OnInit {
         estimated_time: formData.estimated_time,
       };
 
+      console.log('Sending task data:', taskData); // Para debugging
+
       try {
         if (this.isEditing && this.currentTaskId) {
           await this.apiService
@@ -213,7 +215,7 @@ export class TaskPage implements OnInit {
         this.dismissModal();
         this.loadTasks();
       } catch (error: any) {
-        console.error('Error detallado:', error);
+        console.error('Error completo:', error);
         const errorMessage =
           error.error?.detail || error.message || 'Error al guardar la tarea';
         this.toastService.showToast(errorMessage, 'error');
