@@ -17,35 +17,64 @@ def serialize_mongo_document(doc):
 async def create_task(task: Task):
     try:
         if not task.user_id or not task.subject_id:
-            raise HTTPException(status_code=400, detail="user_id y subject_id son requeridos")
+            raise HTTPException(
+                status_code=400,
+                detail="user_id y subject_id son requeridos"
+            )
 
+        # Validar ObjectIds
         try:
             user_id_obj = ObjectId(task.user_id)
             subject_id_obj = ObjectId(task.subject_id)
-        except:
-            raise HTTPException(status_code=400, detail="ID inválido")
+        except Exception as e:
+            raise HTTPException(
+                status_code=400,
+                detail=f"ID inválido: {str(e)}"
+            )
 
-        result = await task_service.process_task(
-            user_id=str(user_id_obj),
-            subject_id=str(subject_id_obj),
-            task_description=task.description,
-            due_date=task.due_date,
-            estimated_time=task.estimated_time
-        )
-        
+        # Procesar la tarea
+        try:
+            result = await task_service.process_task(
+                user_id=str(user_id_obj),
+                subject_id=str(subject_id_obj),
+                task_description=task.description,
+                due_date=task.due_date,
+                estimated_time=task.estimated_time
+            )
+        except ValueError as e:
+            raise HTTPException(
+                status_code=400,
+                detail=str(e)
+            )
+        except Exception as e:
+            print(f"Error inesperado: {str(e)}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error interno del servidor: {str(e)}"
+            )
+
         if not result:
-            raise HTTPException(status_code=400, detail="Error al procesar la tarea")
-        
+            raise HTTPException(
+                status_code=400,
+                detail="Error al procesar la tarea"
+            )
+
         return {
-            "message": "Tarea creada",
+            "message": "Tarea creada exitosamente",
             "task_id": str(result["task_id"]),
             "task_type": result["task_type"],
             "adjusted_priority": result["adjusted_priority"],
             "reminders": result["reminders"]
         }
+
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"Error creating task: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error no manejado: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error interno del servidor: {str(e)}"
+        )
 
 @router.patch("/tasks/{task_id}/complete/")
 async def complete_task(task_id: str):

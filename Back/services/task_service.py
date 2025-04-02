@@ -24,83 +24,88 @@ class TaskService:
 
 
     async def process_task(
-        self, 
-        user_id: str, 
-        subject_id: str, 
-        task_description: str, 
+        self,
+        user_id: str,
+        subject_id: str,
+        task_description: str,
         due_date: str,
-        estimated_time: Optional[int] = None
-    ) -> Optional[Dict]:
-        """
-        Procesa una tarea, ajusta la prioridad según la descripción y la materia, genera recordatorios, etc.
-        """
-        if not task_description:
-            print("Descripción de la tarea vacía.")
-            return None
-
+        estimated_time: Optional[int] = 30
+    ) -> dict:
         try:
-            due_date_dt = datetime.strptime(due_date, "%Y-%m-%d %H:%M:%S")
-        except ValueError:
-            print("Formato de fecha inválido. Use YYYY-MM-DD HH:MM:SS")
-            return None
+            # Validar que el usuario y la materia existan
+            user = await mongodb.get_collection("users").find_one({"_id": ObjectId(user_id)})
+            subject = await mongodb.get_collection("subjects").find_one({"_id": ObjectId(subject_id)})
+            
+            if not user or not subject:
+                raise ValueError("Usuario o materia no encontrados")
 
-        # Obtener información de la materia
-        subject = await mongodb.get_collection("subjects").find_one({"_id": ObjectId(subject_id)})
-        if not subject:
-            raise HTTPException(status_code=404, detail="Materia no encontrada")
-
-        subject_priority = subject['credits']  # Ejemplo: la prioridad se basa en los créditos
-
-        # Procesar la descripción de la tarea
-        doc = self.nlp(task_description)
-        keywords = self.extract_keywords(doc)
-        task_type = self.classify_task_type(task_description)
-
-        # Ajustar la prioridad de la tarea según la descripción y la materia
-        adjusted_priority = self.task_prioritizer.adjust_priority(task_description, subject_priority)
-
-        # Detectar si hay palabras clave urgentes
-        urgent_keywords_detected = any(keyword in task_description.lower() for keyword in URGENT_KEYWORDS)
-
-        # Calcular nivel de insistencia
-        insistence_level = self.task_scheduler.calculate_insistence_level(adjusted_priority, due_date_dt, urgent_keywords_detected)
-
-        # Generar recordatorios
-        reminders = self.task_scheduler.generate_advanced_reminders(task_description, adjusted_priority, due_date_dt, insistence_level, task_type)
-
-        # Guardar la tarea en la base de datos
-        task_data = {
-            "user_id": user_id,
-            "subject_id": subject_id,
-            "description": task_description,
-            "due_date": due_date_dt,
-            "completed": False,
-            "task_type": task_type,
-            "priority": adjusted_priority,
-            "estimated_time": estimated_time
-        }
-        task_id = await mongodb.get_collection("tasks").insert_one(task_data)
-
-        # Guardar cada recordatorio en la colección de recordatorios
-        for reminder_date in reminders:
-            reminder_data = {
+            # Crear la tarea base
+            task_data = {
                 "user_id": user_id,
-                "task_id": str(task_id.inserted_id),
-                "reminder_date": reminder_date,
-                "status": "pendiente",
-                "priority": adjusted_priority,
-                "insistence_level": insistence_level
+                "subject_id": subject_id,
+                "description": task_description,
+                "due_date": due_date,
+                "estimated_time": estimated_time,
+                "completed": False,
+                "created_at": datetime.utcnow().isoformat(),
+                "task_type": "general",
+                "priority": 1,
+                "reminders": []
             }
-            await mongodb.get_collection("reminders").insert_one(reminder_data)
 
-        return {
-            "task_id": str(task_id.inserted_id),
-            "keywords": keywords,
-            "adjusted_priority": adjusted_priority,
-            "insistence_level": insistence_level,
-            "task_type": task_type,
-            "reminders": reminders
-        }
+            # Insertar la tarea en la base de datos
+            result = await mongodb.get_collection("tasks").insert_one(task_data)
+            
+            if not result.inserted_id:
+                raise ValueError("Error al insertar la tarea en la base de datos")
+
+            # Determinar el tipo de tarea y prioridad basado en la descripción
+            task_type = self._determine_task_type(task_description)
+            priority = self._calculate_priority(task_description, estimated_time)
+            
+            # Actualizar la tarea con el tipo y prioridad calculados
+            await mongodb.get_collection("tasks").update_one(
+                {"_id": result.inserted_id},
+                {
+                    "$set": {
+                        "task_type": task_type,
+                        "priority": priority
+                    }
+                }
+            )
+
+            return {
+                "task_id": result.inserted_id,
+                "task_type": task_type,
+                "adjusted_priority": priority,
+                "reminders": []
+            }
+
+        except Exception as e:
+            print(f"Error en process_task: {str(e)}")
+            raise ValueError(f"Error al procesar la tarea: {str(e)}")
+
+    def _determine_task_type(self, description: str) -> str:
+        description_lower = description.lower()
+        if any(word in description_lower for word in ["examen", "prueba", "test"]):
+            return "examen"
+        elif any(word in description_lower for word in ["proyecto", "trabajo"]):
+            return "proyecto"
+        elif any(word in description_lower for word in ["leer", "lectura"]):
+            return "lectura"
+        return "general"
+
+    def _calculate_priority(self, description: str, estimated_time: int) -> int:
+        # Lógica simple de prioridad basada en tiempo estimado
+        if estimated_time > 120:
+            return 5
+        elif estimated_time > 90:
+            return 4
+        elif estimated_time > 60:
+            return 3
+        elif estimated_time > 30:
+            return 2
+        return 1
 
     def extract_keywords(self, doc) -> list:
         return [token.text for token in doc if not token.is_stop and not token.is_punct]
