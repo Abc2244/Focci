@@ -179,7 +179,10 @@ export class TaskPage implements OnInit {
   async saveTask() {
     if (this.taskForm.valid) {
       const userId = this.authService.getCurrentUserId();
-      if (!userId) return;
+      if (!userId) {
+        this.toastService.showToast('Error: Usuario no identificado', 'error');
+        return;
+      }
 
       const formData = this.taskForm.value;
       const taskData: CreateTaskDTO = {
@@ -192,16 +195,14 @@ export class TaskPage implements OnInit {
 
       try {
         if (this.isEditing && this.currentTaskId) {
-          const updateData = { ...taskData };
           await this.apiService
-            .updateTask(this.currentTaskId, updateData)
+            .updateTask(this.currentTaskId, taskData)
             .toPromise();
           this.toastService.showToast('Tarea actualizada con éxito', 'success');
         } else {
           const response = await this.apiService
             .createTask(taskData)
             .toPromise();
-
           if (response) {
             this.toastService.showToast(
               `Tarea creada: ${response.task_type} (Prioridad: ${response.adjusted_priority})`,
@@ -209,12 +210,13 @@ export class TaskPage implements OnInit {
             );
           }
         }
-
         this.dismissModal();
         this.loadTasks();
-      } catch (error) {
-        this.toastService.showToast('Error al guardar la tarea', 'error');
-        console.error('Error:', error);
+      } catch (error: any) {
+        console.error('Error detallado:', error);
+        const errorMessage =
+          error.error?.detail || error.message || 'Error al guardar la tarea';
+        this.toastService.showToast(errorMessage, 'error');
       }
     }
   }

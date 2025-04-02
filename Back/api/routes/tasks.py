@@ -26,16 +26,16 @@ async def create_task(task: Task):
         
         if not result:
             raise HTTPException(status_code=400, detail="Error al procesar la tarea")
-            
+        
         return {
             "message": "Tarea creada",
-            "task_id": result["task_id"],
+            "task_id": str(result["task_id"]),
             "task_type": result["task_type"],
             "adjusted_priority": result["adjusted_priority"],
             "reminders": result["reminders"]
         }
-        
     except Exception as e:
+        print(f"Error creating task: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.patch("/tasks/{task_id}/complete/")

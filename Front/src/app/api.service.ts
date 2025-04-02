@@ -58,7 +58,7 @@ export class ApiService {
   createTask(taskData: CreateTaskDTO): Observable<TaskResponse> {
     console.log('API createTask called with:', taskData);
     return this.http
-      .post<TaskResponse>(`${this.apiUrl}/tasks`, taskData, {
+      .post<TaskResponse>(`${this.apiUrl}/tasks/`, taskData, {
         headers: this.getAuthHeaders(),
       })
       .pipe(
