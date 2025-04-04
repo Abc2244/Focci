@@ -184,19 +184,19 @@ export class TaskPage implements OnInit {
         return;
       }
 
-      const formData = this.taskForm.value;
-      // Asegurarse de que la fecha tenga el formato correcto con UTC
-      const dueDate = new Date(formData.due_date);
-      const taskData: CreateTaskDTO = {
-        user_id: userId,
-        subject_id: formData.subject_id,
-        description: formData.description,
-        // Asegurarse de que la fecha incluya la zona horaria
-        due_date: dueDate.toISOString().replace('.000Z', 'Z'),
-        estimated_time: formData.estimated_time,
-      };
-
       try {
+        // Formatear la fecha correctamente
+        const formValue = this.taskForm.value;
+        const dueDate = new Date(formValue.due_date);
+
+        const taskData: CreateTaskDTO = {
+          user_id: userId,
+          subject_id: formValue.subject_id,
+          description: formValue.description,
+          due_date: dueDate.toISOString(), // Asegurarse de que la fecha esté en formato ISO
+          estimated_time: formValue.estimated_time,
+        };
+
         if (this.isEditing && this.currentTaskId) {
           await this.apiService
             .updateTask(this.currentTaskId, taskData)

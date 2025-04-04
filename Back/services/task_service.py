@@ -63,9 +63,15 @@ class TaskService:
             # Asegurarse de que la fecha esté en UTC
             try:
                 # Convertir la fecha string a datetime UTC
-                due_date_dt = datetime.fromisoformat(due_date.replace('Z', '+00:00'))
+                if isinstance(due_date, str):
+                    # Si es string, convertir a datetime
+                    due_date_dt = datetime.fromisoformat(due_date.replace('Z', '+00:00'))
+                else:
+                    # Si ya es datetime, usarlo directamente
+                    due_date_dt = due_date
+                
+                # Asegurarse de que tenga zona horaria
                 if due_date_dt.tzinfo is None:
-                    # Si la fecha no tiene zona horaria, asumimos UTC
                     due_date_dt = due_date_dt.replace(tzinfo=datetime.timezone.utc)
             except Exception as e:
                 raise ValueError(f"Error al procesar la fecha: {str(e)}")
