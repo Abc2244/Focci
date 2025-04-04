@@ -191,7 +191,8 @@ export class TaskPage implements OnInit {
         user_id: userId,
         subject_id: formData.subject_id,
         description: formData.description,
-        due_date: dueDate.toISOString(), // Esto asegura el formato correcto
+        // Asegurarse de que la fecha incluya la zona horaria
+        due_date: dueDate.toISOString().replace('.000Z', 'Z'),
         estimated_time: formData.estimated_time,
       };
 

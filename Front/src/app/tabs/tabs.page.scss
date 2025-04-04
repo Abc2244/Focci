@@ -250,7 +250,11 @@ ion-header {
 
 // Aseguramos que el contenido principal tenga el espacio correcto
 #main-content {
-  background-color: transparent;
+  background: linear-gradient(
+    135deg,
+    #f5f7fa 0%,
+    var(--ion-color-secondary-tint) 100%
+  );
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -269,7 +273,9 @@ ion-header {
     overflow: hidden;
 
     ion-router-outlet {
-      padding-top: var(--header-height);
+      padding-top: calc(var(--ion-safe-area-top) + var(--header-height));
+      padding-bottom: calc(var(--tab-height) + var(--ion-safe-area-bottom));
+      background: transparent;
     }
   }
 }

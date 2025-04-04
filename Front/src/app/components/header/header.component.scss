@@ -1,20 +1,21 @@
 :host {
   --header-height: 60px;
-  --header-padding-top: max(var(--ion-safe-area-top), 16px);
+  --header-padding-top: max(var(--ion-safe-area-top), 24px);
 }
 
 // Estilos para la barra de navegación superior moderna
 .modern-header {
   position: relative;
   z-index: 10;
+  background: white;
 
   ion-toolbar {
     --padding-top: var(--header-padding-top);
     --min-height: calc(var(--header-height) + var(--header-padding-top));
-    --background: transparent;
+    --background: white;
     --color: var(--ion-color-primary);
     --border-width: 0;
-    box-shadow: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     padding-top: var(--header-padding-top);
   }
 }
@@ -22,7 +23,7 @@
 // Añadir estilos específicos para el ion-header
 ion-header {
   position: relative !important;
-  background-color: transparent;
+  background-color: white;
   z-index: 1000;
 
   &::after {
@@ -30,7 +31,7 @@ ion-header {
   }
 
   ion-toolbar {
-    --background: transparent;
+    --background: white;
     --border-width: 0;
     box-shadow: none;
   }

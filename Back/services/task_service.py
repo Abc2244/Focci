@@ -64,9 +64,9 @@ class TaskService:
             try:
                 # Convertir la fecha string a datetime UTC
                 due_date_dt = datetime.fromisoformat(due_date.replace('Z', '+00:00'))
-                # Asegurarse de que la fecha está en UTC
                 if due_date_dt.tzinfo is None:
-                    raise ValueError("La fecha debe incluir información de zona horaria")
+                    # Si la fecha no tiene zona horaria, asumimos UTC
+                    due_date_dt = due_date_dt.replace(tzinfo=datetime.timezone.utc)
             except Exception as e:
                 raise ValueError(f"Error al procesar la fecha: {str(e)}")
             
@@ -91,10 +91,10 @@ class TaskService:
                 "user_id": user_id,
                 "subject_id": subject_id,
                 "description": task_description,
-                "due_date": due_date_dt.isoformat(),  # Usar el formato ISO
+                "due_date": due_date_dt.isoformat(),  # Esto incluirá la zona horaria
                 "estimated_time": estimated_time,
                 "completed": False,
-                "created_at": datetime.utcnow().isoformat(),
+                "created_at": datetime.now(datetime.timezone.utc).isoformat(),
                 "task_type": task_type,
                 "priority": final_priority,
                 "insistence_level": insistence_level,

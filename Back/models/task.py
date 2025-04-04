@@ -17,9 +17,11 @@ class Task(BaseModel):
     @validator('due_date')
     def validate_due_date(cls, v):
         try:
-            # Intentar parsear la fecha
-            datetime.fromisoformat(v.replace('Z', '+00:00'))
-            return v
+            # Asegurarse de que la fecha tenga zona horaria
+            dt = datetime.fromisoformat(v.replace('Z', '+00:00'))
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=datetime.timezone.utc)
+            return dt.isoformat()
         except Exception as e:
             raise ValueError(f'Formato de fecha inválido: {str(e)}')
 
