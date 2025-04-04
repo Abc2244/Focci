@@ -2,7 +2,7 @@ from fastapi import HTTPException
 import spacy
 import nltk
 from nltk.corpus import stopwords
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Optional
 from services.task_prioritizer_service import TaskPrioritizer
 from services.task_scheduler_service import TaskScheduler
@@ -60,47 +60,44 @@ class TaskService:
                 estimated_time
             )
 
-            # Asegurarse de que la fecha esté en UTC
+            # Procesar la fecha
             try:
-                # Convertir la fecha string a datetime UTC
                 if isinstance(due_date, str):
-                    # Si es string, convertir a datetime
                     due_date_dt = datetime.fromisoformat(due_date.replace('Z', '+00:00'))
                 else:
-                    # Si ya es datetime, usarlo directamente
                     due_date_dt = due_date
-                
-                # Asegurarse de que tenga zona horaria
+
                 if due_date_dt.tzinfo is None:
-                    due_date_dt = due_date_dt.replace(tzinfo=datetime.timezone.utc)
+                    due_date_dt = due_date_dt.replace(tzinfo=timezone.utc)
             except Exception as e:
                 raise ValueError(f"Error al procesar la fecha: {str(e)}")
-            
+
             # Calcular nivel de insistencia
+            urgent_keywords_detected = any(keyword in task_description.lower() for keyword in ["urgente", "importante", "crítico"])
             insistence_level = self.task_scheduler.calculate_insistence_level(
-                priority=final_priority,
-                due_date_dt=due_date_dt,
-                urgent_keywords_detected=base_priority > subject.get('priority', 1)
+                final_priority,
+                due_date_dt,
+                urgent_keywords_detected
             )
 
             # Generar recordatorios
             reminders = self.task_scheduler.generate_advanced_reminders(
-                task_description=task_description,
-                priority=final_priority,
-                due_date_dt=due_date_dt,
-                insistence_level=insistence_level,
-                task_type=task_type
+                task_description,
+                final_priority,
+                due_date_dt,
+                insistence_level,
+                task_type
             )
 
-            # Crear la tarea con la fecha en formato ISO
+            # Crear el documento de la tarea
             task_data = {
-                "user_id": user_id,
-                "subject_id": subject_id,
+                "user_id": str(user_id),
+                "subject_id": str(subject_id),
                 "description": task_description,
-                "due_date": due_date_dt.isoformat(),  # Esto incluirá la zona horaria
+                "due_date": due_date_dt.isoformat(),
                 "estimated_time": estimated_time,
                 "completed": False,
-                "created_at": datetime.now(datetime.timezone.utc).isoformat(),
+                "created_at": datetime.now(timezone.utc).isoformat(),
                 "task_type": task_type,
                 "priority": final_priority,
                 "insistence_level": insistence_level,
@@ -109,9 +106,6 @@ class TaskService:
 
             # Insertar la tarea en la base de datos
             result = await mongodb.get_collection("tasks").insert_one(task_data)
-            
-            if not result.inserted_id:
-                raise ValueError("Error al insertar la tarea en la base de datos")
 
             return {
                 "task_id": result.inserted_id,
