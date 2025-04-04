@@ -60,7 +60,11 @@ class TaskScheduler:
         Genera una lista de recordatorios basados en el nivel de insistencia, prioridad y fecha de vencimiento.
         """
         reminders = []
-        current_date = datetime.now()
+        current_date = datetime.now(datetime.timezone.utc)  # Asegurarse de que current_date tenga zona horaria
+
+        # Asegurarse de que due_date_dt tenga zona horaria
+        if due_date_dt.tzinfo is None:
+            due_date_dt = due_date_dt.replace(tzinfo=datetime.timezone.utc)
 
         delta_days = (due_date_dt - current_date).days
 
@@ -92,7 +96,8 @@ class TaskScheduler:
             else:
                 # Distribuir los recordatorios según la cantidad total de días disponibles y el número de recordatorios
                 reminder_time = current_date + timedelta(days=(i * delta_days // num_reminders))
-            reminder_dates.append(reminder_time.strftime("%Y-%m-%d %H:%M:%S"))
+            # Asegurarse de que la fecha tenga formato ISO con zona horaria
+            reminder_dates.append(reminder_time.astimezone(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S %Z"))
         return reminder_dates
 
     def _get_reminder_templates(self, task_type: str) -> list:
@@ -112,7 +117,12 @@ class TaskScheduler:
         """
         Calcula el nivel de insistencia en función de la prioridad, fecha de vencimiento y palabras clave urgentes.
         """
-        current_date = datetime.now()
+        current_date = datetime.now(datetime.timezone.utc)
+        
+        # Asegurarse de que due_date_dt tenga zona horaria
+        if due_date_dt.tzinfo is None:
+            due_date_dt = due_date_dt.replace(tzinfo=datetime.timezone.utc)
+
         delta_days = (due_date_dt - current_date).days
 
         # Nivel base de insistencia basado en la prioridad
