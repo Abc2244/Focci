@@ -50,6 +50,7 @@ export class RemindersPage implements OnInit {
     this.loadReminders();
     this.loadTasks();
     this.requestNotificationPermissions();
+    this.scheduleAllPendingReminders();
   }
 
   ionViewWillEnter() {
@@ -330,5 +331,34 @@ export class RemindersPage implements OnInit {
         'error'
       );
     }
+  }
+
+  async scheduleAllPendingReminders() {
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) return;
+
+    this.apiService
+      .getUpcomingReminders(userId)
+      .subscribe(async (reminders: any[]) => {
+        const pendingReminders = reminders.filter(
+          (reminder) =>
+            reminder.status === 'pendiente' &&
+            new Date(reminder.reminder_date) > new Date()
+        );
+
+        console.log(
+          'Programando recordatorios pendientes:',
+          pendingReminders.length
+        );
+
+        for (const reminder of pendingReminders) {
+          await this.notificationsService.scheduleNotification(reminder);
+        }
+
+        this.toastService.showToast(
+          `${pendingReminders.length} recordatorios programados`,
+          'success'
+        );
+      });
   }
 }

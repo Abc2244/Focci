@@ -63,8 +63,7 @@ async def create_task(task: Task):
             "message": "Tarea creada exitosamente",
             "task_id": str(result["task_id"]),
             "task_type": result["task_type"],
-            "adjusted_priority": result["adjusted_priority"],
-            "reminders": result["reminders"]
+            "adjusted_priority": result["adjusted_priority"]
         }
 
     except HTTPException:

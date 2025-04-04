@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { jwtDecode } from 'jwt-decode';
 import { firstValueFrom } from 'rxjs';
+import { NotificationsService } from './notifications.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,10 @@ export class AuthService {
     password: '1234',
   };
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private notificationsService: NotificationsService
+  ) {
     // Verificamos si hay credenciales guardadas al iniciar
     this.checkAndLoginTestUser();
   }
@@ -41,6 +45,8 @@ export class AuthService {
 
       if (response && response.access_token) {
         localStorage.setItem(this.tokenKey, response.access_token);
+        // Inicializar notificaciones después de un login exitoso
+        await this.notificationsService.initializeNotifications();
         return true;
       }
 
@@ -75,6 +81,16 @@ export class AuthService {
     }
   }
 
+  async logout() {
+    try {
+      // Limpiar todas las notificaciones programadas antes de cerrar sesión
+      await this.notificationsService.resetAllNotifications();
+      localStorage.removeItem(this.tokenKey);
+    } catch (error) {
+      console.error('Error durante el logout:', error);
+    }
+  }
+
   getCurrentUserId(): string | null {
     const token = this.getToken();
     if (token) {
@@ -96,10 +112,6 @@ export class AuthService {
 
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
-  }
-
-  logout() {
-    localStorage.removeItem(this.tokenKey);
   }
 
   async getUserId(): Promise<string | null> {

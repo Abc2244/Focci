@@ -8,11 +8,10 @@ from services.task_prioritizer_service import TaskPrioritizer
 from services.task_scheduler_service import TaskScheduler
 from config.database import mongodb
 from bson import ObjectId
+from bson.errors import InvalidId
 
 nltk.download('punkt')
 nltk.download('stopwords')
-
-URGENT_KEYWORDS = ['urgente', 'importante', 'crítico', 'prioridad']
 
 class TaskService:
     def __init__(self):
@@ -21,7 +20,6 @@ class TaskService:
         self.tasks: Dict[int, Dict] = {}
         self.task_prioritizer = TaskPrioritizer()
         self.task_scheduler = TaskScheduler()
-
 
     async def process_task(
         self,
@@ -32,14 +30,56 @@ class TaskService:
         estimated_time: Optional[int] = 30
     ) -> dict:
         try:
+            # Validar ObjectId
+            try:
+                user_id = ObjectId(user_id)
+                subject_id = ObjectId(subject_id)
+            except InvalidId:
+                raise ValueError("ID de usuario o materia no válido")
+
             # Validar que el usuario y la materia existan
-            user = await mongodb.get_collection("users").find_one({"_id": ObjectId(user_id)})
-            subject = await mongodb.get_collection("subjects").find_one({"_id": ObjectId(subject_id)})
+            user = await mongodb.get_collection("users").find_one({"_id": user_id})
+            subject = await mongodb.get_collection("subjects").find_one({"_id": subject_id})
             
             if not user or not subject:
                 raise ValueError("Usuario o materia no encontrados")
 
-            # Crear la tarea base
+            # Determinar el tipo de tarea
+            task_type = self._determine_task_type(task_description)
+            
+            # Calcular prioridad usando TaskPrioritizer
+            base_priority = self.task_prioritizer.adjust_priority(
+                task_description,
+                subject_priority=subject.get('priority', 1)
+            )
+            
+            # Ajustar prioridad final
+            final_priority = self._adjust_priority_by_type_and_time(
+                base_priority,
+                task_type,
+                estimated_time
+            )
+
+            # Convertir due_date a datetime para TaskScheduler
+            due_date_dt = datetime.fromisoformat(due_date.replace('Z', '+00:00'))
+            
+            # Calcular nivel de insistencia
+            insistence_level = self.task_scheduler.calculate_insistence_level(
+                priority=final_priority,
+                due_date_dt=due_date_dt,
+                urgent_keywords_detected=base_priority > subject.get('priority', 1)
+            )
+
+            # Generar recordatorios
+            reminders = self.task_scheduler.generate_advanced_reminders(
+                task_description=task_description,
+                priority=final_priority,
+                due_date_dt=due_date_dt,
+                insistence_level=insistence_level,
+                task_type=task_type
+            )
+
+            # Crear la tarea
             task_data = {
                 "user_id": user_id,
                 "subject_id": subject_id,
@@ -48,9 +88,10 @@ class TaskService:
                 "estimated_time": estimated_time,
                 "completed": False,
                 "created_at": datetime.utcnow().isoformat(),
-                "task_type": "general",
-                "priority": 1,
-                "reminders": []
+                "task_type": task_type,
+                "priority": final_priority,
+                "insistence_level": insistence_level,
+                "reminders": reminders
             }
 
             # Insertar la tarea en la base de datos
@@ -59,26 +100,12 @@ class TaskService:
             if not result.inserted_id:
                 raise ValueError("Error al insertar la tarea en la base de datos")
 
-            # Determinar el tipo de tarea y prioridad basado en la descripción
-            task_type = self._determine_task_type(task_description)
-            priority = self._calculate_priority(task_description, estimated_time)
-            
-            # Actualizar la tarea con el tipo y prioridad calculados
-            await mongodb.get_collection("tasks").update_one(
-                {"_id": result.inserted_id},
-                {
-                    "$set": {
-                        "task_type": task_type,
-                        "priority": priority
-                    }
-                }
-            )
-
             return {
                 "task_id": result.inserted_id,
                 "task_type": task_type,
-                "adjusted_priority": priority,
-                "reminders": []
+                "adjusted_priority": final_priority,
+                "insistence_level": insistence_level,
+                "reminders": reminders
             }
 
         except Exception as e:
@@ -87,25 +114,35 @@ class TaskService:
 
     def _determine_task_type(self, description: str) -> str:
         description_lower = description.lower()
-        if any(word in description_lower for word in ["examen", "prueba", "test"]):
+        if any(word in description_lower for word in ["examen", "prueba", "test", "evaluación"]):
             return "examen"
-        elif any(word in description_lower for word in ["proyecto", "trabajo"]):
+        elif any(word in description_lower for word in ["proyecto", "trabajo", "investigación"]):
             return "proyecto"
-        elif any(word in description_lower for word in ["leer", "lectura"]):
+        elif any(word in description_lower for word in ["leer", "lectura", "libro", "artículo"]):
             return "lectura"
         return "general"
 
-    def _calculate_priority(self, description: str, estimated_time: int) -> int:
-        # Lógica simple de prioridad basada en tiempo estimado
-        if estimated_time > 120:
-            return 5
+    def _adjust_priority_by_type_and_time(self, base_priority: int, task_type: str, estimated_time: int) -> int:
+        # Ajustar prioridad según el tipo de tarea
+        type_priority_boost = {
+            "examen": 2,
+            "proyecto": 1,
+            "lectura": 0,
+            "general": 0
+        }
+        
+        # Ajustar prioridad según tiempo estimado
+        time_priority_boost = 0
+        if estimated_time >= 120:
+            time_priority_boost = 2
         elif estimated_time > 90:
-            return 4
-        elif estimated_time > 60:
-            return 3
-        elif estimated_time > 30:
-            return 2
-        return 1
+            time_priority_boost = 1
+        
+        # Calcular prioridad final
+        final_priority = base_priority + type_priority_boost.get(task_type, 0) + time_priority_boost
+        
+        # Asegurar que la prioridad esté entre 1 y 5
+        return max(1, min(5, final_priority))
 
     def extract_keywords(self, doc) -> list:
         return [token.text for token in doc if not token.is_stop and not token.is_punct]

@@ -7,6 +7,7 @@ import { Platform } from '@ionic/angular';
 })
 export class NotificationsService {
   private isNativePlatform: boolean;
+  private scheduledNotifications: Set<string> = new Set();
 
   constructor(private platform: Platform) {
     // Determinar si estamos en una plataforma nativa una sola vez
@@ -127,34 +128,28 @@ export class NotificationsService {
     }
 
     try {
-      // Asegurarse de que reminder_date sea un objeto Date
-      let reminderDate: Date;
-      if (typeof reminder.reminder_date === 'string') {
-        reminderDate = new Date(reminder.reminder_date);
-      } else {
-        reminderDate = reminder.reminder_date;
-      }
-      
-      const now = new Date();
-
-      // Verificar si la fecha es válida
-      if (isNaN(reminderDate.getTime())) {
-        console.error('Fecha de recordatorio inválida:', reminder.reminder_date);
+      // Evitar duplicados
+      if (this.scheduledNotifications.has(reminder._id)) {
+        console.log('Notificación ya programada:', reminder._id);
         return;
       }
 
-      // Si la fecha del recordatorio ya pasó, no programar
-      if (reminderDate < now) {
-        console.log('La fecha del recordatorio ya pasó, no se programará:', reminderDate);
+      let reminderDate = new Date(reminder.reminder_date);
+      const now = new Date();
+
+      // Verificar si la fecha es válida y futura
+      if (isNaN(reminderDate.getTime()) || reminderDate <= now) {
+        console.log('Fecha inválida o pasada:', reminderDate);
         return;
       }
 
       console.log('Programando notificación para:', reminderDate);
 
       // Asegurarse de que insistence_level sea un número
-      const insistenceLevel = typeof reminder.insistence_level === 'string' 
-        ? parseInt(reminder.insistence_level) 
-        : reminder.insistence_level;
+      const insistenceLevel =
+        typeof reminder.insistence_level === 'string'
+          ? parseInt(reminder.insistence_level)
+          : reminder.insistence_level;
 
       // Generar un ID único basado en el ID del recordatorio
       let uniqueIdBase: number;
@@ -215,7 +210,15 @@ export class NotificationsService {
 
       console.log('Notificaciones a programar:', notifications);
       await LocalNotifications.schedule({ notifications });
-      console.log('Notificaciones programadas con éxito');
+
+      // Registrar la notificación como programada
+      this.scheduledNotifications.add(reminder._id);
+
+      console.log('Notificación programada exitosamente para:', {
+        id: reminder._id,
+        date: reminderDate,
+        task: reminder.taskName,
+      });
     } catch (error) {
       console.error('Error al programar notificación:', error);
     }
@@ -237,8 +240,29 @@ export class NotificationsService {
       }
 
       await LocalNotifications.cancel({ notifications: notificationsToCancel });
+
+      // Eliminar de las notificaciones programadas
+      this.scheduledNotifications.delete(reminderId);
     } catch (error) {
       console.error('Error al cancelar notificación:', error);
+    }
+  }
+
+  // Añadir este método para limpiar y reprogramar todas las notificaciones
+  async resetAllNotifications() {
+    try {
+      // Cancelar todas las notificaciones pendientes
+      const pending = await LocalNotifications.getPending();
+      if (pending.notifications.length > 0) {
+        await LocalNotifications.cancel({
+          notifications: pending.notifications,
+        });
+      }
+
+      // Limpiar el registro de notificaciones programadas
+      this.scheduledNotifications.clear();
+    } catch (error) {
+      console.error('Error al resetear notificaciones:', error);
     }
   }
 }
