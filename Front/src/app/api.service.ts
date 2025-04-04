@@ -273,6 +273,13 @@ export class ApiService {
       .pipe(catchError(this.handleError));
   }
 
+  // Actualizar el estado de un recordatorio
+  updateReminderStatus(reminder_id: string, status: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/reminders/${reminder_id}/status/`, {
+      status: status,
+    });
+  }
+
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
     return new HttpHeaders({

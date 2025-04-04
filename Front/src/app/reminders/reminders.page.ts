@@ -58,6 +58,26 @@ export class RemindersPage implements OnInit {
     this.loadTasks();
   }
 
+  // Método para cerrar el modal
+  closeModal() {
+    this.showModal = false;
+    this.isEditing = false;
+    this.currentReminderId = null;
+    this.reminderForm.reset({
+      reminder_date: '',
+      priority: 3,
+      task_id: '',
+      message: '',
+      status: 'pendiente',
+      insistence_level: 1,
+    });
+  }
+
+  // Método para cancelar el modal (usado en el HTML)
+  cancelModal() {
+    this.closeModal();
+  }
+
   loadReminders(): void {
     this.isLoading = true;
     const userId = this.authService.getCurrentUserId();
@@ -126,30 +146,23 @@ export class RemindersPage implements OnInit {
   }
 
   getInsistenceText(level: number): string {
-    const levels = [
-      'Muy Baja',
-      'Baja',
-      'Baja-Media',
-      'Media-Baja',
-      'Media',
-      'Media-Alta',
-      'Alta-Media',
-      'Alta',
-      'Muy Alta',
-      'Crítica',
-      'Urgente',
-    ];
-    return levels[level] || 'Media';
+    level = Number(level);
+    if (level === 0) return 'Muy Baja';
+    if (level <= 3) return 'Baja';
+    if (level <= 7) return 'Media';
+    if (level <= 9) return 'Alta';
+    return 'Urgente';
   }
 
   loadTasks(): void {
     const userId = this.authService.getCurrentUserId();
     if (userId) {
-      this.apiService.getTasks(userId).subscribe(
+      this.apiService.getUserTasks(userId).subscribe(
         (data: any) => {
           this.tasks = data;
         },
         (error: any) => {
+          console.error('Error loading tasks:', error);
           this.toastService.showToast('Error al cargar tareas', 'error');
         }
       );
@@ -162,6 +175,7 @@ export class RemindersPage implements OnInit {
     this.reminderForm.reset({
       reminder_date: new Date().toISOString(),
       priority: 3,
+      task_id: '',
       message: '',
       status: 'pendiente',
       insistence_level: 1,
@@ -169,25 +183,93 @@ export class RemindersPage implements OnInit {
     this.showModal = true;
   }
 
+  // Método para editar un recordatorio
   editReminder(reminder: any): void {
     this.isEditing = true;
     this.currentReminderId = reminder._id;
     this.reminderForm.setValue({
       reminder_date: reminder.reminder_date,
-      priority: reminder.priority,
+      priority: Number(reminder.priority),
       task_id: reminder.task_id,
-      message: reminder.message || '',
+      message: reminder.message,
       status: reminder.status,
-      insistence_level: reminder.insistence_level,
+      insistence_level: Number(reminder.insistence_level),
     });
     this.showModal = true;
   }
 
-  cancelModal(): void {
-    this.showModal = false;
+  // Método para completar un recordatorio
+  completeReminder(reminderId: string): void {
+    this.updateReminderStatus(reminderId, 'completado');
   }
 
-  saveReminder(): void {
+  // Método para reactivar un recordatorio
+  reactivateReminder(reminderId: string): void {
+    this.updateReminderStatus(reminderId, 'pendiente');
+  }
+
+  // Método para actualizar el estado de un recordatorio
+  updateReminderStatus(reminderId: string, newStatus: string): void {
+    // Crear objeto con los datos a actualizar
+    const updateData = {
+      status: newStatus,
+      completed_date:
+        newStatus === 'completado' ? new Date().toISOString() : null,
+    };
+
+    this.apiService.updateReminder(reminderId, updateData).subscribe(
+      async (response: any) => {
+        this.toastService.showToast(
+          `Recordatorio ${
+            newStatus === 'completado' ? 'completado' : 'reactivado'
+          }`,
+          'success'
+        );
+        this.loadReminders();
+
+        // Si se completa, cancelar la notificación
+        if (newStatus === 'completado') {
+          await this.notificationsService.cancelNotification(reminderId);
+        }
+        // Si se reactiva, programar la notificación
+        else if (newStatus === 'pendiente') {
+          const reminder = this.reminders.find((r) => r._id === reminderId);
+          if (reminder) {
+            await this.notificationsService.scheduleNotification(reminder);
+          }
+        }
+      },
+      (error: any) => {
+        console.error('Error updating reminder status:', error);
+        this.toastService.showToast(
+          'Error al actualizar el recordatorio',
+          'error'
+        );
+      }
+    );
+  }
+
+  // Método para eliminar un recordatorio
+  deleteReminder(reminderId: string): void {
+    this.apiService.deleteReminder(reminderId).subscribe(
+      async (response: any) => {
+        this.toastService.showToast('Recordatorio eliminado', 'success');
+        this.loadReminders();
+
+        // Cancelar la notificación asociada
+        await this.notificationsService.cancelNotification(reminderId);
+      },
+      (error: any) => {
+        console.error('Error deleting reminder:', error);
+        this.toastService.showToast(
+          'Error al eliminar el recordatorio',
+          'error'
+        );
+      }
+    );
+  }
+
+  saveReminder() {
     if (this.reminderForm.invalid) {
       console.log('Form invalid:', this.reminderForm.errors);
       return;
@@ -203,39 +285,38 @@ export class RemindersPage implements OnInit {
       // Obtener los valores del formulario
       const formData = { ...this.reminderForm.value };
 
-      // Corregir la zona horaria para la fecha del recordatorio
-      if (formData.reminder_date) {
-        // Convertir la fecha a objeto Date si es string
-        const dateObj =
-          typeof formData.reminder_date === 'string'
-            ? new Date(formData.reminder_date)
-            : formData.reminder_date;
-
-        // Ajustar la zona horaria para mantener la hora local seleccionada
-        const userTimezoneOffset = dateObj.getTimezoneOffset() * 60000;
-        const adjustedDate = new Date(dateObj.getTime() - userTimezoneOffset);
-        formData.reminder_date = adjustedDate.toISOString();
+      // Asegurarse de que la fecha sea un string ISO
+      if (
+        formData.reminder_date &&
+        typeof formData.reminder_date === 'object'
+      ) {
+        formData.reminder_date = formData.reminder_date.toISOString();
       }
+
+      // Convertir valores numéricos
+      formData.priority = Number(formData.priority);
+      formData.insistence_level = Number(formData.insistence_level);
 
       // Añadir el ID de usuario
       formData.user_id = userId;
 
-      // Añadir el nombre de la tarea para las notificaciones
+      // Añadir el nombre de la tarea para referencia
       formData.taskName = this.getTaskName(formData.task_id);
 
-      // Generar un ID temporal para nuevos recordatorios
+      // Añadir un ID temporal para la notificación si es nuevo
       if (!this.isEditing) {
         formData._id = `temp_${Date.now()}`;
+      } else {
+        formData._id = this.currentReminderId;
       }
 
       console.log('Saving reminder with formatted data:', formData);
 
-      // Crear o actualizar el recordatorio
       if (this.isEditing && this.currentReminderId) {
         this.apiService
           .updateReminder(this.currentReminderId, formData)
           .subscribe(
-            async (response) => {
+            async (response: any) => {
               console.log('Reminder updated:', response);
               this.toastService.showToast(
                 'Recordatorio actualizado',
@@ -243,9 +324,17 @@ export class RemindersPage implements OnInit {
               );
               this.loadReminders();
               this.closeModal();
-              await this.scheduleAllPendingReminders();
+
+              // Actualizar la notificación
+              await this.notificationsService.cancelNotification(
+                this.currentReminderId!
+              );
+              await this.notificationsService.scheduleNotification({
+                ...formData,
+                _id: this.currentReminderId,
+              });
             },
-            (error) => {
+            (error: any) => {
               console.error('Error updating reminder:', error);
               this.toastService.showToast(
                 'Error al actualizar recordatorio',
@@ -255,7 +344,7 @@ export class RemindersPage implements OnInit {
           );
       } else {
         this.apiService.createReminder(formData).subscribe(
-          async (response) => {
+          async (response: any) => {
             console.log('Reminder created:', response);
             this.toastService.showToast('Recordatorio creado', 'success');
             this.loadReminders();
@@ -267,7 +356,7 @@ export class RemindersPage implements OnInit {
               _id: response.reminder_id,
             });
           },
-          (error) => {
+          (error: any) => {
             console.error('Error creating reminder:', error);
             this.toastService.showToast('Error al crear recordatorio', 'error');
           }
@@ -279,92 +368,30 @@ export class RemindersPage implements OnInit {
     }
   }
 
-  deleteReminder(reminderId: string): void {
-    this.notificationsService.cancelNotification(reminderId);
-    this.apiService.deleteReminder(reminderId).subscribe(
-      () => {
-        this.loadReminders();
-        this.toastService.showToast('Recordatorio eliminado', 'success');
-      },
-      () => {
-        this.toastService.showToast('Error al eliminar recordatorio', 'error');
-      }
-    );
-  }
-
-  completeReminder(reminderId: string): void {
-    this.notificationsService.cancelNotification(reminderId);
-    const reminder = this.reminders.find((r) => r._id === reminderId);
-    if (!reminder) return;
-
-    const updatedReminder = {
-      ...reminder,
-      status: 'completado',
-      completed_date: new Date().toISOString(),
-    };
-
-    this.apiService.updateReminder(reminderId, updatedReminder).subscribe(
-      () => {
-        this.loadReminders();
-        this.toastService.showToast('Recordatorio completado', 'success');
-      },
-      () => {
-        this.toastService.showToast('Error al completar recordatorio', 'error');
-      }
-    );
-  }
-
-  reactivateReminder(reminderId: string): void {
-    const reminder = this.reminders.find((r) => r._id === reminderId);
-    if (!reminder) return;
-
-    const updatedReminder = {
-      ...reminder,
-      status: 'pendiente',
-      completed_date: null,
-    };
-
-    this.apiService.updateReminder(reminderId, updatedReminder).subscribe(
-      () => {
-        this.loadReminders();
-        this.toastService.showToast('Recordatorio reactivado', 'info');
-      },
-      () => {
-        this.toastService.showToast('Error al reactivar recordatorio', 'error');
-      }
-    );
-  }
-
-  dismissModal(): void {
-    this.showModal = false;
+  async requestNotificationPermissions() {
+    try {
+      // Solicitar permisos para notificaciones
+      await LocalNotifications.requestPermissions();
+    } catch (error) {
+      console.error('Error requesting notification permissions:', error);
+    }
   }
 
   async testNotification() {
     try {
-      await this.notificationsService.sendTestNotification();
-      this.toastService.showToast('Notificación de prueba enviada', 'success');
-    } catch (error) {
-      console.error('Error al enviar notificación de prueba:', error);
-      this.toastService.showToast('Error al enviar notificación', 'error');
-    }
-  }
-
-  async requestNotificationPermissions() {
-    try {
-      const permStatus = await LocalNotifications.checkPermissions();
-      if (permStatus.display !== 'granted') {
-        await LocalNotifications.requestPermissions();
+      // Mostrar una notificación de prueba
+      const success = await this.notificationsService.sendTestNotification();
+      if (success) {
         this.toastService.showToast(
-          'Permisos de notificaciones concedidos',
+          'Notificación de prueba enviada',
           'success'
         );
+      } else {
+        this.toastService.showToast('Error al enviar notificación', 'error');
       }
     } catch (error) {
-      console.error('Error al solicitar permisos:', error);
-      this.toastService.showToast(
-        'Error al solicitar permisos de notificaciones',
-        'error'
-      );
+      console.error('Error testing notification:', error);
+      this.toastService.showToast('Error al probar notificación', 'error');
     }
   }
 
@@ -379,51 +406,36 @@ export class RemindersPage implements OnInit {
       this.apiService.getUpcomingReminders(userId).subscribe(
         async (reminders: any[]) => {
           const pendingReminders = reminders.filter(
-            (reminder) =>
-              reminder.status === 'pendiente' &&
-              new Date(reminder.reminder_date) > new Date()
+            (reminder) => reminder.status === 'pendiente'
           );
 
           console.log(
-            'Programando recordatorios pendientes:',
-            pendingReminders.length
+            `Programando ${pendingReminders.length} recordatorios pendientes`
           );
 
-          let successCount = 0;
           for (const reminder of pendingReminders) {
-            try {
-              // Asegurarse de que el recordatorio tenga el nombre de la tarea
-              if (!reminder.taskName) {
-                reminder.taskName = this.getTaskName(reminder.task_id);
-              }
+            // Añadir el nombre de la tarea para las notificaciones
+            reminder.taskName = this.getTaskName(reminder.task_id);
 
-              const success =
-                await this.notificationsService.scheduleNotification(reminder);
-              if (success) successCount++;
-            } catch (err) {
+            // Programar la notificación
+            const success =
+              await this.notificationsService.scheduleNotification(reminder);
+            if (success) {
+              console.log(`Notificación programada para: ${reminder._id}`);
+            } else {
               console.error(
-                'Error al programar recordatorio:',
-                reminder._id,
-                err
+                `Error al programar notificación para: ${reminder._id}`
               );
             }
           }
 
-          if (successCount > 0) {
-            this.toastService.showToast(
-              `${successCount} recordatorios programados correctamente`,
-              'success'
-            );
-          }
-
-          // Verificar notificaciones pendientes para depuración
-          const pending =
-            await this.notificationsService.getPendingNotifications();
+          // Verificar notificaciones programadas
+          const pending = await LocalNotifications.getPending();
           console.log(
-            `${pending.length} notificaciones pendientes en el sistema`
+            `Total de notificaciones programadas: ${pending.notifications.length}`
           );
         },
-        (error) => {
+        (error: any) => {
           console.error('Error al obtener recordatorios:', error);
           this.toastService.showToast(
             'Error al programar recordatorios',

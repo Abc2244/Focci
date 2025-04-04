@@ -34,6 +34,19 @@ async def update_reminder(reminder_id: str, reminder: Reminder):
         raise HTTPException(status_code=404, detail="Recordatorio no encontrado")
     return {"message": "Recordatorio actualizado"}
 
+@router.patch("/reminders/{reminder_id}/status/")
+async def update_reminder_status(reminder_id: str, status_data: dict):
+    if "status" not in status_data:
+        raise HTTPException(status_code=400, detail="El campo 'status' es requerido")
+        
+    result = await mongodb.get_collection("reminders").update_one(
+        {"_id": ObjectId(reminder_id)},
+        {"$set": {"status": status_data["status"]}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Recordatorio no encontrado")
+    return {"message": "Estado del recordatorio actualizado"}
+
 @router.delete("/reminders/{reminder_id}/")
 async def delete_reminder(reminder_id: str):
     result = await mongodb.get_collection("reminders").delete_one({"_id": ObjectId(reminder_id)})
