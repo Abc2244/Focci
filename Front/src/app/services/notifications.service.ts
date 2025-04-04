@@ -120,110 +120,75 @@ export class NotificationsService {
 
   async scheduleNotification(reminder: any): Promise<boolean> {
     try {
-      // Verificar permisos
-      const permStatus = await LocalNotifications.checkPermissions();
-      if (permStatus.display !== 'granted') {
-        await LocalNotifications.requestPermissions();
+      if (!reminder || !reminder._id || !reminder.reminder_date) {
+        console.error('Fecha inválida:', reminder?.reminder_date);
+        return false;
       }
 
-      // Evitar duplicados
+      // Verificar si ya existe una notificación programada para este recordatorio
       if (this.scheduledNotifications.has(reminder._id)) {
-        // Cancelar notificación existente antes de reprogramar
+        // Cancelar la notificación existente antes de reprogramarla
         await this.cancelNotification(reminder._id);
       }
 
-      // Convertir la fecha del recordatorio a objeto Date
-      let reminderDate = new Date(reminder.reminder_date);
-      const now = new Date();
+      // Generar un ID único basado en el ID del recordatorio
+      const uniqueId =
+        Math.abs(
+          reminder._id.split('').reduce((a: number, b: string) => {
+            a = (a << 5) - a + b.charCodeAt(0);
+            return a & a;
+          }, 0)
+        ) % 100000;
+
+      // Convertir la fecha a objeto Date si es string
+      const reminderDate =
+        typeof reminder.reminder_date === 'string'
+          ? new Date(reminder.reminder_date)
+          : reminder.reminder_date;
 
       // Verificar si la fecha es válida y futura
-      if (isNaN(reminderDate.getTime())) {
-        console.error('Fecha inválida:', reminder.reminder_date);
+      const now = new Date();
+      if (
+        !(reminderDate instanceof Date) ||
+        isNaN(reminderDate.getTime()) ||
+        reminderDate <= now
+      ) {
+        console.error('Fecha de recordatorio inválida o pasada:', reminderDate);
         return false;
       }
 
-      // Si la fecha ya pasó, no programar
-      if (reminderDate <= now) {
-        console.log('La fecha ya pasó, no se programará:', reminderDate);
-        return false;
-      }
+      // Obtener el título y mensaje para la notificación
+      const taskName = reminder.taskName || 'Tarea';
+      const title = `Recordatorio: ${taskName}`;
+      const message = reminder.message || 'Es hora de tu recordatorio';
 
-      console.log('Programando notificación para:', reminderDate.toISOString());
-
-      // Asegurarse de que insistence_level sea un número
-      const insistenceLevel = Number(reminder.insistence_level) || 1;
-
-      // Generar un ID único basado en el ID del recordatorio
-      let uniqueIdBase: number;
-      if (reminder._id) {
-        // Usar un hash simple del ID
-        uniqueIdBase =
-          Math.abs(
-            reminder._id.split('').reduce((a: number, b: string) => {
-              a = (a << 5) - a + b.charCodeAt(0);
-              return a & a;
-            }, 0)
-          ) % 100000;
-      } else {
-        uniqueIdBase = Math.floor(Math.random() * 100000);
-      }
-
-      // Crear notificaciones según el nivel de insistencia
-      const notifications = [];
-
-      // Notificación principal
-      notifications.push({
-        id: uniqueIdBase,
-        title: `Recordatorio: ${reminder.taskName || 'Tarea'}`,
-        body: reminder.message || 'Es hora de tu recordatorio',
-        schedule: { at: reminderDate },
-        sound: 'default',
-        smallIcon: 'ic_notification',
-        largeIcon: 'ic_launcher',
-        extra: {
-          reminderId: reminder._id,
-          priority: reminder.priority,
-        },
-      });
-
-      // Notificaciones adicionales según insistencia
-      if (insistenceLevel > 5) {
-        // Agregar recordatorios cada 3 minutos para mayor insistencia
-        const intervalMinutes = insistenceLevel > 8 ? 2 : 3;
-        const repeatCount = insistenceLevel > 8 ? 4 : 3;
-
-        for (let i = 1; i <= repeatCount; i++) {
-          const repeatDate = new Date(
-            reminderDate.getTime() + i * intervalMinutes * 60000
-          );
-          notifications.push({
-            id: uniqueIdBase + i,
-            title: `⚠️ Recordatorio Pendiente: ${reminder.taskName || 'Tarea'}`,
-            body: `${reminder.message || 'Recordatorio pendiente'} (${i + 1}/${
-              repeatCount + 1
-            })`,
-            schedule: { at: repeatDate },
+      // Configurar la notificación
+      const notificationOptions: ScheduleOptions = {
+        notifications: [
+          {
+            id: uniqueId,
+            title: title,
+            body: message,
+            schedule: {
+              at: reminderDate,
+              allowWhileIdle: true,
+            },
             sound: 'default',
             smallIcon: 'ic_notification',
-            largeIcon: 'ic_launcher',
-          });
-        }
-      }
+            actionTypeId: '',
+            extra: {
+              reminderId: reminder._id,
+              taskId: reminder.task_id,
+            },
+          },
+        ],
+      };
 
-      console.log('Notificaciones a programar:', JSON.stringify(notifications));
-
-      // Programar cada notificación individualmente para mayor fiabilidad
-      for (const notification of notifications) {
-        await LocalNotifications.schedule({
-          notifications: [notification],
-        });
-        console.log(
-          'Notificación programada:',
-          notification.id,
-          'para',
-          notification.schedule.at
-        );
-      }
+      // Programar la notificación
+      await LocalNotifications.schedule(notificationOptions);
+      console.log(
+        `Notificación programada para: ${reminderDate.toLocaleString()} (ID: ${uniqueId})`
+      );
 
       // Registrar la notificación como programada
       this.scheduledNotifications.add(reminder._id);

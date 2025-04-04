@@ -193,54 +193,89 @@ export class RemindersPage implements OnInit {
       return;
     }
 
-    const userId = this.authService.getCurrentUserId();
-    if (!userId) {
-      this.toastService.showToast('Usuario no identificado', 'error');
-      return;
-    }
+    try {
+      const userId = this.authService.getCurrentUserId();
+      if (!userId) {
+        this.toastService.showToast('Usuario no autenticado', 'error');
+        return;
+      }
 
-    const reminderData = {
-      ...this.reminderForm.value,
-      user_id: userId,
-      taskName: this.getTaskName(this.reminderForm.value.task_id),
-      reminder_date: new Date(
-        this.reminderForm.value.reminder_date
-      ).toISOString(),
-      priority: parseInt(this.reminderForm.value.priority),
-      insistence_level: parseInt(this.reminderForm.value.insistence_level),
-      _id: this.currentReminderId || `temp_${Date.now()}`,
-    };
-    console.log('Saving reminder with formatted data:', reminderData);
+      // Obtener los valores del formulario
+      const formData = { ...this.reminderForm.value };
 
-    if (this.isEditing && this.currentReminderId) {
-      this.notificationsService.cancelNotification(this.currentReminderId);
+      // Corregir la zona horaria para la fecha del recordatorio
+      if (formData.reminder_date) {
+        // Convertir la fecha a objeto Date si es string
+        const dateObj =
+          typeof formData.reminder_date === 'string'
+            ? new Date(formData.reminder_date)
+            : formData.reminder_date;
 
-      this.apiService
-        .updateReminder(this.currentReminderId, reminderData)
-        .subscribe(
-          (updatedReminder) => {
-            console.log('Reminder updated:', updatedReminder);
-            this.notificationsService.scheduleNotification(updatedReminder);
-            this.loadReminders();
-            this.showModal = false;
-            this.toastService.showToast('Recordatorio actualizado', 'success');
-          },
-          (error) => console.error('Error updating reminder:', error)
-        );
-    } else {
-      this.apiService.createReminder(reminderData).subscribe(
-        (newReminder) => {
-          console.log('Reminder created:', newReminder);
-          this.notificationsService.scheduleNotification(newReminder);
-          this.loadReminders();
-          this.showModal = false;
-          this.toastService.showToast(
-            'Recordatorio creado y notificación programada',
-            'success'
+        // Ajustar la zona horaria para mantener la hora local seleccionada
+        const userTimezoneOffset = dateObj.getTimezoneOffset() * 60000;
+        const adjustedDate = new Date(dateObj.getTime() - userTimezoneOffset);
+        formData.reminder_date = adjustedDate.toISOString();
+      }
+
+      // Añadir el ID de usuario
+      formData.user_id = userId;
+
+      // Añadir el nombre de la tarea para las notificaciones
+      formData.taskName = this.getTaskName(formData.task_id);
+
+      // Generar un ID temporal para nuevos recordatorios
+      if (!this.isEditing) {
+        formData._id = `temp_${Date.now()}`;
+      }
+
+      console.log('Saving reminder with formatted data:', formData);
+
+      // Crear o actualizar el recordatorio
+      if (this.isEditing && this.currentReminderId) {
+        this.apiService
+          .updateReminder(this.currentReminderId, formData)
+          .subscribe(
+            async (response) => {
+              console.log('Reminder updated:', response);
+              this.toastService.showToast(
+                'Recordatorio actualizado',
+                'success'
+              );
+              this.loadReminders();
+              this.closeModal();
+              await this.scheduleAllPendingReminders();
+            },
+            (error) => {
+              console.error('Error updating reminder:', error);
+              this.toastService.showToast(
+                'Error al actualizar recordatorio',
+                'error'
+              );
+            }
           );
-        },
-        (error) => console.error('Error creating reminder:', error)
-      );
+      } else {
+        this.apiService.createReminder(formData).subscribe(
+          async (response) => {
+            console.log('Reminder created:', response);
+            this.toastService.showToast('Recordatorio creado', 'success');
+            this.loadReminders();
+            this.closeModal();
+
+            // Programar la notificación para el nuevo recordatorio
+            await this.notificationsService.scheduleNotification({
+              ...formData,
+              _id: response.reminder_id,
+            });
+          },
+          (error) => {
+            console.error('Error creating reminder:', error);
+            this.toastService.showToast('Error al crear recordatorio', 'error');
+          }
+        );
+      }
+    } catch (error) {
+      console.error('Error in saveReminder:', error);
+      this.toastService.showToast('Error al guardar recordatorio', 'error');
     }
   }
 
