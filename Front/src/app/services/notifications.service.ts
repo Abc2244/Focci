@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
-import { LocalNotifications } from '@capacitor/local-notifications';
+import {
+  LocalNotifications,
+  ScheduleOptions,
+} from '@capacitor/local-notifications';
 import { Platform } from '@ionic/angular';
 
 @Injectable({
@@ -21,26 +24,24 @@ export class NotificationsService {
   }
 
   async initializeNotifications() {
-    if (this.isNativePlatform) {
-      try {
-        const permStatus = await LocalNotifications.checkPermissions();
-        if (permStatus.display !== 'granted') {
-          await LocalNotifications.requestPermissions();
-        }
-
-        // Registrar listener para notificaciones
-        LocalNotifications.addListener(
-          'localNotificationReceived',
-          (notification) => {
-            console.log('Notificación recibida:', notification);
-          }
-        );
-
-        // Limpiar notificaciones antiguas al iniciar
-        await this.clearOldNotifications();
-      } catch (error) {
-        console.error('Error al inicializar notificaciones:', error);
+    try {
+      const permStatus = await LocalNotifications.checkPermissions();
+      if (permStatus.display !== 'granted') {
+        await LocalNotifications.requestPermissions();
       }
+
+      // Registrar listener para notificaciones
+      LocalNotifications.addListener(
+        'localNotificationReceived',
+        (notification) => {
+          console.log('Notificación recibida:', notification);
+        }
+      );
+
+      // Limpiar notificaciones antiguas al iniciar
+      await this.clearOldNotifications();
+    } catch (error) {
+      console.error('Error al inicializar notificaciones:', error);
     }
   }
 
@@ -75,31 +76,25 @@ export class NotificationsService {
   }
 
   // Método de prueba para enviar una notificación inmediata
-  async sendTestNotification() {
-    if (!this.isNativePlatform) {
-      console.log('Las notificaciones solo funcionan en dispositivos nativos');
-      return;
-    }
-
+  async sendTestNotification(): Promise<boolean> {
     try {
-      // Verificar permisos de manera más eficiente
+      // Verificar permisos
       const permStatus = await LocalNotifications.checkPermissions();
-
       if (permStatus.display !== 'granted') {
         const requestResult = await LocalNotifications.requestPermissions();
         if (requestResult.display !== 'granted') {
           console.log(
             'Permisos no concedidos, no se pueden mostrar notificaciones'
           );
-          return;
+          return false;
         }
       }
 
-      // Usar un tiempo más corto para la notificación de prueba
-      const notificationTime = new Date(Date.now() + 1000);
+      // Usar un tiempo más corto para la notificación de prueba (5 segundos)
+      const notificationTime = new Date(Date.now() + 5000);
+      const uniqueId = Math.floor(Math.random() * 100000);
 
-      // Usar un ID único basado en timestamp para evitar conflictos
-      const uniqueId = Math.floor(Date.now() % 100000);
+      console.log('Programando notificación de prueba para:', notificationTime);
 
       await LocalNotifications.schedule({
         notifications: [
@@ -109,73 +104,82 @@ export class NotificationsService {
             body: 'Esta es una notificación de prueba para verificar que funcionan correctamente',
             schedule: { at: notificationTime },
             sound: 'default',
-            actionTypeId: 'TEST_ACTION',
-            smallIcon: 'ic_notification', // Icono para la barra de estado
-            largeIcon: 'ic_launcher', // Icono grande para la notificación
+            smallIcon: 'ic_notification',
+            largeIcon: 'ic_launcher',
           },
         ],
       });
+
+      console.log('Notificación de prueba programada con ID:', uniqueId);
+      return true;
     } catch (error) {
       console.error('Error al programar notificación de prueba:', error);
-      throw error;
+      return false;
     }
   }
 
-  async scheduleNotification(reminder: any) {
-    if (!this.isNativePlatform) {
-      console.log('Las notificaciones solo funcionan en dispositivos nativos');
-      return;
-    }
-
+  async scheduleNotification(reminder: any): Promise<boolean> {
     try {
-      // Evitar duplicados
-      if (this.scheduledNotifications.has(reminder._id)) {
-        console.log('Notificación ya programada:', reminder._id);
-        return;
+      // Verificar permisos
+      const permStatus = await LocalNotifications.checkPermissions();
+      if (permStatus.display !== 'granted') {
+        await LocalNotifications.requestPermissions();
       }
 
+      // Evitar duplicados
+      if (this.scheduledNotifications.has(reminder._id)) {
+        // Cancelar notificación existente antes de reprogramar
+        await this.cancelNotification(reminder._id);
+      }
+
+      // Convertir la fecha del recordatorio a objeto Date
       let reminderDate = new Date(reminder.reminder_date);
       const now = new Date();
 
       // Verificar si la fecha es válida y futura
-      if (isNaN(reminderDate.getTime()) || reminderDate <= now) {
-        console.log('Fecha inválida o pasada:', reminderDate);
-        return;
+      if (isNaN(reminderDate.getTime())) {
+        console.error('Fecha inválida:', reminder.reminder_date);
+        return false;
       }
 
-      console.log('Programando notificación para:', reminderDate);
+      // Si la fecha ya pasó, no programar
+      if (reminderDate <= now) {
+        console.log('La fecha ya pasó, no se programará:', reminderDate);
+        return false;
+      }
+
+      console.log('Programando notificación para:', reminderDate.toISOString());
 
       // Asegurarse de que insistence_level sea un número
-      const insistenceLevel =
-        typeof reminder.insistence_level === 'string'
-          ? parseInt(reminder.insistence_level)
-          : reminder.insistence_level;
+      const insistenceLevel = Number(reminder.insistence_level) || 1;
 
       // Generar un ID único basado en el ID del recordatorio
       let uniqueIdBase: number;
       if (reminder._id) {
-        // Usar los primeros 8 caracteres del ID como número hexadecimal
-        uniqueIdBase = parseInt(reminder._id.substring(0, 8), 16) % 100000;
+        // Usar un hash simple del ID
+        uniqueIdBase =
+          Math.abs(
+            reminder._id.split('').reduce((a: number, b: string) => {
+              a = (a << 5) - a + b.charCodeAt(0);
+              return a & a;
+            }, 0)
+          ) % 100000;
       } else {
-        // Si no hay ID, usar timestamp actual
-        uniqueIdBase = Math.floor(Date.now() % 100000);
+        uniqueIdBase = Math.floor(Math.random() * 100000);
       }
 
       // Crear notificaciones según el nivel de insistencia
       const notifications = [];
 
-      // Notificación principal con sonido y vibración para mayor atención
+      // Notificación principal
       notifications.push({
         id: uniqueIdBase,
         title: `Recordatorio: ${reminder.taskName || 'Tarea'}`,
         body: reminder.message || 'Es hora de tu recordatorio',
         schedule: { at: reminderDate },
         sound: 'default',
-        vibrate: true,
         smallIcon: 'ic_notification',
         largeIcon: 'ic_launcher',
-        importance: 5, // Alta importancia
-        actionTypeId: 'REMINDER_ACTION',
         extra: {
           reminderId: reminder._id,
           priority: reminder.priority,
@@ -200,56 +204,84 @@ export class NotificationsService {
             })`,
             schedule: { at: repeatDate },
             sound: 'default',
-            vibrate: true,
             smallIcon: 'ic_notification',
             largeIcon: 'ic_launcher',
-            importance: 5,
           });
         }
       }
 
-      console.log('Notificaciones a programar:', notifications);
-      await LocalNotifications.schedule({ notifications });
+      console.log('Notificaciones a programar:', JSON.stringify(notifications));
+
+      // Programar cada notificación individualmente para mayor fiabilidad
+      for (const notification of notifications) {
+        await LocalNotifications.schedule({
+          notifications: [notification],
+        });
+        console.log(
+          'Notificación programada:',
+          notification.id,
+          'para',
+          notification.schedule.at
+        );
+      }
 
       // Registrar la notificación como programada
       this.scheduledNotifications.add(reminder._id);
 
-      console.log('Notificación programada exitosamente para:', {
-        id: reminder._id,
-        date: reminderDate,
-        task: reminder.taskName,
-      });
+      return true;
     } catch (error) {
       console.error('Error al programar notificación:', error);
+      return false;
     }
   }
 
-  async cancelNotification(reminderId: string) {
-    if (!this.isNativePlatform) return;
-
+  async cancelNotification(reminderId: string): Promise<boolean> {
     try {
-      const baseId = parseInt(reminderId.substring(0, 8), 16) % 100000;
+      // Generar el mismo ID base que se usó al programar
+      const uniqueIdBase =
+        Math.abs(
+          reminderId.split('').reduce((a: number, b: string) => {
+            a = (a << 5) - a + b.charCodeAt(0);
+            return a & a;
+          }, 0)
+        ) % 100000;
+
       const notificationsToCancel = [];
 
       // Cancelar la notificación principal
-      notificationsToCancel.push({ id: baseId });
+      notificationsToCancel.push({ id: uniqueIdBase });
 
       // Cancelar posibles notificaciones de insistencia (hasta 5 por si acaso)
       for (let i = 1; i <= 5; i++) {
-        notificationsToCancel.push({ id: baseId + i });
+        notificationsToCancel.push({ id: uniqueIdBase + i });
       }
 
       await LocalNotifications.cancel({ notifications: notificationsToCancel });
+      console.log('Notificaciones canceladas para ID:', reminderId);
 
       // Eliminar de las notificaciones programadas
       this.scheduledNotifications.delete(reminderId);
+      return true;
     } catch (error) {
       console.error('Error al cancelar notificación:', error);
+      return false;
     }
   }
 
-  // Añadir este método para limpiar y reprogramar todas las notificaciones
-  async resetAllNotifications() {
+  // Método para verificar notificaciones pendientes (útil para depuración)
+  async getPendingNotifications() {
+    try {
+      const pending = await LocalNotifications.getPending();
+      console.log('Notificaciones pendientes:', pending.notifications);
+      return pending.notifications;
+    } catch (error) {
+      console.error('Error al obtener notificaciones pendientes:', error);
+      return [];
+    }
+  }
+
+  // Método para limpiar y reprogramar todas las notificaciones
+  async resetAllNotifications(): Promise<boolean> {
     try {
       // Cancelar todas las notificaciones pendientes
       const pending = await LocalNotifications.getPending();
@@ -257,12 +289,15 @@ export class NotificationsService {
         await LocalNotifications.cancel({
           notifications: pending.notifications,
         });
+        console.log('Todas las notificaciones canceladas');
       }
 
       // Limpiar el registro de notificaciones programadas
       this.scheduledNotifications.clear();
+      return true;
     } catch (error) {
       console.error('Error al resetear notificaciones:', error);
+      return false;
     }
   }
 }

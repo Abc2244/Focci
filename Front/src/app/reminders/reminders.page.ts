@@ -334,31 +334,70 @@ export class RemindersPage implements OnInit {
   }
 
   async scheduleAllPendingReminders() {
-    const userId = this.authService.getCurrentUserId();
-    if (!userId) return;
+    try {
+      const userId = this.authService.getCurrentUserId();
+      if (!userId) return;
 
-    this.apiService
-      .getUpcomingReminders(userId)
-      .subscribe(async (reminders: any[]) => {
-        const pendingReminders = reminders.filter(
-          (reminder) =>
-            reminder.status === 'pendiente' &&
-            new Date(reminder.reminder_date) > new Date()
-        );
+      // Primero, resetear todas las notificaciones para evitar duplicados
+      await this.notificationsService.resetAllNotifications();
 
-        console.log(
-          'Programando recordatorios pendientes:',
-          pendingReminders.length
-        );
+      this.apiService.getUpcomingReminders(userId).subscribe(
+        async (reminders: any[]) => {
+          const pendingReminders = reminders.filter(
+            (reminder) =>
+              reminder.status === 'pendiente' &&
+              new Date(reminder.reminder_date) > new Date()
+          );
 
-        for (const reminder of pendingReminders) {
-          await this.notificationsService.scheduleNotification(reminder);
+          console.log(
+            'Programando recordatorios pendientes:',
+            pendingReminders.length
+          );
+
+          let successCount = 0;
+          for (const reminder of pendingReminders) {
+            try {
+              // Asegurarse de que el recordatorio tenga el nombre de la tarea
+              if (!reminder.taskName) {
+                reminder.taskName = this.getTaskName(reminder.task_id);
+              }
+
+              const success =
+                await this.notificationsService.scheduleNotification(reminder);
+              if (success) successCount++;
+            } catch (err) {
+              console.error(
+                'Error al programar recordatorio:',
+                reminder._id,
+                err
+              );
+            }
+          }
+
+          if (successCount > 0) {
+            this.toastService.showToast(
+              `${successCount} recordatorios programados correctamente`,
+              'success'
+            );
+          }
+
+          // Verificar notificaciones pendientes para depuración
+          const pending =
+            await this.notificationsService.getPendingNotifications();
+          console.log(
+            `${pending.length} notificaciones pendientes en el sistema`
+          );
+        },
+        (error) => {
+          console.error('Error al obtener recordatorios:', error);
+          this.toastService.showToast(
+            'Error al programar recordatorios',
+            'error'
+          );
         }
-
-        this.toastService.showToast(
-          `${pendingReminders.length} recordatorios programados`,
-          'success'
-        );
-      });
+      );
+    } catch (error) {
+      console.error('Error general en scheduleAllPendingReminders:', error);
+    }
   }
 }
