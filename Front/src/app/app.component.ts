@@ -19,6 +19,8 @@ export class AppComponent {
 
   initializeApp() {
     // No es necesario mostrar el splash screen manualmente si autoHide está en true
-    // SplashScreen.show();
+    SplashScreen.show({
+      autoHide: true,
+    });
   }
 }

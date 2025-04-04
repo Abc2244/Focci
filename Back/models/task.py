@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from datetime import datetime
 from typing import Optional, List
 
@@ -13,6 +13,15 @@ class Task(BaseModel):
     task_type: Optional[str] = Field(default="general")
     priority: Optional[int] = Field(default=1, ge=1, le=5)
     reminders: Optional[List[str]] = Field(default_factory=list)
+
+    @validator('due_date')
+    def validate_due_date(cls, v):
+        try:
+            # Intentar parsear la fecha
+            datetime.fromisoformat(v.replace('Z', '+00:00'))
+            return v
+        except Exception as e:
+            raise ValueError(f'Formato de fecha inválido: {str(e)}')
 
     class Config:
         json_schema_extra = {

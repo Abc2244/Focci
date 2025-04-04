@@ -60,8 +60,15 @@ class TaskService:
                 estimated_time
             )
 
-            # Convertir due_date a datetime para TaskScheduler
-            due_date_dt = datetime.fromisoformat(due_date.replace('Z', '+00:00'))
+            # Asegurarse de que la fecha esté en UTC
+            try:
+                # Convertir la fecha string a datetime UTC
+                due_date_dt = datetime.fromisoformat(due_date.replace('Z', '+00:00'))
+                # Asegurarse de que la fecha está en UTC
+                if due_date_dt.tzinfo is None:
+                    raise ValueError("La fecha debe incluir información de zona horaria")
+            except Exception as e:
+                raise ValueError(f"Error al procesar la fecha: {str(e)}")
             
             # Calcular nivel de insistencia
             insistence_level = self.task_scheduler.calculate_insistence_level(
@@ -79,12 +86,12 @@ class TaskService:
                 task_type=task_type
             )
 
-            # Crear la tarea
+            # Crear la tarea con la fecha en formato ISO
             task_data = {
                 "user_id": user_id,
                 "subject_id": subject_id,
                 "description": task_description,
-                "due_date": due_date,
+                "due_date": due_date_dt.isoformat(),  # Usar el formato ISO
                 "estimated_time": estimated_time,
                 "completed": False,
                 "created_at": datetime.utcnow().isoformat(),
@@ -108,6 +115,8 @@ class TaskService:
                 "reminders": reminders
             }
 
+        except ValueError as ve:
+            raise ValueError(f"Error al procesar la tarea: {str(ve)}")
         except Exception as e:
             print(f"Error en process_task: {str(e)}")
             raise ValueError(f"Error al procesar la tarea: {str(e)}")

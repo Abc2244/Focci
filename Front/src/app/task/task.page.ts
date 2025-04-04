@@ -185,15 +185,15 @@ export class TaskPage implements OnInit {
       }
 
       const formData = this.taskForm.value;
+      // Asegurarse de que la fecha tenga el formato correcto con UTC
+      const dueDate = new Date(formData.due_date);
       const taskData: CreateTaskDTO = {
         user_id: userId,
         subject_id: formData.subject_id,
         description: formData.description,
-        due_date: new Date(formData.due_date).toISOString(),
+        due_date: dueDate.toISOString(), // Esto asegura el formato correcto
         estimated_time: formData.estimated_time,
       };
-
-      console.log('Sending task data:', taskData); // Para debugging
 
       try {
         if (this.isEditing && this.currentTaskId) {
