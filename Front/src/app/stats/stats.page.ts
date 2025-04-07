@@ -3,7 +3,6 @@ import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
 import {
-  TaskStats,
   WeeklyActivity,
   SubjectDistribution,
 } from '../interfaces/stats.interface';
@@ -16,7 +15,7 @@ import {
 export class StatsPage implements OnInit {
   selectedPeriod: string = 'week';
   isLoading: boolean = true;
-  stats: TaskStats | null = null;
+  stats: any = null;
   error: string | null = null;
   weeklyActivity: WeeklyActivity[] = [];
   subjectDistribution: SubjectDistribution[] = [];
@@ -51,11 +50,45 @@ export class StatsPage implements OnInit {
       }
 
       this.apiService.getStats(userId, this.selectedPeriod).subscribe(
-        (stats) => {
-          console.log('Estadísticas recibidas:', stats);
-          this.stats = stats;
-          this.weeklyActivity = stats.weeklyActivity || [];
-          this.subjectDistribution = stats.subjectDistribution || [];
+        (response: any) => {
+          console.log('Estadísticas recibidas:', response);
+
+          // Adaptar la respuesta a la estructura esperada por el componente
+          this.stats = {
+            tasksCreated: 0,
+            tasksCompleted: 0,
+            completionRate: 0,
+            onTimeRate: 0,
+            lateRate: 0,
+            weeklyActivity: [],
+            subjectDistribution: [],
+          };
+
+          // Si hay datos reales en la respuesta, intentar usarlos
+          if (response.data && response.data.task_completion) {
+            this.stats.tasksCreated = response.data.task_completion.total || 0;
+            this.stats.tasksCompleted =
+              response.data.task_completion.completed || 0;
+            this.stats.completionRate =
+              response.data.task_completion.percentage || 0;
+          }
+
+          // Datos de puntualidad
+          if (response.data && response.data.punctuality) {
+            this.stats.onTimeRate = response.data.punctuality.on_time_rate || 0;
+            this.stats.lateRate = response.data.punctuality.late_rate || 0;
+          }
+
+          // Actividad semanal
+          if (response.data && response.data.weekly_activity) {
+            this.weeklyActivity = response.data.weekly_activity;
+          }
+
+          // Distribución por materias
+          if (response.data && response.data.subject_distribution) {
+            this.subjectDistribution = response.data.subject_distribution;
+          }
+
           this.isLoading = false;
         },
         (error) => {
