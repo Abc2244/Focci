@@ -4,32 +4,102 @@
       <h1>Estadísticas</h1>
     </div>
 
-    <div class="development-container">
-      <ion-icon name="construct-outline"></ion-icon>
-      <h2 class="development-title">En Desarrollo</h2>
-      <p class="development-text">
-        Estamos trabajando para traerte estadísticas detalladas de tus tareas.
-      </p>
-      <div class="features-coming">
-        <h3 class="features-title">Próximamente:</h3>
-        <ul>
-          <li>
-            <ion-icon name="checkmark-circle-outline"></ion-icon>
-            <span>Análisis de tareas completadas</span>
-          </li>
-          <li>
-            <ion-icon name="time-outline"></ion-icon>
-            <span>Tiempo promedio de completación</span>
-          </li>
-          <li>
-            <ion-icon name="bar-chart-outline"></ion-icon>
-            <span>Distribución por materias</span>
-          </li>
-          <li>
-            <ion-icon name="calendar-outline"></ion-icon>
-            <span>Actividad semanal</span>
-          </li>
-        </ul>
+    <!-- Selector de período -->
+    <ion-segment
+      [(ngModel)]="selectedPeriod"
+      (ionChange)="segmentChanged($event)"
+      class="period-segment"
+    >
+      <ion-segment-button value="week">
+        <ion-label>Semana</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="month">
+        <ion-label>Mes</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="semester">
+        <ion-label>Semestre</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <!-- Pantalla de carga -->
+    <div class="loading-container" *ngIf="isLoading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando estadísticas...</p>
+    </div>
+
+    <!-- Mensaje de error -->
+    <div class="error-container" *ngIf="error && !isLoading">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <h3>No se pudieron cargar las estadísticas</h3>
+      <p>{{ error }}</p>
+      <ion-button (click)="loadStats()" fill="outline" size="small">
+        Reintentar
+      </ion-button>
+    </div>
+
+    <!-- Contenido de estadísticas -->
+    <div class="stats-container" *ngIf="stats && !isLoading && !error">
+      <!-- Tarjetas de resumen -->
+      <div class="stats-summary">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <div class="stat-icon">
+              <ion-icon name="create-outline"></ion-icon>
+            </div>
+            <div class="stat-value">{{ stats.tasksCreated }}</div>
+            <div class="stat-label">Tareas Creadas</div>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <div class="stat-icon">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+            </div>
+            <div class="stat-value">{{ stats.tasksCompleted }}</div>
+            <div class="stat-label">Tareas Completadas</div>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <div class="stat-icon">
+              <ion-icon name="trending-up-outline"></ion-icon>
+            </div>
+            <div class="stat-value">{{ stats.completionRate }}%</div>
+            <div class="stat-label">Tasa de Completado</div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <!-- Tarjetas de puntualidad -->
+      <div class="stats-detail">
+        <ion-card class="detail-card">
+          <ion-card-header>
+            <ion-card-title>Puntualidad</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="punctuality-stats">
+              <div class="punctuality-item on-time">
+                <div class="punctuality-value">{{ stats.onTimeRate }}%</div>
+                <div class="punctuality-label">A tiempo</div>
+              </div>
+              <div class="punctuality-item late">
+                <div class="punctuality-value">{{ stats.lateRate }}%</div>
+                <div class="punctuality-label">Con retraso</div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <!-- Mensaje cuando no hay datos -->
+      <div class="no-data-message" *ngIf="stats.tasksCreated === 0">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        <p>No hay datos suficientes para este período.</p>
+        <p class="no-data-hint">
+          Crea y completa tareas para ver estadísticas.
+        </p>
       </div>
     </div>
   </div>

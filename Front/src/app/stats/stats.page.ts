@@ -45,33 +45,38 @@ export class StatsPage implements OnInit {
       this.isLoading = true;
       this.error = null;
 
-      const userId = await this.authService.getUserId();
+      const userId = this.authService.getCurrentUserId();
       if (!userId) {
-        throw new Error('No user ID found');
+        throw new Error('No se encontró ID de usuario');
       }
 
-      const stats = await this.apiService
-        .getStats(userId, this.selectedPeriod)
-        .toPromise();
-
-      if (stats) {
-        this.stats = stats;
-        this.weeklyActivity = stats.weeklyActivity;
-        this.subjectDistribution = stats.subjectDistribution;
-      } else {
-        this.stats = null;
-        this.weeklyActivity = [];
-        this.subjectDistribution = [];
-      }
+      this.apiService.getStats(userId, this.selectedPeriod).subscribe(
+        (stats) => {
+          console.log('Estadísticas recibidas:', stats);
+          this.stats = stats;
+          this.weeklyActivity = stats.weeklyActivity || [];
+          this.subjectDistribution = stats.subjectDistribution || [];
+          this.isLoading = false;
+        },
+        (error) => {
+          console.error('Error al cargar estadísticas:', error);
+          this.error =
+            'No se pudieron cargar las estadísticas. Por favor intenta más tarde.';
+          this.stats = null;
+          this.weeklyActivity = [];
+          this.subjectDistribution = [];
+          this.isLoading = false;
+          this.toastService.showToast('Error al cargar estadísticas', 'error');
+        }
+      );
     } catch (error: any) {
-      console.error('Error loading stats:', error);
-      this.error =
-        'No se pudieron cargar las estadísticas. Por favor intenta más tarde.';
+      console.error('Error en loadStats:', error);
+      this.error = error.message || 'Error desconocido';
       this.stats = null;
       this.weeklyActivity = [];
       this.subjectDistribution = [];
-    } finally {
       this.isLoading = false;
+      this.toastService.showToast('Error al cargar estadísticas', 'error');
     }
   }
 }

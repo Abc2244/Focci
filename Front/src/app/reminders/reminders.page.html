@@ -6,14 +6,6 @@
       <h1>Recordatorios</h1>
     </div>
 
-    <!-- Botón de prueba para notificaciones -->
-    <div class="test-notification-container">
-      <ion-button expand="block" (click)="testNotification()" color="primary">
-        <ion-icon name="notifications" slot="start"></ion-icon>
-        Probar Notificación
-      </ion-button>
-    </div>
-
     <!-- Shimmer loading effect -->
     <div class="shimmer-container" *ngIf="isLoading">
       <div class="shimmer-card" *ngFor="let i of [1, 2, 3, 4]"></div>
@@ -285,14 +277,6 @@
       Recordatorios totales: {{reminders.length}} Pendientes:
       {{pendingReminders.length}} Completados: {{completedReminders.length}}
       Cancelados: {{canceledReminders.length}}
-    </div>
-
-    <!-- Añadir justo después del div de debug en la línea 281 -->
-    <div class="test-notification-container">
-      <ion-button expand="block" (click)="testNotification()" color="tertiary">
-        <ion-icon name="notifications-outline" slot="start"></ion-icon>
-        Probar Notificaciones
-      </ion-button>
     </div>
   </div>
 
