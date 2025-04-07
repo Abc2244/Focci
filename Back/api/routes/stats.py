@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException
 from bson import ObjectId
 from datetime import datetime, timedelta
 from config.database import mongodb
+import pandas as pd
 
 router = APIRouter(prefix="/stats", tags=["statistics"])
 
@@ -28,29 +29,59 @@ async def get_tasks_stats(user_id: str, period: str):
     print(f"Recibida solicitud para stats de usuario {user_id}, periodo {period}")
     start_date, end_date = get_date_range(period)
 
+    # Modificamos la consulta para obtener todas las tareas del usuario
+    # sin filtrar por created_at ya que ese campo no existe en el modelo
     tasks = await mongodb.get_collection("tasks").find({
-        "user_id": user_id,
-        "created_at": {"$gte": start_date, "$lte": end_date}
+        "user_id": user_id
     }).to_list(length=None)
-
-    total_tasks = len(tasks)
-    completed_tasks = sum(1 for task in tasks if task.get("completed", False))
+    
+    print(f"Tareas encontradas: {len(tasks)}")
+    
+    # Filtramos las tareas por fecha de creación si tienen ese campo
+    # o por due_date si no tienen created_at
+    filtered_tasks = []
+    for task in tasks:
+        # Usamos due_date como referencia temporal si no hay created_at
+        task_date = None
+        if "created_at" in task:
+            try:
+                task_date = datetime.fromisoformat(task["created_at"].replace('Z', '+00:00'))
+            except:
+                pass
+                
+        if not task_date and "due_date" in task:
+            try:
+                task_date = datetime.fromisoformat(task["due_date"].replace('Z', '+00:00'))
+            except:
+                pass
+                
+        if task_date and start_date <= task_date <= end_date:
+            filtered_tasks.append(task)
+    
+    print(f"Tareas filtradas por periodo: {len(filtered_tasks)}")
+    
+    # Usamos las tareas filtradas para las estadísticas
+    total_tasks = len(filtered_tasks)
+    completed_tasks = sum(1 for task in filtered_tasks if task.get("completed", False))
     on_time = 0
     late = 0
 
-    for task in tasks:
+    for task in filtered_tasks:
         if task.get("completed") and task.get("completed_date") and task.get("due_date"):
-            completed_date = datetime.fromisoformat(task["completed_date"].replace('Z', '+00:00'))
-            due_date = datetime.fromisoformat(task["due_date"].replace('Z', '+00:00'))
-            if completed_date <= due_date:
-                on_time += 1
-            else:
-                late += 1
+            try:
+                completed_date = datetime.fromisoformat(task["completed_date"].replace('Z', '+00:00'))
+                due_date = datetime.fromisoformat(task["due_date"].replace('Z', '+00:00'))
+                if completed_date <= due_date:
+                    on_time += 1
+                else:
+                    late += 1
+            except Exception as e:
+                print(f"Error procesando fechas: {e}")
 
-    weekly_activity = calculate_weekly_activity(tasks)
-    subject_distribution = await calculate_subject_distribution(tasks)
+    weekly_activity = calculate_weekly_activity(filtered_tasks)
+    subject_distribution = await calculate_subject_distribution(filtered_tasks)
 
-    return {
+    stats_result = {
         "tasksCreated": total_tasks,
         "tasksCompleted": completed_tasks,
         "completionRate": round((completed_tasks / total_tasks * 100) if total_tasks > 0 else 0, 2),
@@ -59,6 +90,9 @@ async def get_tasks_stats(user_id: str, period: str):
         "weeklyActivity": weekly_activity,
         "subjectDistribution": subject_distribution
     }
+    
+    print(f"Estadísticas calculadas: {stats_result}")
+    return stats_result
 
 
 # --------- Endpoint: Tasa de puntualidad de tareas completadas ---------
