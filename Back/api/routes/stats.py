@@ -4,7 +4,6 @@ from fastapi import APIRouter, HTTPException
 from bson import ObjectId
 from datetime import datetime, timedelta
 from config.database import mongodb
-import pandas as pd
 
 router = APIRouter(prefix="/stats", tags=["statistics"])
 
