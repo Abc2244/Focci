@@ -55,6 +55,7 @@ async def get_user_stats(user_id: str, period: str):
         # Calcular estadísticas de puntualidad
         on_time = 0
         late = 0
+        completed_tasks_with_dates = 0
         
         for task in tasks:
             if task.get("completed") and task.get("completed_date") and task.get("due_date"):
@@ -73,6 +74,7 @@ async def get_user_stats(user_id: str, period: str):
                         due_date = task["due_date"]
                     
                     # Comparar fechas para determinar si se completó a tiempo
+                    completed_tasks_with_dates += 1
                     logger.info(f"Tarea {task.get('_id')}: completed_date={completed_date}, due_date={due_date}")
                     if completed_date <= due_date:
                         on_time += 1
@@ -84,20 +86,21 @@ async def get_user_stats(user_id: str, period: str):
                     logger.error(f"Error al procesar fechas de tarea {task.get('_id')}: {str(e)}")
                     logger.error(f"Valores de fechas: completed_date={task.get('completed_date')}, due_date={task.get('due_date')}")
         
-        # Asegurarse de que los porcentajes sumen 100% si hay tareas completadas
-        if completed_tasks > 0:
-            if on_time > 0 and late == 0:
-                on_time_rate = 100
-                late_rate = 0
-            elif late > 0 and on_time == 0:
-                on_time_rate = 0
-                late_rate = 100
-            else:
-                on_time_rate = round((on_time / completed_tasks * 100) if completed_tasks > 0 else 0)
-                late_rate = round((late / completed_tasks * 100) if completed_tasks > 0 else 0)
-                
-                # Ajustar para que sumen 100%
-                if on_time_rate + late_rate != 100:
+        # Calcular porcentajes basados en tareas con fechas válidas
+        if completed_tasks_with_dates > 0:
+            on_time_rate = round((on_time / completed_tasks_with_dates) * 100)
+            late_rate = round((late / completed_tasks_with_dates) * 100)
+            
+            # Asegurarse de que sumen 100%
+            if on_time_rate + late_rate != 100:
+                if on_time_rate + late_rate > 100:
+                    # Si suman más de 100, ajustar el mayor
+                    if on_time_rate > late_rate:
+                        on_time_rate = 100 - late_rate
+                    else:
+                        late_rate = 100 - on_time_rate
+                else:
+                    # Si suman menos de 100, ajustar el mayor
                     diff = 100 - (on_time_rate + late_rate)
                     if on_time_rate >= late_rate:
                         on_time_rate += diff
@@ -107,7 +110,7 @@ async def get_user_stats(user_id: str, period: str):
             on_time_rate = 0
             late_rate = 0
         
-        logger.info(f"Estadísticas de puntualidad ajustadas: A tiempo {on_time}/{completed_tasks} ({on_time_rate}%), Con retraso {late}/{completed_tasks} ({late_rate}%)")
+        logger.info(f"Estadísticas de puntualidad: A tiempo {on_time}/{completed_tasks_with_dates} ({on_time_rate}%), Con retraso {late}/{completed_tasks_with_dates} ({late_rate}%)")
         
         # Calcular distribución por materias
         logger.info("Calculando distribución por materias")
