@@ -196,4 +196,105 @@
       }
     }
   }
+
+  .shimmer-container {
+    padding: 10px;
+
+    .shimmer-card {
+      height: 120px;
+      margin-bottom: 16px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .recommendation-actions {
+    margin-top: 8px;
+
+    ion-button {
+      --color: var(--ion-color-primary);
+      font-weight: 500;
+      font-size: 14px;
+
+      ion-icon {
+        margin-left: 4px;
+      }
+    }
+  }
+
+  .daily-planning {
+    margin-bottom: 30px;
+
+    h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--ion-color-medium);
+      margin-bottom: 16px;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 20px;
+
+      &:before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 8px;
+        bottom: 8px;
+        width: 2px;
+        background: var(--ion-color-primary-tint);
+        opacity: 0.5;
+      }
+
+      .timeline-item {
+        display: flex;
+        margin-bottom: 20px;
+        position: relative;
+
+        &:before {
+          content: "";
+          position: absolute;
+          left: -24px;
+          top: 8px;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: var(--ion-color-primary);
+        }
+
+        .timeline-time {
+          min-width: 80px;
+          font-weight: 600;
+          color: var(--ion-color-primary);
+        }
+
+        .timeline-content {
+          flex: 1;
+
+          .timeline-title {
+            font-weight: 600;
+            color: var(--ion-color-medium);
+            margin-bottom: 4px;
+          }
+
+          .timeline-details {
+            font-size: 14px;
+            color: var(--ion-color-medium-shade);
+          }
+        }
+      }
+    }
+  }
 }

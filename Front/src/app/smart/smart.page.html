@@ -4,128 +4,144 @@
       <h1>Asistente Inteligente</h1>
     </div>
 
-    <!-- Recomendaciones personalizadas -->
-    <div class="recommendations-section">
-      <h2>Recomendaciones para hoy</h2>
-
-      <div class="recommendation-card">
-        <div class="recommendation-icon">
-          <ion-icon name="time-outline"></ion-icon>
-        </div>
-        <div class="recommendation-content">
-          <div class="recommendation-title">Momento ideal para estudiar</div>
-          <div class="recommendation-text">
-            Según tus patrones de actividad, tu mejor momento para estudiar
-            Matemáticas es entre las 3:00 PM y 5:00 PM.
-          </div>
-        </div>
-      </div>
-
-      <div class="recommendation-card">
-        <div class="recommendation-icon">
-          <ion-icon name="alert-circle-outline"></ion-icon>
-        </div>
-        <div class="recommendation-content">
-          <div class="recommendation-title">Tareas prioritarias</div>
-          <div class="recommendation-text">
-            Tienes 2 tareas que vencen mañana. Te recomendamos comenzar con el
-            proyecto de Física.
-          </div>
-        </div>
-      </div>
-
-      <div class="recommendation-card">
-        <div class="recommendation-icon">
-          <ion-icon name="trending-up-outline"></ion-icon>
-        </div>
-        <div class="recommendation-content">
-          <div class="recommendation-title">Mejora tu rendimiento</div>
-          <div class="recommendation-text">
-            Has dedicado menos tiempo a Química esta semana. Considera asignar
-            al menos 2 horas para ponerte al día.
-          </div>
-        </div>
-      </div>
+    <!-- Shimmer loading effect -->
+    <div class="shimmer-container" *ngIf="isLoading">
+      <div class="shimmer-card" *ngFor="let i of [1, 2, 3]"></div>
     </div>
 
-    <!-- Planificación inteligente -->
-    <div class="smart-planning">
-      <h2>Plan sugerido para hoy</h2>
+    <!-- Contenido cuando no está cargando -->
+    <div *ngIf="!isLoading">
+      <!-- Recomendaciones personalizadas -->
+      <div class="recommendations-section">
+        <h2>Recomendaciones para hoy</h2>
 
-      <div class="timeline">
-        <div class="timeline-item">
-          <div class="timeline-time">9:00 AM</div>
-          <div class="timeline-content">
-            <div class="timeline-title">Clase de Matemáticas</div>
-            <div class="timeline-details">Aula 201 - 2 horas</div>
+        <!-- Recomendación de momento ideal para estudiar -->
+        <div
+          class="recommendation-card"
+          *ngIf="reminderRecommendations.length > 0"
+        >
+          <div class="recommendation-icon">
+            <ion-icon name="time-outline"></ion-icon>
           </div>
-        </div>
-
-        <div class="timeline-item">
-          <div class="timeline-time">11:30 AM</div>
-          <div class="timeline-content">
-            <div class="timeline-title">Descanso activo</div>
-            <div class="timeline-details">
-              Recomendado: 30 minutos de actividad física
+          <div class="recommendation-content">
+            <div class="recommendation-title">Momento ideal para estudiar</div>
+            <div class="recommendation-text">
+              Según tus patrones de actividad, tu mejor momento para estudiar {{
+              reminderRecommendations[0].subject }} es entre las {{
+              reminderRecommendations[0].bestTimeToStudy.start }} y {{
+              reminderRecommendations[0].bestTimeToStudy.end }}.
             </div>
           </div>
         </div>
 
-        <div class="timeline-item">
-          <div class="timeline-time">1:00 PM</div>
-          <div class="timeline-content">
-            <div class="timeline-title">Almuerzo</div>
-            <div class="timeline-details">
-              Recuerda mantener una alimentación balanceada
+        <!-- Recomendación de priorización -->
+        <div
+          class="recommendation-card"
+          *ngIf="studyRecommendations.length > 0"
+        >
+          <div class="recommendation-icon">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+          </div>
+          <div class="recommendation-content">
+            <div class="recommendation-title">Prioriza esta tarea</div>
+            <div class="recommendation-text">
+              <strong>{{ studyRecommendations[0].description }}</strong> de {{
+              studyRecommendations[0].subject }} requiere tu atención inmediata.
+              Vence en {{ getDaysUntil(studyRecommendations[0].dueDate) }} días.
+            </div>
+            <div
+              class="recommendation-actions"
+              *ngIf="studyRecommendations[0].urgencyLevel === 'alta'"
+            >
+              <ion-button
+                size="small"
+                fill="clear"
+                (click)="createReminder(studyRecommendations[0].taskId, studyRecommendations[0].priority + 2)"
+              >
+                Crear recordatorio
+                <ion-icon name="add-circle-outline" slot="end"></ion-icon>
+              </ion-button>
             </div>
           </div>
         </div>
 
-        <div class="timeline-item">
-          <div class="timeline-time">2:00 PM</div>
-          <div class="timeline-content">
-            <div class="timeline-title">Proyecto de Física</div>
-            <div class="timeline-details">Tiempo estimado: 2 horas</div>
+        <!-- Recomendación de recordatorios -->
+        <div
+          class="recommendation-card"
+          *ngIf="reminderRecommendations.length > 1"
+        >
+          <div class="recommendation-icon">
+            <ion-icon name="notifications-outline"></ion-icon>
           </div>
-        </div>
-
-        <div class="timeline-item">
-          <div class="timeline-time">4:30 PM</div>
-          <div class="timeline-content">
-            <div class="timeline-title">Repaso de Química</div>
-            <div class="timeline-details">Tiempo recomendado: 1.5 horas</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Consejos de estudio -->
-    <div class="study-tips">
-      <h2>Consejos de estudio</h2>
-
-      <div class="tip-card">
-        <div class="tip-icon">
-          <ion-icon name="bulb-outline"></ion-icon>
-        </div>
-        <div class="tip-content">
-          <div class="tip-title">Técnica Pomodoro</div>
-          <div class="tip-text">
-            Estudia en bloques de 25 minutos con descansos de 5 minutos entre
-            ellos. Después de 4 bloques, toma un descanso más largo de 15-30
-            minutos.
+          <div class="recommendation-content">
+            <div class="recommendation-title">Recordatorios inteligentes</div>
+            <div class="recommendation-text">
+              Para tu tarea
+              <strong>{{ reminderRecommendations[1].description }}</strong>, te
+              recomendamos configurar recordatorios con nivel de insistencia {{
+              reminderRecommendations[1].recommendedInsistenceLevel }}.
+            </div>
+            <div class="recommendation-actions">
+              <ion-button
+                size="small"
+                fill="clear"
+                (click)="createReminder(reminderRecommendations[1].taskId, reminderRecommendations[1].recommendedInsistenceLevel)"
+              >
+                Configurar
+                <ion-icon name="settings-outline" slot="end"></ion-icon>
+              </ion-button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="tip-card">
-        <div class="tip-icon">
-          <ion-icon name="water-outline"></ion-icon>
+      <!-- Planificación diaria -->
+      <div class="daily-planning">
+        <h2>Planificación sugerida</h2>
+        <div class="timeline">
+          <div
+            class="timeline-item"
+            *ngFor="let rec of studyRecommendations; let i = index"
+          >
+            <div class="timeline-time">{{ getTimeForIndex(i) }}</div>
+            <div class="timeline-content">
+              <div class="timeline-title">{{ rec.description }}</div>
+              <div class="timeline-details">
+                Tiempo recomendado: {{ rec.estimatedTime }} minutos
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="tip-content">
-          <div class="tip-title">Mantente hidratado</div>
-          <div class="tip-text">
-            Beber suficiente agua mejora la concentración y el rendimiento
-            cognitivo. Intenta beber al menos 8 vasos de agua al día.
+      </div>
+
+      <!-- Consejos de estudio -->
+      <div class="study-tips">
+        <h2>Consejos de estudio</h2>
+
+        <div class="tip-card">
+          <div class="tip-icon">
+            <ion-icon name="bulb-outline"></ion-icon>
+          </div>
+          <div class="tip-content">
+            <div class="tip-title">Técnica Pomodoro</div>
+            <div class="tip-text">
+              Estudia en bloques de 25 minutos con descansos de 5 minutos entre
+              ellos. Después de 4 bloques, toma un descanso más largo de 15-30
+              minutos.
+            </div>
+          </div>
+        </div>
+
+        <div class="tip-card">
+          <div class="tip-icon">
+            <ion-icon name="water-outline"></ion-icon>
+          </div>
+          <div class="tip-content">
+            <div class="tip-title">Mantente hidratado</div>
+            <div class="tip-text">
+              Beber suficiente agua mejora la concentración y el rendimiento
+              cognitivo. Intenta beber al menos 8 vasos de agua al día.
+            </div>
           </div>
         </div>
       </div>
