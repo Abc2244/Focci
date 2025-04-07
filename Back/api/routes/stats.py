@@ -101,6 +101,14 @@ async def get_user_stats(user_id: str, period: str):
                     
                     # Verificar que ambas fechas se hayan convertido correctamente
                     if completed_date and due_date:
+                        # Asegurarse de que ambas fechas sean del mismo tipo (naive o aware)
+                        if completed_date.tzinfo is None and due_date.tzinfo is not None:
+                            # Convertir completed_date a aware usando la misma zona horaria que due_date
+                            completed_date = completed_date.replace(tzinfo=due_date.tzinfo)
+                        elif completed_date.tzinfo is not None and due_date.tzinfo is None:
+                            # Convertir due_date a aware usando la misma zona horaria que completed_date
+                            due_date = due_date.replace(tzinfo=completed_date.tzinfo)
+                        
                         completed_tasks_with_dates += 1
                         logger.info(f"  Fechas convertidas: completed_date={completed_date}, due_date={due_date}")
                         
