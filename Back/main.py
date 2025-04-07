@@ -1,31 +1,30 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api.routes import users, auth, stats, activities, goals, challenges, notifications
-from config.database import mongodb
+from api.routes import auth_router, users_router, subjects_router, tasks_router, reminders_router, stats_router
 
 app = FastAPI()
 
-# Configurar CORS
+# Habilitar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Permite todas las origenes en desarrollo
+    allow_origins=["*"],  # 🔥 Permite cualquier origen (útil en desarrollo)
     allow_credentials=True,
-    allow_methods=["*"],  # Permite todos los métodos
-    allow_headers=["*"],  # Permite todos los headers
+    allow_methods=["*"],  # 🔥 Permite cualquier método (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # 🔥 Permite cualquier encabezado
 )
 
-# Rutas
-app.include_router(auth.router, prefix="/auth", tags=["auth"])
-app.include_router(users.router, prefix="/users", tags=["users"])
-app.include_router(stats.router, prefix="/stats", tags=["stats"])
-app.include_router(activities.router, prefix="/activities", tags=["activities"])
-app.include_router(goals.router, prefix="/goals", tags=["goals"])
-app.include_router(challenges.router, prefix="/challenges", tags=["challenges"])
-app.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
+# Incluir cada router
+app.include_router(auth_router)
+app.include_router(users_router)
+app.include_router(subjects_router)
+app.include_router(tasks_router)
+app.include_router(reminders_router)
+app.include_router(stats_router)
 
+# Ruta de prueba
 @app.get("/")
 async def root():
-    return {"message": "Bienvenido a la API de FOCCI"}
+    return {"message": "API is running!"}
 
 # Imprimir todas las rutas disponibles para depuración
 print("\n=== RUTAS DISPONIBLES ===")
