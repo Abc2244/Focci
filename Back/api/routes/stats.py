@@ -23,8 +23,9 @@ def get_date_range(period: str) -> tuple:
 
 
 # --------- Endpoint: Estadísticas generales por periodo ---------
-@router.get("/users/{user_id}/tasks/{period}")
+@router.get("/users/{user_id}/stats/{period}")
 async def get_tasks_stats(user_id: str, period: str):
+    print(f"Recibida solicitud para stats de usuario {user_id}, periodo {period}")
     start_date, end_date = get_date_range(period)
 
     tasks = await mongodb.get_collection("tasks").find({
@@ -154,3 +155,8 @@ async def calculate_subject_distribution(tasks):
         }
         for data in subject_counts.values()
     ]
+
+
+@router.get("/test")
+async def test_stats_router():
+    return {"message": "Stats router is working"}

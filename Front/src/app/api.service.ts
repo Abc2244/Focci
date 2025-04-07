@@ -250,7 +250,7 @@ export class ApiService {
   // Obtener estadísticas de tareas
   getStats(userId: string, period: string): Observable<TaskStats> {
     return this.http
-      .get<TaskStats>(`${this.apiUrl}/stats/users/${userId}/tasks/${period}`, {
+      .get<TaskStats>(`${this.apiUrl}/stats/users/${userId}/stats/${period}`, {
         headers: this.getAuthHeaders(),
       })
       .pipe(catchError(this.handleError));
