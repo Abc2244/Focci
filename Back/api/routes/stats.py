@@ -58,33 +58,67 @@ async def get_user_stats(user_id: str, period: str):
         completed_tasks_with_dates = 0
         
         for task in tasks:
-            if task.get("completed") and task.get("completed_date") and task.get("due_date"):
+            if task.get("completed") and task.get("completed_date") is not None and task.get("due_date") is not None:
                 try:
+                    # Imprimir los valores originales para depuración
+                    logger.info(f"Procesando tarea {task.get('_id')}")
+                    logger.info(f"  completed_date original: {task.get('completed_date')} ({type(task.get('completed_date'))})")
+                    logger.info(f"  due_date original: {task.get('due_date')} ({type(task.get('due_date'))})")
+                    
                     # Convertir fechas a formato datetime
+                    completed_date = None
+                    due_date = None
+                    
+                    # Manejar completed_date
                     if isinstance(task["completed_date"], str):
-                        completed_date_str = task["completed_date"].replace('Z', '+00:00')
-                        completed_date = datetime.fromisoformat(completed_date_str)
+                        try:
+                            # Intentar ISO format
+                            if 'Z' in task["completed_date"]:
+                                completed_date_str = task["completed_date"].replace('Z', '+00:00')
+                            else:
+                                completed_date_str = task["completed_date"]
+                            completed_date = datetime.fromisoformat(completed_date_str)
+                        except ValueError:
+                            # Intentar formato alternativo
+                            completed_date = datetime.strptime(task["completed_date"], "%Y-%m-%dT%H:%M:%S.%f")
                     else:
                         completed_date = task["completed_date"]
-                        
+                    
+                    # Manejar due_date
                     if isinstance(task["due_date"], str):
-                        due_date_str = task["due_date"].replace('Z', '+00:00')
-                        due_date = datetime.fromisoformat(due_date_str)
+                        try:
+                            # Intentar ISO format
+                            if 'Z' in task["due_date"]:
+                                due_date_str = task["due_date"].replace('Z', '+00:00')
+                            else:
+                                due_date_str = task["due_date"]
+                            due_date = datetime.fromisoformat(due_date_str)
+                        except ValueError:
+                            # Intentar formato alternativo
+                            due_date = datetime.strptime(task["due_date"], "%Y-%m-%dT%H:%M:%S.%f")
                     else:
                         due_date = task["due_date"]
                     
-                    # Comparar fechas para determinar si se completó a tiempo
-                    completed_tasks_with_dates += 1
-                    logger.info(f"Tarea {task.get('_id')}: completed_date={completed_date}, due_date={due_date}")
-                    if completed_date <= due_date:
-                        on_time += 1
-                        logger.info(f"Tarea completada a tiempo: {task.get('_id')}")
+                    # Verificar que ambas fechas se hayan convertido correctamente
+                    if completed_date and due_date:
+                        completed_tasks_with_dates += 1
+                        logger.info(f"  Fechas convertidas: completed_date={completed_date}, due_date={due_date}")
+                        
+                        # Comparar fechas para determinar si se completó a tiempo
+                        if completed_date <= due_date:
+                            on_time += 1
+                            logger.info(f"  ✓ Tarea completada A TIEMPO: {task.get('_id')}")
+                        else:
+                            late += 1
+                            logger.info(f"  ✗ Tarea completada CON RETRASO: {task.get('_id')}")
                     else:
-                        late += 1
-                        logger.info(f"Tarea completada con retraso: {task.get('_id')}")
+                        logger.error(f"  No se pudieron convertir ambas fechas para la tarea {task.get('_id')}")
                 except Exception as e:
                     logger.error(f"Error al procesar fechas de tarea {task.get('_id')}: {str(e)}")
                     logger.error(f"Valores de fechas: completed_date={task.get('completed_date')}, due_date={task.get('due_date')}")
+        
+        # Imprimir resumen antes de calcular porcentajes
+        logger.info(f"Resumen de puntualidad: {on_time} tareas a tiempo, {late} tareas con retraso, de un total de {completed_tasks_with_dates} tareas con fechas válidas")
         
         # Calcular porcentajes basados en tareas con fechas válidas
         if completed_tasks_with_dates > 0:
@@ -93,6 +127,7 @@ async def get_user_stats(user_id: str, period: str):
             
             # Asegurarse de que sumen 100%
             if on_time_rate + late_rate != 100:
+                # Si hay discrepancia, ajustar para que sumen 100%
                 if on_time_rate + late_rate > 100:
                     # Si suman más de 100, ajustar el mayor
                     if on_time_rate > late_rate:
@@ -100,9 +135,13 @@ async def get_user_stats(user_id: str, period: str):
                     else:
                         late_rate = 100 - on_time_rate
                 else:
-                    # Si suman menos de 100, ajustar el mayor
+                    # Si suman menos de 100, distribuir la diferencia
                     diff = 100 - (on_time_rate + late_rate)
-                    if on_time_rate >= late_rate:
+                    if on_time > 0 and late > 0:
+                        # Si hay tareas en ambas categorías, distribuir proporcionalmente
+                        on_time_rate += diff // 2
+                        late_rate += diff - (diff // 2)
+                    elif on_time > 0:
                         on_time_rate += diff
                     else:
                         late_rate += diff
@@ -110,7 +149,7 @@ async def get_user_stats(user_id: str, period: str):
             on_time_rate = 0
             late_rate = 0
         
-        logger.info(f"Estadísticas de puntualidad: A tiempo {on_time}/{completed_tasks_with_dates} ({on_time_rate}%), Con retraso {late}/{completed_tasks_with_dates} ({late_rate}%)")
+        logger.info(f"Estadísticas de puntualidad finales: A tiempo {on_time}/{completed_tasks_with_dates} ({on_time_rate}%), Con retraso {late}/{completed_tasks_with_dates} ({late_rate}%)")
         
         # Calcular distribución por materias
         logger.info("Calculando distribución por materias")

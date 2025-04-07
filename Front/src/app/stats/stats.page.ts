@@ -75,7 +75,7 @@ export class StatsPage implements OnInit {
 
           // Datos de puntualidad
           if (response.data && response.data.punctuality) {
-            // Usar directamente los valores del backend sin modificarlos
+            // Usar directamente los valores del backend
             this.stats.onTimeRate = response.data.punctuality.on_time_rate || 0;
             this.stats.lateRate = response.data.punctuality.late_rate || 0;
 
