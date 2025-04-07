@@ -73,7 +73,7 @@
       </div>
 
       <!-- Tarjetas de puntualidad -->
-      <div class="stats-detail">
+      <div class="stats-detail" *ngIf="stats.tasksCompleted > 0">
         <ion-card class="detail-card">
           <ion-card-header>
             <ion-card-title>Puntualidad</ion-card-title>
@@ -87,6 +87,63 @@
               <div class="punctuality-item late">
                 <div class="punctuality-value">{{ stats.lateRate }}%</div>
                 <div class="punctuality-label">Con retraso</div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <!-- Distribución por materias -->
+      <div
+        class="stats-detail"
+        *ngIf="subjectDistribution && subjectDistribution.length > 0"
+      >
+        <ion-card class="detail-card">
+          <ion-card-header>
+            <ion-card-title>Distribución por Materias</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="subject-distribution">
+              <div
+                class="subject-item"
+                *ngFor="let subject of subjectDistribution"
+              >
+                <div
+                  class="subject-color"
+                  [style.background-color]="subject.color"
+                ></div>
+                <div class="subject-info">
+                  <div class="subject-name">{{ subject.name }}</div>
+                  <div class="subject-percentage">
+                    {{ subject.percentage }}%
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <!-- Actividad Semanal -->
+      <div
+        class="stats-detail"
+        *ngIf="weeklyActivity && weeklyActivity.length > 0"
+      >
+        <ion-card class="detail-card">
+          <ion-card-header>
+            <ion-card-title>Actividad Semanal</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="weekly-activity">
+              <div class="day-activity" *ngFor="let day of weeklyActivity">
+                <div class="day-name">{{ day.day }}</div>
+                <div class="activity-bar-container">
+                  <div
+                    class="activity-bar"
+                    [style.width.%]="day.percentage"
+                  ></div>
+                </div>
+                <div class="day-percentage">{{ day.percentage }}%</div>
               </div>
             </div>
           </ion-card-content>

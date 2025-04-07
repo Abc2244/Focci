@@ -59,14 +59,24 @@ async def get_user_stats(user_id: str, period: str):
         for task in tasks:
             if task.get("completed") and task.get("completed_date") and task.get("due_date"):
                 try:
-                    completed_date = datetime.fromisoformat(task["completed_date"].replace('Z', '+00:00'))
-                    due_date = datetime.fromisoformat(task["due_date"].replace('Z', '+00:00'))
+                    # Asegurarse de que las fechas sean strings antes de procesarlas
+                    completed_date_str = task["completed_date"] if isinstance(task["completed_date"], str) else str(task["completed_date"])
+                    due_date_str = task["due_date"] if isinstance(task["due_date"], str) else str(task["due_date"])
+                    
+                    # Eliminar la 'Z' y agregar zona horaria
+                    completed_date_str = completed_date_str.replace('Z', '+00:00')
+                    due_date_str = due_date_str.replace('Z', '+00:00')
+                    
+                    completed_date = datetime.fromisoformat(completed_date_str)
+                    due_date = datetime.fromisoformat(due_date_str)
+                    
                     if completed_date <= due_date:
                         on_time += 1
                     else:
                         late += 1
                 except Exception as e:
                     logger.error(f"Error al procesar fechas de tarea {task.get('_id')}: {str(e)}")
+                    logger.error(f"Valores de fechas: completed_date={task.get('completed_date')}, due_date={task.get('due_date')}")
         
         on_time_rate = round((on_time / completed_tasks * 100) if completed_tasks > 0 else 0)
         late_rate = round((late / completed_tasks * 100) if completed_tasks > 0 else 0)
