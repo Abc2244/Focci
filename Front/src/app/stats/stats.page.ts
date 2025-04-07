@@ -77,6 +77,28 @@ export class StatsPage implements OnInit {
           if (response.data && response.data.punctuality) {
             this.stats.onTimeRate = response.data.punctuality.on_time_rate || 0;
             this.stats.lateRate = response.data.punctuality.late_rate || 0;
+
+            // Verificar que los porcentajes sumen 100% si hay tareas completadas
+            if (
+              this.stats.tasksCompleted > 0 &&
+              this.stats.onTimeRate + this.stats.lateRate !== 100
+            ) {
+              console.warn(
+                'Los porcentajes de puntualidad no suman 100%:',
+                this.stats.onTimeRate,
+                this.stats.lateRate
+              );
+
+              // Si hay discrepancia, ajustar para que sumen 100%
+              if (this.stats.onTimeRate === 0 && this.stats.lateRate > 0) {
+                this.stats.lateRate = 100;
+              } else if (
+                this.stats.lateRate === 0 &&
+                this.stats.onTimeRate > 0
+              ) {
+                this.stats.onTimeRate = 100;
+              }
+            }
           }
 
           // Actividad semanal
