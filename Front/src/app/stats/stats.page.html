@@ -79,6 +79,9 @@
             <ion-card-title>Puntualidad</ion-card-title>
           </ion-card-header>
           <ion-card-content>
+            <div class="chart-container">
+              <canvas id="punctualityChart" height="200"></canvas>
+            </div>
             <div class="punctuality-stats">
               <div class="punctuality-item on-time">
                 <div class="punctuality-value">{{ stats.onTimeRate }}%</div>
@@ -103,21 +106,21 @@
             <ion-card-title>Distribución por Materias</ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            <div class="subject-distribution">
+            <div class="chart-container chart-container-large">
+              <canvas id="subjectChart" height="300"></canvas>
+            </div>
+            <!-- Lista de materias con sus porcentajes -->
+            <div class="subject-list">
               <div
                 class="subject-item"
-                *ngFor="let subject of subjectDistribution"
+                *ngFor="let subject of subjectDistribution; let i = index"
               >
                 <div
                   class="subject-color"
-                  [style.background-color]="subject.color"
+                  [style.background-color]="getSubjectColor(i)"
                 ></div>
-                <div class="subject-info">
-                  <div class="subject-name">{{ subject.name }}</div>
-                  <div class="subject-percentage">
-                    {{ subject.percentage }}%
-                  </div>
-                </div>
+                <div class="subject-name">{{ subject.name }}</div>
+                <div class="subject-percentage">{{ subject.percentage }}%</div>
               </div>
             </div>
           </ion-card-content>
@@ -134,6 +137,9 @@
             <ion-card-title>Actividad Semanal</ion-card-title>
           </ion-card-header>
           <ion-card-content>
+            <div class="chart-container">
+              <canvas id="weeklyChart" height="200"></canvas>
+            </div>
             <div class="weekly-activity">
               <div class="day-activity" *ngFor="let day of weeklyActivity">
                 <div class="day-name">{{ day.day }}</div>
