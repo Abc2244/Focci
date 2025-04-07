@@ -59,21 +59,27 @@ async def get_user_stats(user_id: str, period: str):
         for task in tasks:
             if task.get("completed") and task.get("completed_date") and task.get("due_date"):
                 try:
-                    # Asegurarse de que las fechas sean strings antes de procesarlas
-                    completed_date_str = task["completed_date"] if isinstance(task["completed_date"], str) else str(task["completed_date"])
-                    due_date_str = task["due_date"] if isinstance(task["due_date"], str) else str(task["due_date"])
+                    # Convertir fechas a formato datetime
+                    if isinstance(task["completed_date"], str):
+                        completed_date_str = task["completed_date"].replace('Z', '+00:00')
+                        completed_date = datetime.fromisoformat(completed_date_str)
+                    else:
+                        completed_date = task["completed_date"]
+                        
+                    if isinstance(task["due_date"], str):
+                        due_date_str = task["due_date"].replace('Z', '+00:00')
+                        due_date = datetime.fromisoformat(due_date_str)
+                    else:
+                        due_date = task["due_date"]
                     
-                    # Eliminar la 'Z' y agregar zona horaria
-                    completed_date_str = completed_date_str.replace('Z', '+00:00')
-                    due_date_str = due_date_str.replace('Z', '+00:00')
-                    
-                    completed_date = datetime.fromisoformat(completed_date_str)
-                    due_date = datetime.fromisoformat(due_date_str)
-                    
+                    # Comparar fechas para determinar si se completó a tiempo
+                    logger.info(f"Tarea {task.get('_id')}: completed_date={completed_date}, due_date={due_date}")
                     if completed_date <= due_date:
                         on_time += 1
+                        logger.info(f"Tarea completada a tiempo: {task.get('_id')}")
                     else:
                         late += 1
+                        logger.info(f"Tarea completada con retraso: {task.get('_id')}")
                 except Exception as e:
                     logger.error(f"Error al procesar fechas de tarea {task.get('_id')}: {str(e)}")
                     logger.error(f"Valores de fechas: completed_date={task.get('completed_date')}, due_date={task.get('due_date')}")
