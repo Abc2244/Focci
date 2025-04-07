@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api.routes import auth_router, users_router, subjects_router, tasks_router, reminders_router
+from api.routes import auth_router, users_router, subjects_router, tasks_router, reminders_router, stats_router
 
 app = FastAPI()
 
@@ -19,8 +19,15 @@ app.include_router(users_router)
 app.include_router(subjects_router)
 app.include_router(tasks_router)
 app.include_router(reminders_router)
+app.include_router(stats_router)
 
 # Ruta de prueba
 @app.get("/")
 async def root():
     return {"message": "API is running!"}
+
+# Imprimir todas las rutas disponibles para depuración
+print("\n=== RUTAS DISPONIBLES ===")
+for route in app.routes:
+    print(f"Método: {route.methods}, Ruta: {route.path}")
+print("========================\n")
