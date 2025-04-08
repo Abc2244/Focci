@@ -3,7 +3,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
 import { AlertController } from '@ionic/angular';
-import { Task, CreateTaskDTO } from '../interfaces/task.interface';
+import {
+  Task,
+  CreateTaskDTO,
+  TaskResponse,
+} from '../interfaces/task.interface';
 import { Subject } from '../interfaces/subject.interface';
 import { ToastService } from '../services/toast.service';
 
@@ -45,6 +49,7 @@ export class TaskPage implements OnInit {
       description: ['', Validators.required],
       due_date: ['', Validators.required],
       subject_id: ['', Validators.required],
+      estimated_time: [30, [Validators.required, Validators.min(0)]],
     });
 
     this.minDate = new Date().toISOString();
@@ -174,33 +179,47 @@ export class TaskPage implements OnInit {
   async saveTask() {
     if (this.taskForm.valid) {
       const userId = this.authService.getCurrentUserId();
-      if (!userId) return;
-
-      const formData = this.taskForm.value;
-      const taskData: CreateTaskDTO = {
-        user_id: userId,
-        subject_id: formData.subject_id,
-        description: formData.description,
-        due_date: new Date(formData.due_date).toISOString(),
-        completed: false,
-      };
+      if (!userId) {
+        this.toastService.showToast('Error: Usuario no identificado', 'error');
+        return;
+      }
 
       try {
+        // Formatear la fecha correctamente
+        const formValue = this.taskForm.value;
+        const dueDate = new Date(formValue.due_date);
+
+        const taskData: CreateTaskDTO = {
+          user_id: userId,
+          subject_id: formValue.subject_id,
+          description: formValue.description,
+          due_date: dueDate.toISOString(), // Asegurarse de que la fecha esté en formato ISO
+          estimated_time: formValue.estimated_time,
+        };
+
         if (this.isEditing && this.currentTaskId) {
           await this.apiService
             .updateTask(this.currentTaskId, taskData)
             .toPromise();
           this.toastService.showToast('Tarea actualizada con éxito', 'success');
         } else {
-          await this.apiService.createTask(taskData).toPromise();
-          this.toastService.showToast('Tarea creada con éxito', 'success');
+          const response = await this.apiService
+            .createTask(taskData)
+            .toPromise();
+          if (response) {
+            this.toastService.showToast(
+              `Tarea creada: ${response.task_type} (Prioridad: ${response.adjusted_priority})`,
+              'success'
+            );
+          }
         }
-
         this.dismissModal();
         this.loadTasks();
-      } catch (error) {
-        this.toastService.showToast('Error al guardar la tarea', 'error');
-        console.error('Error:', error);
+      } catch (error: any) {
+        console.error('Error completo:', error);
+        const errorMessage =
+          error.error?.detail || error.message || 'Error al guardar la tarea';
+        this.toastService.showToast(errorMessage, 'error');
       }
     }
   }
@@ -222,6 +241,7 @@ export class TaskPage implements OnInit {
       description: task.description,
       due_date: task.due_date,
       subject_id: task.subject_id,
+      estimated_time: task.estimated_time,
     });
 
     this.showModal = true;

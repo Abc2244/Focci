@@ -5,7 +5,7 @@ import {
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { Task, CreateTaskDTO } from './interfaces/task.interface';
+import { Task, CreateTaskDTO, TaskResponse } from './interfaces/task.interface';
 import { Subject, ScheduleItem } from './interfaces/subject.interface';
 import { environment } from '../environments/environment';
 import { catchError, tap } from 'rxjs/operators';
@@ -55,23 +55,40 @@ export class ApiService {
   // Tareas
   // -----------------------------------------
 
-  createTask(taskData: any): Observable<any> {
-    console.log('API createTask called with:', taskData);
+  createTask(taskData: CreateTaskDTO): Observable<TaskResponse> {
+    console.log('Creating task with data:', taskData);
     return this.http
-      .post(`${this.apiUrl}/tasks`, taskData, {
+      .post<TaskResponse>(`${this.apiUrl}/tasks`, taskData, {
         headers: this.getAuthHeaders(),
       })
-      .pipe(catchError(this.handleError));
+      .pipe(
+        tap((response) => console.log('Task creation response:', response)),
+        catchError((error) => {
+          console.error('Error creating task:', error);
+          return throwError(
+            () => new Error(error.error?.detail || 'Error al crear la tarea')
+          );
+        })
+      );
   }
 
   getUserTasks(user_id: string): Observable<Task[]> {
-    return this.http.get<Task[]>(`${this.apiUrl}/users/${user_id}/tasks/`);
+    return this.http
+      .get<Task[]>(`${this.apiUrl}/users/${user_id}/tasks/`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(
+        tap((tasks) => console.log('Retrieved tasks:', tasks)),
+        catchError(this.handleError)
+      );
   }
 
   getPendingTasks(user_id: string): Observable<Task[]> {
-    return this.http.get<Task[]>(
-      `${this.apiUrl}/users/${user_id}/tasks/pending/`
-    );
+    return this.http
+      .get<Task[]>(`${this.apiUrl}/users/${user_id}/tasks/pending/`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(catchError(this.handleError));
   }
 
   getCompletedTasks(user_id: string): Observable<Task[]> {
@@ -85,7 +102,11 @@ export class ApiService {
   }
 
   updateTask(task_id: string, taskData: Partial<Task>): Observable<any> {
-    return this.http.put(`${this.apiUrl}/tasks/${task_id}/`, taskData);
+    return this.http
+      .put(`${this.apiUrl}/tasks/${task_id}/`, taskData, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(catchError(this.handleError));
   }
 
   deleteTask(task_id: string): Observable<any> {
@@ -229,7 +250,7 @@ export class ApiService {
   // Obtener estadísticas de tareas
   getStats(userId: string, period: string): Observable<TaskStats> {
     return this.http
-      .get<TaskStats>(`${this.apiUrl}/stats/users/${userId}/tasks/${period}`, {
+      .get<TaskStats>(`${this.apiUrl}/stats/users/${userId}/stats/${period}`, {
         headers: this.getAuthHeaders(),
       })
       .pipe(catchError(this.handleError));
@@ -251,6 +272,13 @@ export class ApiService {
       .pipe(catchError(this.handleError));
   }
   
+
+  // Actualizar el estado de un recordatorio
+  updateReminderStatus(reminder_id: string, status: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/reminders/${reminder_id}/status/`, {
+      status: status,
+    });
+  }
 
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');

@@ -1,13 +1,9 @@
 export interface TaskStats {
-  created: number;
-  completed: number;
+  tasksCreated: number;
+  tasksCompleted: number;
   completionRate: number;
   onTimeRate: number;
   lateRate: number;
-  tasksCompleted: number;
-  tasksCreated: number;
-  lateTasksRate: number;
-  averageCompletionDays: number;
   weeklyActivity: WeeklyActivity[];
   subjectDistribution: SubjectDistribution[];
   averageDays?: number;

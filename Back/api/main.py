@@ -26,7 +26,12 @@ app.include_router(subjects_router)
 app.include_router(tasks_router)
 app.include_router(stats_router)
 
-
 ##Después de incluir todas las rutas
 for route in app.routes:
     print(f"Ruta disponible: {route.path}")
+
+##Después de incluir todos los routers
+print("\n=== RUTAS DISPONIBLES ===")
+for route in app.routes:
+    print(f"Método: {route.methods}, Ruta: {route.path}")
+print("========================\n")

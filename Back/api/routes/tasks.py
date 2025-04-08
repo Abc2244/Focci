@@ -4,17 +4,76 @@ from fastapi import APIRouter, HTTPException
 
 from config.database import mongodb
 from models.task import Task
+from services.task_service import TaskService
 
 router = APIRouter()
+task_service = TaskService()
 
 def serialize_mongo_document(doc):
     doc["_id"] = str(doc["_id"])
     return doc
 
-@router.post("/tasks/")
+@router.post("/tasks/", response_model=dict)
 async def create_task(task: Task):
-    task_id = await mongodb.get_collection("tasks").insert_one(task.dict())
-    return {"message": "Tarea creada", "task_id": str(task_id.inserted_id)}
+    try:
+        if not task.user_id or not task.subject_id:
+            raise HTTPException(
+                status_code=400,
+                detail="user_id y subject_id son requeridos"
+            )
+
+        # Validar ObjectIds
+        try:
+            user_id_obj = ObjectId(task.user_id)
+            subject_id_obj = ObjectId(task.subject_id)
+        except Exception as e:
+            raise HTTPException(
+                status_code=400,
+                detail=f"ID inválido: {str(e)}"
+            )
+
+        # Procesar la tarea
+        try:
+            result = await task_service.process_task(
+                user_id=str(user_id_obj),
+                subject_id=str(subject_id_obj),
+                task_description=task.description,
+                due_date=task.due_date,
+                estimated_time=task.estimated_time
+            )
+        except ValueError as e:
+            raise HTTPException(
+                status_code=400,
+                detail=str(e)
+            )
+        except Exception as e:
+            print(f"Error inesperado: {str(e)}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error interno del servidor: {str(e)}"
+            )
+
+        if not result:
+            raise HTTPException(
+                status_code=400,
+                detail="Error al procesar la tarea"
+            )
+
+        return {
+            "message": "Tarea creada exitosamente",
+            "task_id": str(result["task_id"]),
+            "task_type": result["task_type"],
+            "adjusted_priority": result["adjusted_priority"]
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error no manejado: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error interno del servidor: {str(e)}"
+        )
 
 @router.patch("/tasks/{task_id}/complete/")
 async def complete_task(task_id: str):

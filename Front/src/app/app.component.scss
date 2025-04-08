@@ -1,16 +1,27 @@
 :host {
   ion-app {
-    // Variables globales para safe area
-    --ion-safe-area-top: env(safe-area-inset-top, 50px);
-    --ion-safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    // Aumentamos el valor por defecto del safe area superior
+    --ion-safe-area-top: env(safe-area-inset-top, 60px);
+    --ion-safe-area-bottom: env(safe-area-inset-bottom, 34px);
     --ion-safe-area-left: env(safe-area-inset-left, 0px);
     --ion-safe-area-right: env(safe-area-inset-right, 0px);
+    background: linear-gradient(
+      135deg,
+      #f5f7fa 0%,
+      var(--ion-color-secondary-tint) 100%
+    );
   }
 }
 
 .safe-area {
-  padding-top: max(var(--ion-safe-area-top), 50px);
-  padding-bottom: var(--ion-safe-area-bottom);
+  // Aumentamos el padding superior
+  padding-top: max(var(--ion-safe-area-top), 60px);
+  padding-bottom: max(var(--ion-safe-area-bottom), 34px);
   padding-left: var(--ion-safe-area-left);
   padding-right: var(--ion-safe-area-right);
+  background: transparent;
+}
+
+ion-content {
+  --background: transparent;
 }

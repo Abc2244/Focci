@@ -25,16 +25,23 @@
         <ion-card-content>
           <div class="task-info">
             <ion-chip class="date-chip">
-              <ion-icon name="calendar-outline" class="chip-icon"></ion-icon>
-              <span class="chip-text"
-                >{{ task.due_date | date:'mediumDate' }}</span
-              >
+              <ion-icon name="calendar-outline"></ion-icon>
+              <ion-label>{{ task.due_date | date:'mediumDate' }}</ion-label>
             </ion-chip>
-            <ion-chip class="time-chip">
-              <ion-icon name="time-outline" class="chip-icon"></ion-icon>
-              <span class="chip-text"
-                >{{ task.due_date | date:'shortTime' }}</span
-              >
+
+            <ion-chip [class]="'type-chip type-' + task.task_type">
+              <ion-icon name="bookmark-outline"></ion-icon>
+              <ion-label>{{task.task_type | titlecase}}</ion-label>
+            </ion-chip>
+
+            <ion-chip [class]="'priority-chip priority-' + task.priority">
+              <ion-icon name="flag-outline"></ion-icon>
+              <ion-label>Prioridad {{task.priority}}</ion-label>
+            </ion-chip>
+
+            <ion-chip *ngIf="task.estimated_time" class="time-estimate-chip">
+              <ion-icon name="time-outline"></ion-icon>
+              <ion-label>{{task.estimated_time}} min</ion-label>
             </ion-chip>
           </div>
 
@@ -225,6 +232,19 @@
                 locale="es-ES"
                 class="large-input"
               ></ion-datetime>
+            </ion-item>
+
+            <ion-item class="custom-input">
+              <ion-label position="floating" class="form-label large-label"
+                >Tiempo estimado (minutos)</ion-label
+              >
+              <ion-input
+                formControlName="estimated_time"
+                type="number"
+                min="0"
+                step="15"
+                class="large-input"
+              ></ion-input>
             </ion-item>
           </div>
         </div>

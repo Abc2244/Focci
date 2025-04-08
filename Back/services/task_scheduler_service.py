@@ -1,5 +1,5 @@
 import random
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 EXAM_REMINDER_TEMPLATES = [
@@ -56,30 +56,38 @@ GENERAL_REMINDER_TEMPLATES = [
 
 class TaskScheduler:
     def generate_advanced_reminders(self, task_description: str, priority: int, due_date_dt: datetime, insistence_level: int, task_type: str) -> list:
-        """
-        Genera una lista de recordatorios basados en el nivel de insistencia, prioridad y fecha de vencimiento.
-        """
-        reminders = []
-        current_date = datetime.now()
+        try:
+            current_date = datetime.now(timezone.utc)
 
-        delta_days = (due_date_dt - current_date).days
+            if isinstance(due_date_dt, str):
+                due_date_dt = datetime.fromisoformat(due_date_dt.replace('Z', '+00:00'))
+            
+            if due_date_dt.tzinfo is None:
+                due_date_dt = due_date_dt.replace(tzinfo=timezone.utc)
 
-        if delta_days <= 0:
-            return ["La tarea ya está vencida o es para hoy."]
+            delta = due_date_dt - current_date
+            delta_days = delta.days
 
-        # Generar más recordatorios a medida que aumenta la insistencia
-        num_reminders = max(1, priority + insistence_level)
+            if delta_days <= 0:
+                return ["La tarea ya está vencida o es para hoy."]
 
-        # Distribuir recordatorios de manera más frecuente si la insistencia es alta
-        reminder_dates = self._distribute_reminders(num_reminders, delta_days, current_date)
-        reminder_templates = self._get_reminder_templates(task_type)
+            num_reminders = max(1, priority + insistence_level)
+            reminder_dates = self._distribute_reminders(num_reminders, delta_days, current_date)
+            reminder_templates = self._get_reminder_templates(task_type)
 
-        for reminder_time in reminder_dates:
-            reminder_template = random.choice(reminder_templates)
-            reminder = reminder_template.format(task_description=task_description.lower(), reminder_time=reminder_time)
-            reminders.append(reminder)
+            reminders = []
+            for reminder_time in reminder_dates:
+                reminder_template = random.choice(reminder_templates)
+                reminder = reminder_template.format(
+                    task_description=task_description.lower(),
+                    reminder_time=reminder_time
+                )
+                reminders.append(reminder)
 
-        return reminders
+            return reminders
+        except Exception as e:
+            print(f"Error en generate_advanced_reminders: {str(e)}")
+            return ["Error al generar recordatorios"]
 
     def _distribute_reminders(self, num_reminders: int, delta_days: int, current_date: datetime) -> list:
         """
@@ -92,7 +100,8 @@ class TaskScheduler:
             else:
                 # Distribuir los recordatorios según la cantidad total de días disponibles y el número de recordatorios
                 reminder_time = current_date + timedelta(days=(i * delta_days // num_reminders))
-            reminder_dates.append(reminder_time.strftime("%Y-%m-%d %H:%M:%S"))
+            # Asegurarse de que la fecha tenga formato ISO con zona horaria
+            reminder_dates.append(reminder_time.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S %Z"))
         return reminder_dates
 
     def _get_reminder_templates(self, task_type: str) -> list:
@@ -109,24 +118,29 @@ class TaskScheduler:
             return GENERAL_REMINDER_TEMPLATES
 
     def calculate_insistence_level(self, priority: int, due_date_dt: datetime, urgent_keywords_detected: bool) -> int:
-        """
-        Calcula el nivel de insistencia en función de la prioridad, fecha de vencimiento y palabras clave urgentes.
-        """
-        current_date = datetime.now()
-        delta_days = (due_date_dt - current_date).days
+        try:
+            current_date = datetime.now(timezone.utc)
 
-        # Nivel base de insistencia basado en la prioridad
-        insistence_level = priority  # Mayor prioridad = mayor insistencia
+            if isinstance(due_date_dt, str):
+                due_date_dt = datetime.fromisoformat(due_date_dt.replace('Z', '+00:00'))
+            
+            if due_date_dt.tzinfo is None:
+                due_date_dt = due_date_dt.replace(tzinfo=timezone.utc)
 
-        # Incrementar insistencia si la fecha de vencimiento está cerca
-        if delta_days <= 3:
-            insistence_level += 2  # Aumenta mucho la insistencia cuando faltan pocos días
-        elif delta_days <= 7:
-            insistence_level += 1  # Aumenta ligeramente si la fecha está dentro de una semana
+            delta = due_date_dt - current_date
+            delta_days = delta.days
 
-        # Si se detectaron palabras clave urgentes, incrementar la insistencia
-        if urgent_keywords_detected:
-            insistence_level += 1
+            insistence_level = priority
 
-        # Limitar el nivel de insistencia entre 1 y 5
-        return min(insistence_level, 5)
+            if delta_days <= 3:
+                insistence_level += 2
+            elif delta_days <= 7:
+                insistence_level += 1
+
+            if urgent_keywords_detected:
+                insistence_level += 1
+
+            return min(max(1, insistence_level), 5)
+        except Exception as e:
+            print(f"Error en calculate_insistence_level: {str(e)}")
+            return 1

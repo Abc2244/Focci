@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-
+import { SplashScreen } from '@capacitor/splash-screen';
 import {
   ActionPerformed,
   PushNotificationSchema,
@@ -13,5 +13,14 @@ import {
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  constructor() {}
+  constructor() {
+    this.initializeApp();
+  }
+
+  initializeApp() {
+    // No es necesario mostrar el splash screen manualmente si autoHide está en true
+    SplashScreen.show({
+      autoHide: true,
+    });
+  }
 }
