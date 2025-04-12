@@ -93,6 +93,27 @@
             </div>
           </div>
         </div>
+
+        <!-- Recomendaciones basadas en horario -->
+        <div
+          class="recommendation-card"
+          *ngFor="let rec of studyTimeRecommendations"
+        >
+          <div class="recommendation-icon">
+            <ion-icon name="calendar-outline"></ion-icon>
+          </div>
+          <div class="recommendation-content">
+            <div class="recommendation-title">
+              Momento ideal para {{ rec.subject }}
+            </div>
+            <div class="recommendation-text">
+              Te recomendamos estudiar de {{ rec.timeSlot.start |
+              date:'shortTime' }} a {{ rec.timeSlot.end | date:'shortTime' }}
+              <br />
+              <small>{{ rec.reason }}</small>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Planificación diaria -->

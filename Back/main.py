@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api.routes import auth_router, users_router, subjects_router, tasks_router, reminders_router, stats_router
+from api.routes import auth_router, users_router, subjects_router, tasks_router, reminders_router, stats_router, schedule_router
 
 app = FastAPI()
 
@@ -20,6 +20,7 @@ app.include_router(subjects_router)
 app.include_router(tasks_router)
 app.include_router(reminders_router)
 app.include_router(stats_router)
+app.include_router(schedule_router)
 
 # Ruta de prueba
 @app.get("/")
