@@ -297,35 +297,25 @@ export class SmartPage implements OnInit {
   getDaysUntil(dateString: string): number {
     const dueDate = new Date(dateString);
     const today = new Date();
-    const diffTime = Math.abs(dueDate.getTime() - today.getTime());
+    const diffTime = dueDate.getTime() - today.getTime();
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
   getTimeForIndex(index: number): string {
-    // Generar horarios escalonados para la planificación diaria
-    const baseHour = 9; // Comenzar a las 9 AM
-    const hour = baseHour + index * 2; // Cada tarea separada por 2 horas
-
-    return `${hour}:00 ${hour >= 12 ? 'PM' : 'AM'}`;
+    const baseHour = 9; // Empezar a las 9 AM
+    const hour = baseHour + index;
+    return `${hour}:00`;
   }
 
   getSubjectName(subjectId: string): string {
     return this.subjectMap.get(subjectId) || 'Sin materia';
   }
 
-  createReminder(taskId: string, insistenceLevel: number) {
-    // Navegar a la página de recordatorios con parámetros
-    this.router.navigate(['/reminders'], {
-      queryParams: {
-        taskId: taskId,
-        insistenceLevel: insistenceLevel,
-      },
-    });
-
-    this.toastService.showToast(
-      'Navegando a la página de recordatorios para crear uno nuevo',
-      'success'
+  createReminder(taskId: string, priority: number) {
+    console.log(
+      `Creando recordatorio para tarea ${taskId} con prioridad ${priority}`
     );
+    this.toastService.showToast('Recordatorio creado', 'success');
   }
 
   createSubjectMap() {

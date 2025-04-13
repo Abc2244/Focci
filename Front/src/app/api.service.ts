@@ -267,7 +267,7 @@ export class ApiService {
   // Obtener estadísticas de tiempo
   getTasksTimeStats(userId: string): Observable<any> {
     return this.http
-      .get(`${this.apiUrl}/stats/users/${userId}/time-stats`, {
+      .get(`${this.apiUrl}/stats/users/${userId}/time`, {
         headers: this.getAuthHeaders(),
       })
       .pipe(catchError(this.handleError));

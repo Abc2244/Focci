@@ -38,11 +38,10 @@ export class ScheduleService {
    */
   getUserSchedule(userId: string): Observable<ScheduleItem[]> {
     return this.http
-      .get<ScheduleItem[]>(`${this.apiUrl}/users/${userId}/schedule`)
+      .get<ScheduleItem[]>(`${this.apiUrl}/schedule/users/${userId}`)
       .pipe(
         catchError((error) => {
-          console.error('Error obteniendo horario del usuario:', error);
-          // Si hay un error, devolvemos un array vacío para no romper la aplicación
+          console.error('Error obteniendo horario:', error);
           return of([]);
         })
       );
