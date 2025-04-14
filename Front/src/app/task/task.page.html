@@ -48,6 +48,7 @@
           <div class="task-actions">
             <ion-button
               fill="clear"
+              color="primary"
               (click)="completeTask(task._id!)"
               class="action-button"
             >
@@ -58,6 +59,7 @@
             </ion-button>
             <ion-button
               fill="clear"
+              color="primary"
               (click)="editTask(task)"
               class="action-button"
             >
@@ -65,6 +67,7 @@
             </ion-button>
             <ion-button
               fill="clear"
+              color="primary"
               (click)="deleteTask(task._id!)"
               class="action-button"
             >
@@ -105,8 +108,8 @@
             <div class="task-info">
               <ion-chip class="date-chip">
                 <ion-icon name="calendar-outline" class="chip-icon"></ion-icon>
-                <span class="chip-text"
-                  >Creada: {{ task.created_at | date:'shortDate' }}</span
+                <ion-label class="chip-text"
+                  >Creada: {{ task.created_at | date:'shortDate' }}</ion-label
                 >
               </ion-chip>
 
@@ -114,8 +117,8 @@
                 [class]="{'date-chip': true, 'late-chip': isTaskLate(task)}"
               >
                 <ion-icon name="alarm-outline" class="chip-icon"></ion-icon>
-                <span class="chip-text"
-                  >Límite: {{ task.due_date | date:'shortDate' }}</span
+                <ion-label class="chip-text"
+                  >Límite: {{ task.due_date | date:'shortDate' }}</ion-label
                 >
               </ion-chip>
 
@@ -124,9 +127,9 @@
                   name="checkmark-circle-outline"
                   class="chip-icon"
                 ></ion-icon>
-                <span class="chip-text"
+                <ion-label class="chip-text"
                   >Completada: {{ task.completed_date | date:'shortDate'
-                  }}</span
+                  }}</ion-label
                 >
               </ion-chip>
             </div>
@@ -154,7 +157,7 @@
 
   <!-- Botón flotante para agregar -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button class="custom-fab" (click)="addTask()" color="secondary">
+    <ion-fab-button class="custom-fab" (click)="addTask()" color="primary">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>

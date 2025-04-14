@@ -245,41 +245,6 @@ ion-button {
   }
 }
 
-// Modo oscuro
-[data-theme="dark"] {
-  --app-background-light: #121212;
-  --app-background-dark: #1e1e1e;
-  --app-card-color: #2d2d2d;
-  --app-card-color-rgb: 45, 45, 45;
-  --app-text-color: #ffffff;
-  --app-text-color-medium: #b0b0b0;
-  --app-text-color-light: #808080;
-  --app-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
-  --app-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.3);
-  --app-shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.4);
-
-  ion-card {
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .custom-input {
-    ion-input,
-    ion-select {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 6px;
-    }
-  }
-
-  .empty-state {
-    color: var(--app-text-color-medium);
-  }
-
-  ion-tab-bar {
-    --background: var(--app-card-color);
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
-  }
-}
-
 // Asegurar que los textos tengan el color correcto
 h1,
 h2,
