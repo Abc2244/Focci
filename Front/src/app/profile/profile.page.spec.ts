@@ -4,7 +4,9 @@ import { IonicModule } from '@ionic/angular';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
+import { ThemeService } from '../services/theme.service';
 import { of } from 'rxjs';
+import { Router } from '@angular/router';
 
 describe('ProfilePage', () => {
   let component: ProfilePage;
@@ -12,11 +14,18 @@ describe('ProfilePage', () => {
   let apiServiceSpy = jasmine.createSpyObj('ApiService', [
     'getUserProfile',
     'updateUserProfile',
+    'updatePassword',
   ]);
   let authServiceSpy = jasmine.createSpyObj('AuthService', [
     'getCurrentUserId',
     'logout',
   ]);
+  let themeServiceSpy = jasmine.createSpyObj('ThemeService', [
+    'getCurrentTheme',
+    'setTheme',
+    'updateCustomColors',
+  ]);
+  let routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
   beforeEach(async () => {
     apiServiceSpy.getUserProfile.and.returnValue(
@@ -26,7 +35,9 @@ describe('ProfilePage', () => {
       })
     );
     apiServiceSpy.updateUserProfile.and.returnValue(of({}));
+    apiServiceSpy.updatePassword.and.returnValue(of({}));
     authServiceSpy.getCurrentUserId.and.returnValue('user123');
+    themeServiceSpy.getCurrentTheme.and.returnValue('light');
 
     await TestBed.configureTestingModule({
       declarations: [ProfilePage],
@@ -34,6 +45,8 @@ describe('ProfilePage', () => {
       providers: [
         { provide: ApiService, useValue: apiServiceSpy },
         { provide: AuthService, useValue: authServiceSpy },
+        { provide: ThemeService, useValue: themeServiceSpy },
+        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
 
@@ -75,5 +88,12 @@ describe('ProfilePage', () => {
   it('should logout user', () => {
     component.logout();
     expect(authServiceSpy.logout).toHaveBeenCalled();
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('should change theme', () => {
+    component.changeTheme('dark');
+    expect(themeServiceSpy.setTheme).toHaveBeenCalledWith('dark');
+    expect(component.settings.darkMode).toBeTrue();
   });
 });

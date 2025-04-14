@@ -10,6 +10,7 @@ import { SharedModule } from './shared/shared.module';
 
 // IMPORTAR HttpClientModule
 import { HttpClientModule } from '@angular/common/http';
+import { ThemeService } from './services/theme.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -20,7 +21,10 @@ import { HttpClientModule } from '@angular/common/http';
     HttpClientModule, // AÑADIR HttpClientModule AQUÍ
     SharedModule,
   ],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  providers: [
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    ThemeService,
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

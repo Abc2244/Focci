@@ -6,7 +6,7 @@ from .routes.users import router as users_router
 from .routes.subjects import router as subjects_router
 from .routes.tasks import router as tasks_router
 from .routes.stats import router as stats_router
-
+from .routes.schedule import router as schedule_router
 app = FastAPI()
 
 ##Configurar CORS
@@ -25,6 +25,7 @@ app.include_router(users_router)
 app.include_router(subjects_router)
 app.include_router(tasks_router)
 app.include_router(stats_router)
+app.include_router(schedule_router)
 
 ##Después de incluir todas las rutas
 for route in app.routes:

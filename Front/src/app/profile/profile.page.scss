@@ -1,19 +1,19 @@
 @import "src/app/shared/styles/common";
 
-// Variables de colores
+// Variables de colores usando variables CSS
 $profile-primary: var(--ion-color-primary);
 $profile-primary-tint: var(--ion-color-primary-tint);
 $profile-primary-shade: var(--ion-color-primary-shade);
-$profile-light-bg: #f5f7fa;
-$profile-card-bg: white;
-$profile-text-dark: #333;
-$profile-text-medium: #555;
-$profile-text-light: #777;
+$profile-light-bg: var(--app-background-light);
+$profile-card-bg: var(--app-card-color, white);
+$profile-text-dark: var(--app-text-color);
+$profile-text-medium: var(--app-text-color-medium, #555);
+$profile-text-light: var(--app-text-color-light, #777);
 
 .profile-content {
   --background: linear-gradient(
     135deg,
-    #f5f7fa 0%,
+    var(--app-background-light) 0%,
     var(--ion-color-primary-tint) 100%
   );
 
@@ -24,7 +24,7 @@ $profile-text-light: #777;
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(33, 150, 243, 0.05)" stroke-width="2"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(var(--ion-color-primary-rgb), 0.05)" stroke-width="2"/></svg>');
     background-size: 300px 300px;
     opacity: 0.5;
     pointer-events: none;
@@ -53,7 +53,7 @@ $profile-text-light: #777;
     h1 {
       font-size: 28px;
       font-weight: 700;
-      color: black; 
+      color: black;
       margin: 0;
     }
 
@@ -126,7 +126,7 @@ $profile-text-light: #777;
       background: rgba(255, 255, 255, 0.9);
 
       ion-card-header {
-        background-color:  rgba(255, 255, 255, 0.9);
+        background-color: rgba(255, 255, 255, 0.9);
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 
         .card-header-content {
@@ -150,14 +150,14 @@ $profile-text-light: #777;
 
       ion-card-content {
         padding: 0;
-        background-color:  rgba(255, 255, 255, 0.9);
+        background-color: rgba(255, 255, 255, 0.9);
 
         ion-list {
           background-color: transparent;
           padding: 0;
 
           ion-item {
-            --background:  rgba(255, 255, 255, 0.9);
+            --background: rgba(255, 255, 255, 0.9);
             --padding-start: 16px;
             --padding-end: 16px;
             --padding-top: 12px;
@@ -207,9 +207,10 @@ $profile-text-light: #777;
 // Estilos para el modal
 .profile-modal {
   --border-radius: 16px;
+  --background: var(--app-background-light);
 
   .modal-content {
-    --background: #f9f9f9;
+    --background: var(--app-background-light);
 
     .form-container {
       padding: 16px;
@@ -241,50 +242,53 @@ $profile-text-light: #777;
       }
     }
   }
+
+  ion-header ion-toolbar {
+    --background: var(--app-card-color);
+  }
 }
 
 // Estilos para modo oscuro
-:host-context(.dark) {
+:host-context(.dark-theme) {
   .profile-content {
-    --background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    --background: linear-gradient(
+      135deg,
+      var(--app-background-light) 0%,
+      var(--ion-color-primary-shade) 100%
+    );
   }
 
   .profile-header {
-    background: rgba(40, 40, 40, 0.8);
+    background: rgba(30, 30, 30, 0.9);
 
-    .user-name {
-      color: #f5f5f5;
-    }
-
-    .user-email {
-      color: #cccccc;
+    h1,
+    p {
+      color: var(--app-text-color);
     }
   }
 
   .profile-card {
-    background: #2d2d2d !important;
+    background-color: var(--app-card-color);
 
-    ion-card-header {
-      background: rgba($profile-primary, 0.15) !important;
-
+    ion-card-header .card-header-content {
       ion-card-title {
-        color: #f5f5f5 !important;
+        color: var(--app-text-color);
       }
     }
 
     ion-card-content {
-      background-color: #2d2d2d !important;
+      background-color: var(--app-card-color);
 
       ion-list {
         ion-item {
-          --background: #2d2d2d !important;
+          --background: var(--app-card-color);
 
           ion-label h2 {
-            color: #f5f5f5 !important;
+            color: var(--app-text-color) !important;
           }
 
           ion-label p {
-            color: #cccccc !important;
+            color: var(--app-text-color-medium) !important;
           }
         }
       }
@@ -293,44 +297,108 @@ $profile-text-light: #777;
 
   .profile-modal {
     ion-header ion-toolbar {
-      --background: #2d2d2d;
-      --color: #f5f5f5;
+      --background: var(--app-card-color);
+      --color: var(--app-text-color);
     }
 
     .modal-content {
-      --background: #1a1a1a;
+      --background: var(--app-background-light);
 
       .custom-input {
-        --background: #2d2d2d;
+        --background: var(--app-card-color);
 
         ion-label {
-          color: #cccccc;
+          color: var(--app-text-color-medium);
         }
 
         ion-input {
-          --color: #f5f5f5;
-          --placeholder-color: #999999;
+          --color: var(--app-text-color);
+          --placeholder-color: var(--app-text-color-medium);
         }
       }
     }
   }
 }
 
-// Añadir esto al final del archivo para darle mayor prioridad
+// Anular estilos específicos para asegurar que se apliquen correctamente
 ion-card-content ion-list ion-item ion-label h2 {
-  color: #333 !important;
+  color: var(--app-text-color) !important;
   font-weight: 500 !important;
 }
 
 ion-card-content ion-list ion-item ion-label p {
-  color: #666 !important;
+  color: var(--app-text-color-medium) !important;
 }
 
 // Para los modales
 .profile-modal .custom-input ion-input {
-  --color: #333 !important;
+  --color: var(--app-text-color) !important;
 }
 
 .profile-modal .custom-input ion-label {
-  color: #555 !important;
+  color: var(--app-text-color-medium) !important;
+}
+
+.theme-selector-container {
+  padding: 1rem;
+
+  ion-list {
+    background: transparent;
+    padding: 0;
+
+    ion-item {
+      --background: var(--app-card-color);
+      --background-activated: var(--app-card-color);
+      margin-bottom: 0.5rem;
+      border-radius: 8px;
+
+      &.selected-theme {
+        --background: var(--ion-color-primary-tint);
+        --color: var(--ion-color-primary);
+        font-weight: 600;
+
+        ion-icon {
+          color: var(--ion-color-primary);
+        }
+      }
+
+      ion-icon {
+        font-size: 1.5rem;
+        margin-right: 1rem;
+
+        &[name="water-outline"] {
+          color: #2196f3;
+        }
+        &[name="leaf-outline"] {
+          color: #4caf50;
+        }
+        &[name="flame-outline"] {
+          color: #ff9800;
+        }
+        &[name="flower-outline"] {
+          color: #9c27b0;
+        }
+        &[name="sunny-outline"] {
+          color: #ffc107;
+        }
+        &[name="moon-outline"] {
+          color: #607d8b;
+        }
+        &[name="color-palette-outline"] {
+          color: #e91e63;
+        }
+      }
+    }
+  }
+}
+
+.custom-color-container {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--app-card-color);
+  border-radius: 8px;
+
+  ion-button {
+    margin-top: 1rem;
+  }
 }

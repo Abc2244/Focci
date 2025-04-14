@@ -264,20 +264,41 @@ export class ApiService {
       .pipe(catchError(this.handleError));
   }
 
-  getTimeStats(userId: string): Observable<{ averageDays: number }> {
+  // Obtener estadísticas de tiempo
+  getTasksTimeStats(userId: string): Observable<any> {
     return this.http
-      .get<{ averageDays: number }>(`${this.apiUrl}/stats/users/${userId}/time`, {
+      .get(`${this.apiUrl}/stats/users/${userId}/time`, {
         headers: this.getAuthHeaders(),
       })
       .pipe(catchError(this.handleError));
   }
-  
 
   // Actualizar el estado de un recordatorio
   updateReminderStatus(reminder_id: string, status: string): Observable<any> {
     return this.http.patch(`${this.apiUrl}/reminders/${reminder_id}/status/`, {
       status: status,
     });
+  }
+
+  // Agregar este método para obtener espacios libres en el horario
+  getFreeTimeSlots(userId: string): Observable<any> {
+    return this.http
+      .get(`${this.apiUrl}/schedule/users/${userId}/free-slots`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(catchError(this.handleError));
+  }
+
+  // Obtener una tarea por su ID
+  getTaskById(taskId: string): Observable<TaskResponse> {
+    return this.http
+      .get<TaskResponse>(`${this.apiUrl}/tasks/${taskId}`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(
+        tap((task) => console.log('Retrieved task:', task)),
+        catchError(this.handleError)
+      );
   }
 
   private getAuthHeaders(): HttpHeaders {

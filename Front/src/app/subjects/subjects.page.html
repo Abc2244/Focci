@@ -43,6 +43,7 @@
           <div class="subject-actions">
             <ion-button
               fill="clear"
+              color="primary"
               (click)="editSubject(subject)"
               class="action-button"
             >
@@ -68,7 +69,7 @@
     </div>
   </div>
 
-  <!-- Botón flotante para agregar con el evento click -->
+  <!-- Botón flotante -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button class="custom-fab" (click)="addSubject()">
       <ion-icon name="add"></ion-icon>
@@ -76,20 +77,26 @@
   </ion-fab>
 </ion-content>
 
-<!-- Modal simplificado que funcionaba antes -->
-<ion-modal [isOpen]="showModal" class="subject-modal">
+<!-- Modal -->
+<ion-modal
+  [isOpen]="showModal"
+  class="subject-modal fullscreen-modal"
+  [breakpoints]="[1.0]"
+  [initialBreakpoint]="1.0"
+>
   <ng-template>
-    <ion-header class="ion-no-border">
+    <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-button (click)="dismissModal()" class="modal-button">
-            <ion-icon name="close-outline" class="modal-icon"></ion-icon>
+          <ion-button (click)="dismissModal()">
+            <ion-icon name="close-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
+        <ion-title>{{ isEditing ? 'Editar' : 'Nueva' }} Materia</ion-title>
         <ion-buttons slot="end">
           <ion-button
             (click)="saveSubject()"
-            class="modal-button save-button"
+            [strong]="true"
             [disabled]="!subjectForm.valid"
           >
             {{ isEditing ? 'Actualizar' : 'Crear' }}
@@ -110,7 +117,6 @@
               placeholder="Ej: Matemáticas"
             ></ion-input>
           </ion-item>
-          
 
           <ion-item class="custom-input">
             <ion-label position="floating">Créditos</ion-label>
@@ -133,7 +139,7 @@
                   (ionChange)="updateScheduleDay(i, $event.detail.value)"
                   placeholder="Día"
                   interface="action-sheet"
-                  class="day-select"
+                  class="day-select custom-action-sheet"
                 >
                   <ion-select-option
                     *ngFor="let day of availableDays"

@@ -1,31 +1,44 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
+import { ScheduleService, ScheduleItem } from '../services/schedule.service';
 import { Task } from '../interfaces/task.interface';
 import { Subject } from '../interfaces/subject.interface';
-import { NotificationsService } from '../services/notifications.service';
 import { Router } from '@angular/router';
 import { ToastService } from '../services/toast.service';
+import {
+  SmartAssistantService,
+  ReminderPlan,
+  ReminderSuggestion,
+} from '../services/smart-assistant.service';
+import { NotificationsService } from '../services/notifications.service';
+import { firstValueFrom } from 'rxjs';
 
-interface StudyRecommendation {
-  taskId: string;
-  description: string;
-  subject: string;
-  dueDate: string;
-  priority: number;
-  urgencyLevel: 'baja' | 'media' | 'alta';
-  estimatedTime?: number; // Añadido para el template
+// Actualizar la interfaz ReminderSuggestion para incluir la propiedad date y timeFormat
+interface ExtendedReminderSuggestion extends Omit<ReminderSuggestion, 'time'> {
+  date?: string | null; // Permitir que date sea string, undefined o null
+  time?: string; // Hacer que time sea opcional
 }
 
-interface ReminderRecommendation {
-  taskId: string;
-  description: string;
-  subject: string;
-  recommendedInsistenceLevel: number;
-  bestTimeToStudy: {
-    start: string;
-    end: string;
-  };
+// Actualizar la interfaz ReminderPlan para usar ExtendedReminderSuggestion
+interface ExtendedReminderPlan extends Omit<ReminderPlan, 'reminders'> {
+  reminders: ExtendedReminderSuggestion[];
+  taskPriority?: number;
+  insistenceLevel?: number;
+}
+
+// Definir interfaces necesarias
+interface TimeSlot {
+  start: Date;
+  end: Date;
+  isFree: boolean;
+}
+
+interface TaskWithSlots {
+  task: Task;
+  availableSlots: TimeSlot[];
+  selectedSlot?: TimeSlot;
+  reminderPlan?: ExtendedReminderPlan;
 }
 
 @Component({
@@ -34,221 +47,566 @@ interface ReminderRecommendation {
   styleUrls: ['./smart.page.scss'],
 })
 export class SmartPage implements OnInit {
+  isLoading = true;
+  userId: string | null = null;
   tasks: Task[] = [];
+  taskPlans: TaskWithSlots[] = [];
+  selectedTask: Task | null = null;
   subjects: Subject[] = [];
   subjectMap: Map<string, string> = new Map();
-  isLoading = true;
-  studyRecommendations: StudyRecommendation[] = [];
-  reminderRecommendations: ReminderRecommendation[] = [];
+  showReminderPlanModal = false;
+  currentReminderPlan: ExtendedReminderPlan | null = null;
+  reminderPlans: ExtendedReminderPlan[] = [];
+
+  // Variable para controlar qué modal mostrar
+  showTaskDetailsModal = false;
+
+  // Propiedades necesarias para el template
+  idealTimeSlots: any[] = [];
+  suggestedSchedule: any[] = [];
+  reminderRecommendations: any[] = [];
+  studyRecommendations: any[] = [];
 
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
-    private notificationsService: NotificationsService,
+    private scheduleService: ScheduleService,
     private router: Router,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private smartAssistant: SmartAssistantService,
+    private notificationsService: NotificationsService
   ) {}
 
-  ngOnInit() {
-    this.loadUserData();
+  async ngOnInit() {
+    this.userId = this.authService.getCurrentUserId();
+    if (this.userId) {
+      await this.loadData();
+    }
   }
 
-  async loadUserData() {
+  async loadData() {
     this.isLoading = true;
-    const userId = this.authService.getCurrentUserId();
-
-    if (!userId) {
-      this.toastService.showToast('No se pudo identificar al usuario', 'error');
+    try {
+      await this.loadSubjects();
+      await this.loadTasks();
+      await this.generateReminderPlans();
+    } catch (error) {
+      console.error('Error loading data:', error);
+      this.toastService.showToast('Error al cargar los datos', 'error');
+    } finally {
       this.isLoading = false;
-      return;
     }
+  }
+
+  async loadSubjects() {
+    if (!this.userId) return;
 
     try {
-      // Cargar materias
-      this.apiService.getUserSubjects(userId).subscribe(
-        (subjects) => {
-          this.subjects = subjects;
-          // Crear mapa de ID a nombre para fácil acceso
-          this.subjects.forEach((subject) => {
-            this.subjectMap.set(subject._id, subject.name);
-          });
-
-          // Cargar tareas pendientes
-          this.apiService.getPendingTasks(userId).subscribe(
-            (tasks) => {
-              this.tasks = tasks;
-              this.generateRecommendations();
-
-              // Cargar estadísticas de tiempo si están disponibles
-              this.apiService.getTasksTimeStats(userId).subscribe(
-                (timeStats) => {
-                  // Mejorar recomendaciones con estadísticas de tiempo
-                  this.enhanceRecommendationsWithTimeStats(timeStats);
-                  this.isLoading = false;
-                },
-                (error) => {
-                  console.error(
-                    'Error al cargar estadísticas de tiempo:',
-                    error
-                  );
-                  this.isLoading = false;
-                }
-              );
-            },
-            (error) => {
-              console.error('Error al cargar tareas:', error);
-              this.isLoading = false;
-            }
-          );
-        },
-        (error) => {
-          console.error('Error al cargar materias:', error);
-          this.isLoading = false;
-        }
+      // Obtener materias del usuario
+      const subjects = await firstValueFrom(
+        this.apiService.getUserSubjects(this.userId)
       );
-    } catch (error) {
-      console.error('Error general:', error);
-      this.isLoading = false;
-    }
-  }
 
-  generateRecommendations() {
-    // Ordenar tareas por prioridad (mayor a menor)
-    const sortedTasks = [...this.tasks].sort((a, b) => {
-      const priorityA = a.priority || 0;
-      const priorityB = b.priority || 0;
-      return priorityB - priorityA;
-    });
+      this.subjects = subjects || [];
 
-    // Generar recomendaciones de estudio basadas en tareas prioritarias
-    this.studyRecommendations = sortedTasks.slice(0, 5).map((task) => {
-      const taskType = this.classifyTaskType(task.description);
-      const priority = task.priority || 1;
-
-      // Determinar nivel de urgencia basado en prioridad
-      let urgencyLevel: 'baja' | 'media' | 'alta' = 'baja';
-      if (priority >= 4) {
-        urgencyLevel = 'alta';
-      } else if (priority >= 2) {
-        urgencyLevel = 'media';
-      }
-
-      return {
-        taskId: task._id || '',
-        description: task.description,
-        subject: this.getSubjectName(task.subject_id),
-        dueDate: task.due_date,
-        priority: priority,
-        urgencyLevel: urgencyLevel,
-        estimatedTime: task.estimated_time || 30,
-      };
-    });
-
-    // Generar recomendaciones de recordatorios
-    this.reminderRecommendations = sortedTasks.slice(0, 3).map((task) => {
-      const taskType = this.classifyTaskType(task.description);
-      const bestTime = this.suggestBestTimeToStudy(taskType);
-
-      return {
-        taskId: task._id || '',
-        description: task.description,
-        subject: this.getSubjectName(task.subject_id),
-        recommendedInsistenceLevel: Math.min((task.priority || 1) + 1, 5),
-        bestTimeToStudy: bestTime,
-      };
-    });
-  }
-
-  enhanceRecommendationsWithTimeStats(timeStats: any) {
-    // Si hay estadísticas de tiempo disponibles, mejorar las recomendaciones
-    if (timeStats && timeStats.productiveHours) {
-      // Ejemplo: Ajustar los mejores momentos para estudiar basado en horas productivas
-      this.reminderRecommendations.forEach((rec, index) => {
-        if (timeStats.productiveHours.morning && index === 0) {
-          rec.bestTimeToStudy = { start: '9:00 AM', end: '12:00 PM' };
-        } else if (timeStats.productiveHours.afternoon && index === 1) {
-          rec.bestTimeToStudy = { start: '2:00 PM', end: '5:00 PM' };
-        } else if (timeStats.productiveHours.evening && index === 2) {
-          rec.bestTimeToStudy = { start: '7:00 PM', end: '10:00 PM' };
+      // Crear mapa de ID a nombre de materia
+      this.subjectMap.clear();
+      this.subjects.forEach((subject) => {
+        if (subject._id) {
+          this.subjectMap.set(subject._id, subject.name);
         }
       });
+    } catch (error) {
+      console.error('Error loading subjects:', error);
+      this.subjects = [];
     }
   }
 
-  classifyTaskType(taskDescription: string): string {
-    const description = taskDescription.toLowerCase();
-
-    if (
-      description.includes('examen') ||
-      description.includes('prueba') ||
-      description.includes('test')
-    ) {
-      return 'examen';
-    } else if (
-      description.includes('proyecto') ||
-      description.includes('trabajo')
-    ) {
-      return 'proyecto';
-    } else if (
-      description.includes('lectura') ||
-      description.includes('leer') ||
-      description.includes('libro')
-    ) {
-      return 'lectura';
-    }
-
-    return 'general';
+  // Método para obtener el nombre de una materia por su ID
+  getSubjectName(subjectId: string): string {
+    return this.subjectMap.get(subjectId) || 'Materia desconocida';
   }
 
-  suggestBestTimeToStudy(taskType: string): { start: string; end: string } {
-    // Sugerencias basadas en el tipo de tarea
+  // Método para obtener el icono según el tipo de tarea
+  getTaskIcon(taskType: string | undefined): string {
     switch (taskType) {
       case 'examen':
-        // Mañana para exámenes (mayor concentración)
-        return { start: '9:00 AM', end: '12:00 PM' };
+        return 'document-text-outline';
       case 'proyecto':
-        // Tarde para proyectos (creatividad)
-        return { start: '3:00 PM', end: '6:00 PM' };
+        return 'construct-outline';
       case 'lectura':
-        // Noche para lecturas (tranquilidad)
-        return { start: '8:00 PM', end: '10:00 PM' };
+        return 'book-outline';
       default:
-        // Mediodía para tareas generales
-        return { start: '12:00 PM', end: '3:00 PM' };
+        return 'checkbox-outline';
     }
   }
 
-  getDaysUntil(dateString: string): number {
-    const dueDate = new Date(dateString);
+  async loadTasks() {
+    if (!this.userId) return;
+
+    try {
+      // Obtener tareas pendientes del usuario
+      const tasks = await firstValueFrom(
+        this.apiService.getPendingTasks(this.userId)
+      );
+
+      // Filtrar tareas no vencidas
+      const now = new Date();
+      this.tasks = tasks.filter(
+        (task) => !task.completed && new Date(task.due_date) >= now
+      );
+
+      console.log('📋 Tareas cargadas:', this.tasks.length);
+
+      // Crear planes para cada tarea
+      this.taskPlans = this.tasks.map((task) => ({
+        task,
+        availableSlots: [],
+      }));
+
+      // Buscar mejores horarios de estudio para cada tarea
+      await this.findBestStudyTimes();
+    } catch (error) {
+      console.error('Error loading tasks:', error);
+      this.tasks = [];
+      this.taskPlans = [];
+    }
+  }
+
+  async findBestStudyTimes() {
+    if (!this.userId) return;
+
+    try {
+      console.log('🔍 Iniciando búsqueda de mejores horarios de estudio');
+
+      // Obtener el horario del usuario
+      console.log('📅 Solicitando horario del usuario:', this.userId);
+      const schedule = await firstValueFrom(
+        this.scheduleService.getUserSchedule(this.userId)
+      );
+      console.log('📋 Horario obtenido:', schedule);
+      console.log('📊 Número de elementos en el horario:', schedule.length);
+
+      // Para cada tarea, encontrar los mejores horarios
+      for (const plan of this.taskPlans) {
+        console.log('🔄 Procesando tarea:', plan.task.description);
+
+        // Calcular días hasta la fecha límite
+        const daysUntilDue = this.getDaysUntilDue(plan.task.due_date);
+        console.log('⏳ Días hasta la fecha límite:', daysUntilDue);
+
+        // Si la fecha ya pasó, omitir esta tarea
+        if (daysUntilDue < 0) {
+          console.log('⚠️ Esta tarea ya venció, omitiendo...');
+          continue;
+        }
+
+        // Determinar cuántos slots de estudio recomendar basado en la urgencia
+        let slotsToRecommend = 1;
+        if (daysUntilDue <= 3) {
+          slotsToRecommend = 3; // Muy urgente
+        } else if (daysUntilDue <= 7) {
+          slotsToRecommend = 2; // Urgente
+        }
+        console.log('🎯 Slots a recomendar:', slotsToRecommend);
+
+        // Encontrar slots libres en el horario
+        const freeSlots: TimeSlot[] = [];
+        const now = new Date();
+        const dueDate = new Date(plan.task.due_date);
+
+        console.log('🕒 Fecha actual:', now);
+        console.log('📅 Fecha límite:', dueDate);
+
+        // Horarios típicos de estudio (ampliados)
+        const studyTimes = [
+          { start: 7, end: 9 }, // Temprano en la mañana
+          { start: 9, end: 12 }, // Mañana
+          { start: 12, end: 14 }, // Mediodía
+          { start: 14, end: 17 }, // Tarde
+          { start: 17, end: 19 }, // Final de la tarde
+          { start: 19, end: 22 }, // Noche
+        ];
+
+        // Buscar en los próximos días hasta la fecha límite
+        for (let day = 0; day < Math.min(daysUntilDue, 7); day++) {
+          const date = new Date(now);
+          date.setDate(date.getDate() + day);
+          console.log(`📆 Analizando día ${day + 1}:`, date.toDateString());
+
+          for (const time of studyTimes) {
+            const startTime = new Date(date);
+            startTime.setHours(time.start, 0, 0);
+
+            const endTime = new Date(date);
+            endTime.setHours(time.end, 0, 0);
+
+            console.log(
+              `⏰ Evaluando horario: ${time.start}:00 - ${time.end}:00`
+            );
+
+            // Verificar si este horario está ocupado en el calendario
+            const isOccupied = schedule.some((item) => {
+              const itemStart = new Date(item.startTime);
+              const itemEnd = new Date(item.endTime);
+
+              // Verificar si es el mismo día
+              const isSameDay =
+                startTime.getDate() === itemStart.getDate() &&
+                startTime.getMonth() === itemStart.getMonth() &&
+                startTime.getFullYear() === itemStart.getFullYear();
+
+              if (!isSameDay) return false;
+
+              // Verificar superposición de horarios
+              const overlap =
+                (startTime >= itemStart && startTime < itemEnd) ||
+                (endTime > itemStart && endTime <= itemEnd) ||
+                (startTime <= itemStart && endTime >= itemEnd);
+
+              if (overlap) {
+                console.log('⚠️ Conflicto con evento:', item.title);
+                console.log(
+                  '   Evento:',
+                  itemStart.toLocaleString(),
+                  '-',
+                  itemEnd.toLocaleString()
+                );
+              }
+
+              return overlap;
+            });
+
+            if (!isOccupied) {
+              console.log('✅ Horario libre encontrado');
+              freeSlots.push({
+                start: startTime,
+                end: endTime,
+                isFree: true,
+              });
+            } else {
+              console.log('❌ Horario ocupado');
+            }
+          }
+        }
+
+        console.log('🗓️ Total de slots libres encontrados:', freeSlots.length);
+
+        // Ordenar por proximidad (los más cercanos primero)
+        freeSlots.sort((a, b) => a.start.getTime() - b.start.getTime());
+
+        // Limitar a la cantidad recomendada
+        plan.availableSlots = freeSlots.slice(0, slotsToRecommend);
+        console.log(
+          '📝 Slots recomendados para esta tarea:',
+          plan.availableSlots
+        );
+      }
+    } catch (error) {
+      console.error('❌ Error encontrando mejores horarios:', error);
+    }
+  }
+
+  async generateReminderPlans() {
+    if (!this.userId || this.tasks.length === 0) return;
+
+    try {
+      this.reminderPlans = [];
+
+      // Generar planes de recordatorios para cada tarea
+      for (const task of this.tasks) {
+        // Determinar la prioridad de la tarea basada en la fecha límite
+        const daysUntilDue = this.getDaysUntilDue(task.due_date);
+        let taskPriority = 3; // Prioridad media por defecto
+
+        if (daysUntilDue <= 2) {
+          taskPriority = 5; // Alta prioridad
+        } else if (daysUntilDue <= 5) {
+          taskPriority = 4; // Prioridad media-alta
+        } else if (daysUntilDue >= 14) {
+          taskPriority = 2; // Prioridad baja
+        }
+
+        // Determinar el nivel de insistencia basado en el tipo de tarea
+        let insistenceLevel = 1; // Nivel bajo por defecto
+        if (task.task_type === 'examen') {
+          insistenceLevel = 5; // Nivel alto para exámenes
+        } else if (task.task_type === 'proyecto') {
+          insistenceLevel = 3; // Nivel medio para proyectos
+        }
+
+        // Usar el servicio para generar el plan de recordatorios
+        const reminderPlan = this.smartAssistant.generateReminderPlanForTask(
+          task,
+          taskPriority,
+          insistenceLevel
+        );
+
+        // Guardar el plan de recordatorios
+        this.reminderPlans.push(reminderPlan);
+
+        // Asignar el plan a la tarea correspondiente
+        const taskPlan = this.taskPlans.find(
+          (plan) => plan.task._id === task._id
+        );
+        if (taskPlan) {
+          taskPlan.reminderPlan = reminderPlan;
+        }
+      }
+    } catch (error) {
+      console.error('Error generating reminder plan:', error);
+    }
+  }
+
+  // Método para mostrar el plan de recordatorios
+  showReminderPlan(plan: TaskWithSlots) {
+    if (plan.reminderPlan) {
+      this.currentReminderPlan = plan.reminderPlan;
+      this.showReminderPlanModal = true;
+      // No establecer selectedTask para evitar que se abra el modal de detalles
+    }
+  }
+
+  // Método para cancelar el plan de recordatorios
+  cancelReminderPlan() {
+    this.showReminderPlanModal = false;
+    this.currentReminderPlan = null;
+  }
+
+  // Función para calcular la fecha basada en un formato relativo
+  private calculateRelativeDate(
+    baseDate: Date,
+    timeFormat: string
+  ): Date | null {
+    try {
+      // Crear una copia de la fecha base para no modificar la original
+      const result = new Date(baseDate.getTime());
+
+      // Patrones para formatos relativos
+      const weekPattern = /(\d+)\s+semana(s)?\s+(antes|después)/i;
+      const dayPattern = /(\d+)\s+día(s)?\s+(antes|después)/i;
+      const hourPattern = /(\d+)\s+hora(s)?\s+(antes|después)/i;
+
+      // Comprobar si es un formato de semanas
+      const weekMatch = timeFormat.match(weekPattern);
+      if (weekMatch) {
+        const weeks = parseInt(weekMatch[1], 10);
+        const direction = weekMatch[3].toLowerCase() === 'antes' ? -1 : 1;
+        result.setDate(result.getDate() + direction * weeks * 7);
+        return result;
+      }
+
+      // Comprobar si es un formato de días
+      const dayMatch = timeFormat.match(dayPattern);
+      if (dayMatch) {
+        const days = parseInt(dayMatch[1], 10);
+        const direction = dayMatch[3].toLowerCase() === 'antes' ? -1 : 1;
+        result.setDate(result.getDate() + direction * days);
+        return result;
+      }
+
+      // Comprobar si es un formato de horas
+      const hourMatch = timeFormat.match(hourPattern);
+      if (hourMatch) {
+        const hours = parseInt(hourMatch[1], 10);
+        const direction = hourMatch[3].toLowerCase() === 'antes' ? -1 : 1;
+        result.setHours(result.getHours() + direction * hours);
+        return result;
+      }
+
+      // Si no coincide con ningún patrón, registrar el error y devolver null
+      console.error('Formato de tiempo no reconocido:', timeFormat);
+      return null;
+    } catch (error) {
+      console.error('Error al calcular fecha relativa:', error);
+      return null;
+    }
+  }
+
+  async acceptReminderPlan() {
+    try {
+      if (!this.currentReminderPlan) {
+        console.error('No hay plan de recordatorios seleccionado');
+        return;
+      }
+
+      const userId = this.authService.getCurrentUserId();
+      if (!userId) {
+        console.error('No se pudo obtener el ID del usuario');
+        this.toastService.showToast(
+          'Error: No se pudo identificar al usuario',
+          'error'
+        );
+        return;
+      }
+
+      // Marcar el plan como aceptado
+      this.currentReminderPlan.accepted = true;
+
+      // Usar el servicio para crear los recordatorios
+      this.smartAssistant
+        .createRemindersFromPlan(
+          this.currentReminderPlan,
+          userId // Ahora pasamos userId que sabemos que es string
+        )
+        .subscribe(
+          (responses) => {
+            console.log('Recordatorios creados:', responses);
+
+            // Cerrar el modal
+            this.showReminderPlanModal = false;
+
+            // Recargar los datos
+            this.loadData();
+
+            this.toastService.showToast(
+              'Plan de recordatorios aceptado correctamente',
+              'success'
+            );
+          },
+          (error) => {
+            console.error('Error al crear recordatorios:', error);
+            this.toastService.showToast(
+              'Error al crear los recordatorios',
+              'error'
+            );
+          }
+        );
+    } catch (error) {
+      console.error('Error al aceptar el plan de recordatorios:', error);
+      this.toastService.showToast(
+        'Error al aceptar el plan de recordatorios',
+        'error'
+      );
+    }
+  }
+
+  // Método para calcular días hasta la fecha de entrega
+  getDaysUntilDue(dueDate: string): number {
+    const due = new Date(dueDate);
     const today = new Date();
-    const diffTime = Math.abs(dueDate.getTime() - today.getTime());
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffTime = due.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
   }
 
-  getTimeForIndex(index: number): string {
-    // Generar horarios escalonados para la planificación diaria
-    const baseHour = 9; // Comenzar a las 9 AM
-    const hour = baseHour + index * 2; // Cada tarea separada por 2 horas
+  // Método para formatear un rango de tiempo
+  formatTimeRange(start: Date, end: Date): string {
+    const formatTime = (date: Date) => {
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const formattedHours = hours % 12 || 12;
+      const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+      return `${formattedHours}:${formattedMinutes} ${ampm}`;
+    };
 
-    return `${hour}:00 ${hour >= 12 ? 'PM' : 'AM'}`;
+    return `${formatTime(start)} - ${formatTime(end)}`;
   }
 
-  getSubjectName(subjectId: string): string {
-    return this.subjectMap.get(subjectId) || 'Sin materia';
+  // Método para programar una sesión de estudio
+  async scheduleStudySession(plan: TaskWithSlots, slot: TimeSlot) {
+    if (!this.userId || !plan.task._id) return;
+
+    console.log('🔄 Iniciando programación de sesión de estudio');
+    console.log('📚 Tarea:', plan.task.description);
+    console.log('⏰ Horario seleccionado:', slot.start, '-', slot.end);
+
+    try {
+      // Marcar este slot como seleccionado
+      plan.selectedSlot = slot;
+
+      // Crear un elemento en el horario
+      const scheduleItem: Partial<ScheduleItem> = {
+        user_id: this.userId,
+        title: `Estudiar: ${plan.task.description}`,
+        startTime: slot.start.toISOString(),
+        endTime: slot.end.toISOString(),
+        day: slot.start.toLocaleDateString('es-ES', { weekday: 'long' }),
+        type: 'personal',
+        subject_id: plan.task.subject_id,
+        color: '#4caf50', // Verde para sesiones de estudio
+      };
+
+      console.log('📝 Elemento de horario a crear:', scheduleItem);
+
+      const createdItem = await firstValueFrom(
+        this.scheduleService.createScheduleItem(scheduleItem)
+      );
+
+      // Programar una notificación 30 minutos antes
+      // Crear una nueva instancia de Date para no modificar el objeto original
+      const notificationTime = new Date(slot.start.getTime());
+      notificationTime.setMinutes(notificationTime.getMinutes() - 30);
+
+      console.log(
+        '✅ Recordatorio para sesión de estudio creado para:',
+        notificationTime
+      );
+
+      // Crear un objeto de notificación con el formato correcto
+      const notificationData = {
+        title: `Recordatorio: ${plan.task.description}`,
+        body: 'Tu sesión de estudio comienza en 30 minutos',
+        scheduledTime: notificationTime.toISOString(),
+        _id: `study_session_${plan.task._id}_${Date.now()}`, // ID único para la notificación
+        task_id: plan.task._id,
+        reminder_date: notificationTime.toISOString(),
+      };
+
+      await this.notificationsService.scheduleNotification(notificationData);
+
+      // Mostrar confirmación
+      this.toastService.showToast(
+        'Sesión de estudio programada correctamente',
+        'success'
+      );
+
+      // Recargar datos
+      await this.loadData();
+    } catch (error) {
+      console.error('❌ Error programando sesión de estudio:', error);
+      this.toastService.showToast(
+        'Error al programar la sesión de estudio',
+        'error'
+      );
+    }
   }
 
-  createReminder(taskId: string, insistenceLevel: number) {
-    // Navegar a la página de recordatorios con parámetros
-    this.router.navigate(['/reminders'], {
-      queryParams: {
-        taskId: taskId,
-        insistenceLevel: insistenceLevel,
-      },
-    });
+  // Método para ver detalles de una tarea
+  viewTaskDetails(task: Task) {
+    this.selectedTask = task;
+    this.showTaskDetailsModal = true;
+    // Asegurarse de que el modal de recordatorios no esté abierto
+    this.showReminderPlanModal = false;
+  }
 
-    this.toastService.showToast(
-      'Navegando a la página de recordatorios para crear uno nuevo',
-      'success'
-    );
+  // Método para cerrar el modal de detalles
+  closeTaskDetails() {
+    this.showTaskDetailsModal = false;
+    this.selectedTask = null;
+  }
+
+  // Método para manejar el evento de refresh
+  async doRefresh(event: any) {
+    await this.loadData();
+    event.target.complete();
+  }
+
+  // Método para formatear la fecha
+  formatDate(date: Date): string {
+    // Obtener el nombre del día en español
+    const dayName = date.toLocaleDateString('es-ES', { weekday: 'short' });
+    // Obtener el día del mes
+    const day = date.getDate();
+    // Obtener el mes abreviado
+    const month = date.toLocaleDateString('es-ES', { month: 'short' });
+
+    // Capitalizar la primera letra del día
+    const capitalizedDayName =
+      dayName.charAt(0).toUpperCase() + dayName.slice(1);
+
+    // Retornar el formato: "Lun 15 May"
+    return `${capitalizedDayName} ${day} ${month}`;
   }
 }

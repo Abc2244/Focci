@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
-import { ToastController } from '@ionic/angular';
+import { ToastController, AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { ThemeService, ColorTheme } from '../services/theme.service';
 
 @Component({
   selector: 'app-profile',
@@ -25,31 +26,45 @@ export class ProfilePage implements OnInit {
   lastSync: Date = new Date();
   showEditProfileModal = false;
   showChangePasswordModal = false;
+  showThemeSelectorModal = false;
   profileForm: FormGroup;
   passwordForm: FormGroup;
+  customColorInput: string = '#ff00ff'; // Color rosa por defecto
+
+  themeOptions = [
+    { value: 'blue' as ColorTheme, label: 'Azul', icon: 'water-outline' },
+    { value: 'green' as ColorTheme, label: 'Verde', icon: 'leaf-outline' },
+    { value: 'orange' as ColorTheme, label: 'Naranja', icon: 'flame-outline' },
+    { value: 'purple' as ColorTheme, label: 'Morado', icon: 'flower-outline' },
+    {
+      value: 'custom' as ColorTheme,
+      label: 'Personalizado',
+      icon: 'color-palette-outline',
+    },
+  ];
 
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
     private fb: FormBuilder,
     private toastController: ToastController,
-    private router: Router
+    private alertController: AlertController,
+    private router: Router,
+    public themeService: ThemeService
   ) {
     this.profileForm = this.fb.group({
       username: ['', Validators.required],
+      firstName: [''],
+      lastName: [''],
       email: ['', [Validators.required, Validators.email]],
+      phone: [''],
     });
 
-    this.passwordForm = this.fb.group(
-      {
-        old_password: ['', Validators.required],
-        new_password: ['', [Validators.required, Validators.minLength(6)]],
-        confirm_password: ['', Validators.required],
-      },
-      {
-        validators: this.passwordMatchValidator,
-      }
-    );
+    this.passwordForm = this.fb.group({
+      old_password: ['', Validators.required],
+      new_password: ['', [Validators.required, Validators.minLength(6)]],
+      confirm_password: ['', Validators.required],
+    });
   }
 
   passwordMatchValidator(g: FormGroup) {
@@ -61,6 +76,12 @@ export class ProfilePage implements OnInit {
   ngOnInit() {
     this.loadUserProfile();
     this.loadSettings();
+    this.settings.darkMode = this.themeService.isDarkMode();
+
+    const savedColor = localStorage.getItem('custom-primary-color');
+    if (savedColor) {
+      this.customColorInput = savedColor;
+    }
   }
 
   loadUserProfile() {
@@ -87,8 +108,6 @@ export class ProfilePage implements OnInit {
     if (savedSettings) {
       this.settings = JSON.parse(savedSettings);
     }
-    // Aplicar modo oscuro si está activado
-    document.body.classList.toggle('dark', this.settings.darkMode);
   }
 
   saveSettings() {
@@ -97,8 +116,39 @@ export class ProfilePage implements OnInit {
   }
 
   toggleDarkMode() {
-    document.body.classList.toggle('dark', this.settings.darkMode);
+    this.themeService.applyDarkMode(this.settings.darkMode);
     this.saveSettings();
+  }
+
+  changeTheme(theme: ColorTheme) {
+    if (theme === 'custom') {
+      this.themeService.updateCustomColors(this.customColorInput);
+    } else {
+      this.themeService.applyTheme(theme);
+    }
+    this.showThemeSelectorModal = false;
+  }
+
+  applyCustomColor() {
+    this.themeService.updateCustomColors(this.customColorInput);
+    this.themeService.applyTheme('custom');
+    this.showThemeSelectorModal = false;
+  }
+
+  openThemeSelector() {
+    this.showThemeSelectorModal = true;
+  }
+
+  getThemeName() {
+    const currentTheme = this.themeService.getCurrentTheme();
+    const themeMap: { [key: string]: string } = {
+      blue: 'Azul',
+      green: 'Verde',
+      orange: 'Naranja',
+      purple: 'Morado',
+      custom: 'Personalizado',
+    };
+    return themeMap[currentTheme] || 'Azul';
   }
 
   openLanguageSelector() {

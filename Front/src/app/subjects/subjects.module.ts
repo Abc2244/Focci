@@ -16,9 +16,5 @@ import { SharedModule } from '../shared/shared.module';
     SharedModule,
   ],
   declarations: [SubjectsPage],
-  schemas: [
-    // Esto permite usar componentes web personalizados sin errores
-    // CUSTOM_ELEMENTS_SCHEMA
-  ],
 })
 export class SubjectsPageModule {}

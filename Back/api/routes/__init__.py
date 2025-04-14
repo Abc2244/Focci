@@ -4,6 +4,7 @@ from .subjects import router as subjects_router
 from .tasks import router as tasks_router
 from .reminders import router as reminders_router
 from .stats import router as stats_router
+from .schedule import router as schedule_router
 
 __all__ = [
     "auth_router",
@@ -11,5 +12,6 @@ __all__ = [
     "subjects_router",
     "tasks_router",
     "reminders_router",
-    "stats_router"
+    "stats_router",
+    "schedule_router"
 ]
