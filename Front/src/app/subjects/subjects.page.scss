@@ -162,25 +162,42 @@
     }
   }
 
-  .modal-content {
-    --background: var(--app-background-light);
-  }
-
   .form-container {
-    padding: 1rem;
+    padding: 1.5rem;
 
     ion-item {
       --background: transparent;
-      margin-bottom: 1rem;
-    }
+      margin-bottom: 1.5rem;
 
-    ion-label {
-      color: var(--ion-color-primary) !important;
-      font-weight: 500;
-      opacity: 1;
+      &.custom-input {
+        --padding-start: 0;
+        --padding-end: 0;
+        --inner-padding-end: 0;
+
+        ion-label {
+          color: var(--ion-color-primary) !important;
+          font-weight: 500;
+          margin-bottom: 8px;
+          transform-origin: left;
+          transition: all 0.2s ease;
+
+          &.label-floating {
+            transform: translateY(4px) scale(1.1);
+          }
+        }
+
+        ion-input {
+          --padding-start: 0;
+          --padding-top: 8px;
+          font-size: 1.1rem;
+          --color: var(--app-text-color);
+        }
+      }
     }
 
     .schedule-selector {
+      margin-top: 2rem;
+
       ion-label {
         color: var(--ion-color-primary) !important;
         font-size: 1.1rem;
@@ -188,37 +205,6 @@
         margin-bottom: 1rem;
         display: block;
       }
-    }
-  }
-}
-
-// Ajustes para modo oscuro
-:host-context([data-theme="dark"]) {
-  .subject-modal {
-    ion-header ion-toolbar {
-      --background: var(--app-card-color);
-
-      ion-title {
-        color: var(--ion-color-primary);
-      }
-    }
-
-    .modal-content {
-      --background: var(--app-background-dark);
-    }
-
-    .form-container {
-      ion-item {
-        --background: var(--app-card-color);
-      }
-
-      ion-label {
-        opacity: 1;
-      }
-    }
-
-    .schedule-selector {
-      background: var(--app-card-color);
     }
   }
 }

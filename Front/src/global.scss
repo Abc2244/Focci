@@ -39,21 +39,39 @@
 
 // Variables globales
 :root {
+  // Espaciado
   --app-spacing-xs: 0.25rem;
+  --app-spacing-sm: 0.5rem;
   --app-spacing-md: 1rem;
+  --app-spacing-lg: 1.5rem;
+  --app-spacing-xl: 2rem;
+
+  // Bordes
+  --app-border-radius-sm: 4px;
   --app-border-radius-md: 8px;
   --app-border-radius-lg: 16px;
+
+  // Sombras
   --app-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --app-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
   --app-shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.1);
 
-  // Colores base - Tema claro por defecto
+  // Colores base - Tema claro
   --app-background-light: #f5f7fa;
   --app-background-dark: #e0e0e0;
-  --app-text-color: #333333;
-  --app-text-color-medium: #555555;
-  --app-text-color-light: #777777;
   --app-card-color: #ffffff;
   --app-card-color-rgb: 255, 255, 255;
+  --app-text-color: #333333;
+  --app-text-color-medium: #666666;
+  --app-text-color-light: #999999;
+
+  // Transiciones
+  --app-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  // Componentes
+  --header-height: 60px;
+  --tab-height: 65px;
+  --menu-width: 280px;
 
   // Colores de la aplicación
   --app-color-white: #ffffff;
@@ -126,104 +144,140 @@
     var(--ion-color-secondary-tint) 100%
   );
 
-  // Sombras
-  --app-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
-
-  // Bordes
-  --app-border-radius-sm: 4px;
-
-  // Espaciado
-  --app-spacing-sm: 8px;
-  --app-spacing-lg: 24px;
-  --app-spacing-xl: 32px;
-
-  // Componentes comunes
-  --header-height: 60px;
-  --header-padding-top: max(var(--ion-safe-area-top), 16px);
-  --tab-height: 65px;
-  --menu-width: 280px;
-
-  // Transiciones
-  --default-transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
-
   // Glassmorphism
   --glass-bg: rgba(255, 255, 255, 0.85);
   --glass-blur: blur(10px);
   --glass-border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-// Tema oscuro
-[data-theme="dark"] {
-  --app-background-light: #121212;
-  --app-background-dark: #1e1e1e;
-  --app-text-color: #f5f5f5;
-  --app-text-color-medium: #b0b0b0;
-  --app-text-color-light: #909090;
-  --app-card-color: #2d2d2d;
-  --app-card-color-rgb: 45, 45, 45;
-
-  // Colores de la aplicación
-  --app-color-gray-100: #2d2d2d;
-  --app-color-gray-200: #333333;
-  --app-color-gray-300: #444444;
-  --app-color-gray-400: #555555;
-  --app-color-gray-500: #666666;
-  --app-color-gray-600: #777777;
-  --app-color-gray-700: #888888;
-  --app-color-gray-800: #999999;
-  --app-color-gray-900: #aaaaaa;
-
-  // Ajustar colores de Ionic para el tema oscuro
-  --ion-background-color: var(--app-background-dark);
-  --ion-text-color: var(--app-text-color);
-  --ion-toolbar-background: var(--app-card-color);
-  --ion-item-background: var(--app-card-color);
-  --ion-card-background: var(--app-card-color);
-
-  // Ajustar específicamente para los selectores de horario
-  ion-select,
-  ion-input {
-    --background: var(--app-card-color) !important;
-    --color: var(--app-text-color);
-    --placeholder-color: var(--ion-color-primary);
-  }
-
-  .schedule-selector {
-    background: var(--app-card-color) !important;
-  }
-
-  .schedule-item {
-    background: var(--app-card-color) !important;
-  }
+// Estilos base
+body {
+  font-family: "Inter", sans-serif;
+  color: var(--app-text-color);
+  background: var(--app-background-light);
 }
 
-// Tema personalizado - hereda del tema claro pero con colores personalizados
-[data-theme="custom"] {
-  // Mantiene la estructura del tema claro pero con colores personalizados
-  // Los colores personalizados se establecen dinámicamente desde ThemeService
-}
-
-// Estilos globales
+// Estilos de componentes comunes
 ion-content {
   --background: var(--app-background-light);
 }
 
 ion-card {
   --background: var(--app-card-color);
-  box-shadow: 0 4px 16px rgba(var(--app-color-black-rgb), 0.05);
+  box-shadow: var(--app-shadow-sm);
+  border-radius: var(--app-border-radius-lg);
+  border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
 }
 
 ion-item {
   --background: var(--app-card-color);
   --color: var(--app-text-color);
+  --border-color: transparent;
 }
 
-ion-label {
-  color: var(--app-text-color) !important;
+// Inputs y controles de formulario
+.custom-input {
+  background: var(--app-card-color);
+  border-radius: var(--app-border-radius-md);
+  padding: var(--app-spacing-sm);
+  margin-bottom: var(--app-spacing-md);
+
+  ion-label {
+    color: var(--ion-color-primary);
+    font-weight: 500;
+  }
+
+  ion-input,
+  ion-select,
+  ion-textarea {
+    --color: var(--ion-color-primary);
+    --placeholder-color: var(--app-text-color-medium);
+    font-size: 1rem;
+  }
 }
 
-ion-modal {
-  --background: var(--app-background-light);
+// Botones
+ion-button {
+  --border-radius: var(--app-border-radius-md);
+  font-weight: 500;
+
+  &.custom-fab {
+    --background: var(--ion-color-primary);
+    --box-shadow: var(--app-shadow-lg);
+  }
+}
+
+// Toast personalizado
+.app-toast {
+  --border-radius: 12px;
+  --min-height: 48px;
+
+  &.toast-success {
+    --background: #e8f5e9;
+    --color: var(--ion-color-secondary);
+  }
+
+  &.toast-error {
+    --background: #fff3e0;
+    --color: var(--ion-color-danger);
+  }
+
+  &.toast-warning {
+    --background: #fff8e1;
+    --color: var(--ion-color-warning);
+  }
+
+  &.toast-info {
+    --background: #e3f2fd;
+    --color: var(--ion-color-primary);
+  }
+}
+
+// Estado vacío
+.empty-state {
+  padding: var(--app-spacing-xl);
+  text-align: center;
+  color: var(--app-text-color-medium);
+
+  ion-icon {
+    font-size: 4rem;
+    margin-bottom: var(--app-spacing-md);
+  }
+}
+
+// Modo oscuro
+[data-theme="dark"] {
+  --app-background-light: #121212;
+  --app-background-dark: #1e1e1e;
+  --app-card-color: #2d2d2d;
+  --app-card-color-rgb: 45, 45, 45;
+  --app-text-color: #ffffff;
+  --app-text-color-medium: #b0b0b0;
+  --app-text-color-light: #808080;
+  --app-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --app-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.3);
+  --app-shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.4);
+
+  ion-card {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .custom-input {
+    ion-input,
+    ion-select {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+    }
+  }
+
+  .empty-state {
+    color: var(--app-text-color-medium);
+  }
+
+  ion-tab-bar {
+    --background: var(--app-card-color);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+  }
 }
 
 // Asegurar que los textos tengan el color correcto
@@ -244,11 +298,6 @@ ion-textarea,
 ion-select {
   --color: var(--app-text-color);
   --placeholder-color: var(--app-text-color-medium);
-}
-
-// Asegurar que los botones tengan el color correcto
-ion-button {
-  --color: var(--ion-color-primary-contrast);
 }
 
 // Ajustes para los chips de horario
@@ -272,14 +321,6 @@ ion-chip {
 ion-select {
   --placeholder-color: var(--ion-color-primary);
   color: var(--ion-color-primary);
-}
-
-// Para el modo oscuro
-[data-theme="dark"] {
-  ion-chip.schedule-chip {
-    --background: var(--app-color-gray-100);
-    border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
-  }
 }
 
 // Estilos para los alerts personalizados
@@ -507,27 +548,6 @@ ion-tab-bar {
   }
 }
 
-// Estado vacío
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 1rem;
-  text-align: center;
-
-  ion-icon {
-    font-size: 5rem;
-    color: var(--app-color-medium);
-    margin-bottom: 1rem;
-  }
-
-  p {
-    color: var(--app-text-color);
-    font-size: 1.2rem;
-  }
-}
-
 // Estilos para los botones de acción, especialmente los de eliminar
 ion-button[color="danger"] {
   --color: var(--ion-color-primary);
@@ -582,28 +602,4 @@ ion-input {
   --background: var(--app-card-color);
   --color: var(--app-text-color);
   --placeholder-color: var(--ion-color-primary);
-}
-
-// Ajustes para el modo oscuro
-[data-theme="dark"] {
-  .custom-input {
-    background: var(--app-card-color);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
-
-    ion-input,
-    ion-select {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 6px;
-    }
-  }
-
-  ion-tab-bar {
-    --background: var(--app-card-color);
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
-  }
-
-  .app-toast {
-    --box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
-  }
 }
