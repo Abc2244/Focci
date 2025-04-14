@@ -471,7 +471,7 @@ ion-fab {
     --background-hover: var(--ion-color-primary-tint);
 
     ion-icon {
-      color: white;
+      color: var(--app-card-color);
       font-size: 24px;
       font-weight: bold;
     }
