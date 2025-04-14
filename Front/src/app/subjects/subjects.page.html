@@ -13,7 +13,9 @@
           <div class="card-header-content">
             <ion-icon name="library-outline" class="subject-icon"></ion-icon>
             <div class="card-title-container">
-              <ion-card-title>{{ subject.name }}</ion-card-title>
+              <ion-card-title class="primary-text"
+                >{{ subject.name }}</ion-card-title
+              >
               <ion-card-subtitle>
                 <ion-icon
                   name="school-outline"
@@ -51,7 +53,7 @@
             </ion-button>
             <ion-button
               fill="clear"
-              color="danger"
+              color="primary"
               (click)="deleteSubject(subject)"
               class="action-button"
             >
@@ -83,12 +85,13 @@
   class="subject-modal fullscreen-modal"
   [breakpoints]="[1.0]"
   [initialBreakpoint]="1.0"
+  (willDismiss)="onWillDismiss($event)"
 >
   <ng-template>
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-button (click)="dismissModal()">
+          <ion-button (click)="dismissModal()" color="primary">
             <ion-icon name="close-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -110,7 +113,9 @@
         <div class="form-container">
           <!-- Campo de nombre con estilo personalizado -->
           <ion-item class="custom-input">
-            <ion-label position="floating">Nombre de materia</ion-label>
+            <ion-label position="floating" color="primary"
+              >Nombre de materia</ion-label
+            >
             <ion-input
               type="text"
               formControlName="name"
@@ -119,7 +124,7 @@
           </ion-item>
 
           <ion-item class="custom-input">
-            <ion-label position="floating">Créditos</ion-label>
+            <ion-label position="floating" color="primary">Créditos</ion-label>
             <ion-input
               type="number"
               formControlName="credits"
@@ -128,7 +133,7 @@
           </ion-item>
 
           <div class="schedule-selector">
-            <ion-label>Horarios de clase</ion-label>
+            <ion-label color="primary">Horarios de clase</ion-label>
             <div class="schedule-items">
               <div
                 *ngFor="let item of selectedScheduleItems; let i = index"
