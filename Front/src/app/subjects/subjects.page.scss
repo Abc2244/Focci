@@ -1,131 +1,40 @@
-@import "../shared/styles/common";
-
-// Botón flotante con el color primario
-ion-fab {
-  ion-fab-button.custom-fab {
-    --background: var(--ion-color-primary) !important;
-    --background-activated: var(--ion-color-primary-shade) !important;
-    --background-hover: var(--ion-color-primary-tint) !important;
-    position: relative;
-    overflow: hidden;
-    border-radius: 50% !important;
-
-    // Efecto de brillo
-    &::before {
-      content: "";
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(
-        to right,
-        rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.3) 50%,
-        rgba(255, 255, 255, 0) 100%
-      );
-      transform: rotate(30deg);
-      animation: shimmer 3s infinite;
-      z-index: 1;
-      pointer-events: none;
-      border-radius: 50%;
-    }
-
-    ion-icon {
-      color: var(--ion-color-primary-contrast);
-      font-size: 24px;
-      font-weight: bold;
-      position: relative;
-      z-index: 2;
-    }
-  }
-}
-
 .subjects-content {
-  @extend .page-content;
   --background: linear-gradient(
     135deg,
     var(--app-background-light) 0%,
     var(--ion-color-primary-tint) 100%
   );
+}
 
-  &::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(var(--ion-color-primary-rgb), 0.05)" stroke-width="2"/></svg>');
-    background-size: 300px 300px;
-    opacity: 0.5;
-    pointer-events: none;
-    z-index: -1;
-  }
+.subjects-container {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
 
-  .subjects-container {
+  .page-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: var(--app-card-color);
     padding: 1rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+    text-align: center;
 
-    .page-title {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 1rem;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      margin-bottom: 1.5rem;
-      width: 100%;
-      text-align: center;
+    h1 {
+      color: var(--ion-color-primary);
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
 
-      h1 {
-        color: var(--ion-color-primary);
-        margin: 0;
-        font-size: 1.5rem;
-        font-weight: 600;
-      }
-
-      .title-icon {
-        font-size: 2rem;
-        color: var(--ion-color-primary);
-      }
-
-      // Efectos decorativos
-      &::before,
-      &::after {
-        content: "";
-        position: absolute;
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        z-index: 0;
-        opacity: 0.1;
-      }
-
-      &::before {
-        top: -50px;
-        right: -50px;
-        background: radial-gradient(
-          circle,
-          rgba(var(--ion-color-primary-rgb), 0.2) 0%,
-          rgba(var(--ion-color-primary-rgb), 0) 70%
-        );
-      }
-
-      &::after {
-        bottom: -50px;
-        left: -50px;
-        background: radial-gradient(
-          circle,
-          rgba(var(--ion-color-primary-rgb), 0.1) 0%,
-          rgba(var(--ion-color-primary-rgb), 0) 70%
-        );
-      }
+    .title-icon {
+      font-size: 2rem;
+      color: var(--ion-color-primary);
     }
   }
 
@@ -135,306 +44,39 @@ ion-fab {
     gap: 1rem;
     margin-bottom: 5rem;
   }
-
-  .subject-card {
-    background: var(--app-card-color);
-    border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
-
-    &:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-    }
-
-    ion-card-header {
-      padding: 1rem;
-      border-bottom: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
-
-      .card-header-content {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-
-        .subject-icon {
-          font-size: 2rem;
-          color: var(--ion-color-primary);
-        }
-
-        ion-card-title {
-          color: var(--ion-color-primary);
-          font-size: 1.3rem;
-          font-weight: 600;
-          margin: 0;
-        }
-
-        ion-card-subtitle {
-          color: var(--app-text-color-medium);
-          margin-top: 0.3rem;
-        }
-      }
-    }
-  }
-
-  .schedule-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    padding: 0.5rem;
-
-    ion-chip.schedule-chip {
-      margin: 0;
-      --background: rgba(var(--ion-color-primary-rgb), 0.1);
-      border: none;
-
-      &.ion-color.ion-color-primary {
-        --ion-color-base: var(--ion-color-primary) !important;
-        --ion-color-base-rgb: var(--ion-color-primary-rgb) !important;
-
-        .schedule-text {
-          color: var(--ion-color-primary) !important;
-          margin-left: 0.5rem;
-        }
-
-        ion-icon {
-          color: var(--ion-color-primary) !important;
-        }
-      }
-
-      &:hover {
-        --background: rgba(var(--ion-color-primary-rgb), 0.15);
-      }
-    }
-  }
-
-  .subject-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
-
-    .action-button {
-      --color: var(--ion-color-primary);
-
-      ion-icon {
-        color: var(--ion-color-primary);
-      }
-    }
-  }
-
-  .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 4rem 1rem;
-    text-align: center;
-    background: rgba(255, 255, 255, 0.7);
-    border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    margin: 2rem auto;
-    max-width: 500px;
-
-    ion-icon {
-      font-size: 5rem;
-      color: var(--ion-color-primary);
-      margin-bottom: 1rem;
-    }
-
-    p {
-      color: var(--app-text-color);
-      font-size: 1.2rem;
-      font-weight: 500;
-    }
-  }
 }
 
-// Animación de brillo para el botón flotante
-@keyframes shimmer {
-  0% {
-    transform: translateX(-150%) rotate(30deg);
-  }
-  100% {
-    transform: translateX(150%) rotate(30deg);
-  }
-}
-
-// Estilos para el modal
-.subject-modal {
-  --height: 100%;
-  --width: 100%;
-
-  ion-header ion-toolbar {
-    --background: var(--ion-color-primary);
-    --color: var(--ion-color-primary-contrast);
-
-    ion-button {
-      --color: var(--ion-color-primary-contrast);
-    }
-  }
-
-  .modal-content {
-    ion-item {
-      --highlight-color: var(--ion-color-primary);
-
-      ion-label {
-        color: var(--ion-color-primary) !important;
-      }
-
-      ion-input {
-        --color: var(--ion-color-primary) !important;
-        --placeholder-color: var(--ion-color-primary);
-      }
-    }
-  }
-
-  .custom-input {
-    --highlight-color: var(--ion-color-primary);
-
-    ion-label {
-      color: var(--ion-color-primary) !important;
-    }
-
-    ion-input {
-      --color: var(--ion-color-primary) !important;
-      --placeholder-color: var(--ion-color-primary);
-    }
-  }
-
-  form {
-    .form-container {
-      ion-item {
-        --highlight-color: var(--ion-color-primary);
-
-        ion-label {
-          color: var(--ion-color-primary) !important;
-        }
-
-        ion-input {
-          --color: var(--ion-color-primary) !important;
-          --placeholder-color: var(--ion-color-primary);
-        }
-      }
-    }
-  }
-
-  .schedule-selector {
-    background: var(--ion-color-primary-contrast);
-
-    .schedule-item {
-      background: var(--ion-color-primary-contrast);
-
-      ion-select {
-        --background: var(--ion-color-primary-contrast);
-        --color: var(--ion-color-primary);
-        border: 1px solid var(--ion-color-primary);
-      }
-
-      ion-button[color="danger"] {
-        --color: var(--ion-color-primary);
-      }
-
-      ion-button[color="danger"] {
-        --color: var(--ion-color-primary);
-
-        ion-icon {
-          color: var(--ion-color-primary);
-        }
-      }
-    }
-  }
-}
-
-// Corregir el color del botón de eliminar
-ion-button[color="danger"] {
-  --color: var(--ion-color-primary);
-  --background: transparent;
+.subject-card {
+  background: var(--app-card-color);
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
 
   &:hover {
-    --background: rgba(var(--ion-color-primary-rgb), 0.1);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
   }
+}
 
-  ion-icon {
+.card-header-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .subject-icon {
+    font-size: 2rem;
     color: var(--ion-color-primary);
   }
 }
 
-// Asegurar que los días sean visibles en el selector
-ion-select-option {
-  color: var(--ion-color-primary);
-  background: var(--ion-color-primary-contrast);
-}
-
-// Estilos para el action sheet con mayor especificidad
-::ng-deep .action-sheet-group.sc-ion-action-sheet-md {
-  background: var(--app-background-light) !important;
-
-  .action-sheet-button.sc-ion-action-sheet-md {
-    color: var(--ion-color-primary) !important;
-    font-weight: 500;
-  }
-
-  .action-sheet-selected.sc-ion-action-sheet-md {
-    color: var(--ion-color-primary) !important;
-    font-weight: 600;
-  }
-
-  .action-sheet-title.sc-ion-action-sheet-md {
-    color: var(--ion-color-primary) !important;
-    font-weight: 600 !important;
-    font-size: 1.1rem !important;
-  }
-}
-
-// Modo oscuro con mayor especificidad
-:host-context([data-theme="dark"]) {
-  ::ng-deep .action-sheet-group.sc-ion-action-sheet-md {
-    background: var(--app-card-color) !important;
-
-    .action-sheet-button.sc-ion-action-sheet-md {
-      color: var(--ion-color-primary) !important;
-    }
-  }
-}
-
-// Mejoramos los estilos para el selector de días y hacerlo más visible
-::ng-deep .action-sheet-group {
-  background: var(--app-background-light) !important;
-
-  .action-sheet-button {
-    color: var(--ion-color-primary) !important;
-    font-weight: 500;
-  }
-
-  .action-sheet-selected {
-    color: var(--ion-color-primary) !important;
-    font-weight: 600;
-  }
-
-  .action-sheet-title {
-    color: var(--ion-color-primary) !important;
-    font-weight: 600 !important;
-    font-size: 1.1rem !important;
-  }
-}
-
-// Mejoramos el selector de horarios para hacerlo responsive
 .schedule-selector {
   margin-top: 1.5rem;
   padding: 1rem;
-  background: var(--app-card-color) !important;
+  background: var(--app-card-color);
   border-radius: 12px;
   border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
-
-  ion-label {
-    color: var(--ion-color-primary);
-    font-weight: 500;
-    margin-bottom: 1rem;
-    display: block;
-  }
 
   .schedule-items {
     display: flex;
@@ -446,10 +88,7 @@ ion-select-option {
       grid-template-columns: 1fr 1fr 1fr auto;
       gap: 0.5rem;
       align-items: center;
-      background: var(--app-card-color) !important;
       padding: 0.5rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 
       @media (max-width: 576px) {
         grid-template-columns: 1fr 1fr;
@@ -465,259 +104,121 @@ ion-select-option {
           justify-self: end;
         }
       }
-
-      ion-select,
-      ion-input {
-        --background: var(--app-card-color) !important;
-        --color: var(--ion-color-primary) !important;
-        --placeholder-color: var(--ion-color-primary);
-        border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
-        border-radius: 6px;
-        padding: 8px;
-
-        &::part(text) {
-          color: var(--ion-color-primary) !important;
-        }
-      }
-
-      ion-button {
-        margin: 0;
-        --padding-start: 8px;
-        --padding-end: 8px;
-      }
-
-      ion-button[color="danger"] {
-        --color: var(--ion-color-primary);
-        --background: transparent;
-
-        ion-icon {
-          color: var(--ion-color-primary);
-        }
-      }
     }
   }
-
-  .add-schedule-btn {
-    margin-top: 1rem;
-    --background: var(--ion-color-primary);
-  }
 }
 
-// Ajustes para el datetime en dispositivos móviles
-::ng-deep ion-datetime {
-  --background: var(--app-color-white) !important;
-  --ion-color-primary: var(--ion-color-primary) !important;
-  --ion-color-primary-contrast: var(--ion-color-primary-contrast) !important;
-  --ion-text-color: var(--ion-color-primary) !important;
-  --ion-toolbar-background: var(--app-color-gray-100) !important;
-  --ion-toolbar-color: var(--ion-color-primary) !important;
-  --ion-item-background: var(--app-color-white) !important;
-  --wheel-highlight-background: rgba(
-    var(--ion-color-primary-rgb),
-    0.2
-  ) !important;
-  --wheel-fade-background-rgb: var(--app-color-white-rgb) !important;
-
-  @media (max-width: 576px) {
-    max-width: 100% !important;
-    width: 100% !important;
-    margin: 0 auto !important;
-  }
-
-  .datetime-header {
-    background: var(--app-color-gray-100) !important;
-    color: var(--ion-color-primary) !important;
-  }
-
-  .datetime-calendar {
-    background: var(--app-color-white) !important;
-  }
-}
-
-// Botón flotante
-ion-fab-button.custom-fab {
-  --background: var(--ion-color-primary);
-  --background-activated: var(--ion-color-primary-shade);
-  --background-hover: var(--ion-color-primary-tint);
-
-  .fab-icon {
-    color: var(--ion-color-primary-contrast);
-    font-size: 24px;
-    font-weight: bold;
-  }
-}
-
-// Estilos para el alert personalizado
-::ng-deep .custom-alert {
-  --background: var(--app-gradient-light);
-
-  .alert-wrapper {
-    background: rgba(var(--app-color-white-rgb), 0.95);
-    border-radius: 15px;
-  }
-
-  .alert-title {
-    color: var(--ion-color-primary) !important;
-    font-size: 1.2rem;
-    font-weight: 600;
-  }
-
-  .alert-sub-title {
+.card-title-container {
+  ion-card-title {
     color: var(--ion-color-primary);
   }
+}
 
-  .alert-message {
-    color: var(--ion-color-primary);
-    font-size: 1rem;
-    padding: 16px;
+.form-container {
+  ion-label {
+    color: var(--ion-color-primary) !important;
+    font-weight: 500;
   }
 
-  .alert-button-group {
-    padding: 8px;
-
-    .alert-button {
-      border-radius: 8px;
+  .schedule-selector {
+    ion-label {
+      color: var(--ion-color-primary) !important;
+      font-size: 1.1rem;
       font-weight: 500;
+      margin-bottom: 1rem;
+    }
 
-      &.delete-button {
-        color: var(--ion-color-danger) !important;
-        font-weight: 600;
+    ion-input {
+      --color: var(--app-text-color);
+      color: var(--app-text-color);
+    }
+  }
+}
+// Estado vacío personalizado
+.empty-state {
+  background: var(--app-card-color);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--ion-color-primary);
+  margin: 2rem auto;
+  max-width: 500px;
+  color: var(--ion-color-primary); /* Letra ionc color primary */
+
+  ion-icon {
+    color: var(--ion-color-primary); /* Icono color primary */
+  }
+}
+
+// Estilos específicos para el modal
+.subject-modal {
+  ion-header {
+    ion-toolbar {
+      --background: var(--app-card-color);
+
+      ion-title {
+        color: var(--ion-color-primary);
+        font-weight: 500;
       }
+    }
+  }
 
-      &.cancel-button {
-        color: var(--ion-color-medium);
-      }
+  .modal-content {
+    --background: var(--app-background-light);
+  }
 
-      .alert-button-inner {
-        justify-content: center;
+  .form-container {
+    padding: 1rem;
+
+    ion-item {
+      --background: transparent;
+      margin-bottom: 1rem;
+    }
+
+    ion-label {
+      color: var(--ion-color-primary) !important;
+      font-weight: 500;
+      opacity: 1;
+    }
+
+    .schedule-selector {
+      ion-label {
+        color: var(--ion-color-primary) !important;
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+        display: block;
       }
     }
   }
 }
 
-// Tema oscuro
-:host-context(.dark-theme) {
-  .subjects-content {
-    --background: linear-gradient(
-      135deg,
-      var(--app-background-light) 0%,
-      rgba(var(--ion-color-primary-rgb), 0.1) 100%
-    );
+// Ajustes para modo oscuro
+:host-context([data-theme="dark"]) {
+  .subject-modal {
+    ion-header ion-toolbar {
+      --background: var(--app-card-color);
 
-    .page-title h1 {
-      color: var(--ion-color-primary);
-    }
-
-    .subject-card {
-      background: var(--app-card-color);
-      border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
-
-      ion-card-header {
-        border-bottom: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
-      }
-
-      ion-card-title {
+      ion-title {
         color: var(--ion-color-primary);
       }
+    }
 
-      ion-card-subtitle {
-        color: var(--app-text-color-medium);
+    .modal-content {
+      --background: var(--app-background-dark);
+    }
+
+    .form-container {
+      ion-item {
+        --background: var(--app-card-color);
+      }
+
+      ion-label {
+        opacity: 1;
       }
     }
 
-    .schedule-chips ion-chip.schedule-chip {
-      --background: rgba(var(--ion-color-primary-rgb), 0.15);
-
-      &:hover {
-        --background: rgba(var(--ion-color-primary-rgb), 0.2);
-      }
-    }
-
-    .empty-state {
-      background: rgba(var(--app-card-color-rgb, 30, 30, 30), 0.7);
-      border: 1px solid rgba(var(--app-card-color-rgb, 30, 30, 30), 0.8);
-
-      p {
-        color: var(--app-text-color);
-      }
-    }
-
-    .subject-modal {
-      ion-header ion-toolbar {
-        --background: linear-gradient(
-          135deg,
-          var(--app-background-light) 0%,
-          var(--app-card-color) 100%
-        );
-      }
-
-      .modal-content {
-        --background: linear-gradient(
-          135deg,
-          var(--app-background-light) 0%,
-          var(--app-card-color) 100%
-        );
-      }
-
-      .custom-input {
-        ion-label {
-          color: var(--ion-color-primary) !important;
-        }
-
-        ion-input {
-          --color: var(--app-text-color) !important;
-        }
-      }
-
-      .schedule-selector {
-        background: rgba(var(--app-card-color-rgb, 30, 30, 30), 0.9);
-
-        .schedule-item {
-          background: var(--app-card-color);
-
-          ion-select,
-          ion-input {
-            --background: var(--app-background-light);
-            --color: var(--ion-color-primary);
-            --placeholder-color: var(--ion-color-primary);
-          }
-        }
-      }
-    }
-  }
-}
-
-// Asegurarse de que los horarios se muestren correctamente
-.schedule-text {
-  color: var(--ion-color-primary) !important;
-}
-
-// Estilos para el selector de días
-ion-select {
-  &::part(text) {
-    color: var(--ion-color-primary) !important;
-  }
-
-  &::part(placeholder) {
-    color: var(--ion-color-primary) !important;
-    opacity: 1;
-  }
-}
-
-// Tema oscuro específico para el selector de horarios
-:host-context([data-theme="dark"]) {
-  .schedule-selector {
-    background: var(--app-card-color) !important;
-
-    .schedule-item {
-      background: var(--app-card-color) !important;
-      border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
-
-      ion-select,
-      ion-input {
-        --background: var(--app-card-color) !important;
-        border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
-      }
+    .schedule-selector {
+      background: var(--app-card-color);
     }
   }
 }

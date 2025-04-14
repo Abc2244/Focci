@@ -120,9 +120,16 @@ export class SubjectsPage implements OnInit {
     this.showModal = true;
   }
 
+  onWillDismiss(event: any) {
+    this.showModal = false;
+    this.subjectForm.reset();
+    this.selectedScheduleItems = [];
+  }
+
   dismissModal() {
     this.showModal = false;
     this.subjectForm.reset();
+    this.selectedScheduleItems = [];
   }
 
   async saveSubject() {
