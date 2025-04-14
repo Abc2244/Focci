@@ -280,6 +280,15 @@ export class ApiService {
     });
   }
 
+  // Agregar este método para obtener espacios libres en el horario
+  getFreeTimeSlots(userId: string): Observable<any> {
+    return this.http
+      .get(`${this.apiUrl}/schedule/users/${userId}/free-slots`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(catchError(this.handleError));
+  }
+
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
     return new HttpHeaders({

@@ -115,11 +115,15 @@ export class AuthService {
   }
 
   async getUserId(): Promise<string | null> {
-    const token = localStorage.getItem('token');
-    if (!token) return null;
+    const token = localStorage.getItem(this.tokenKey);
+    if (!token) {
+      console.error('No token found in localStorage with key:', this.tokenKey);
+      return null;
+    }
 
     try {
       const decodedToken: any = jwtDecode(token);
+      console.log('Decoded token in getUserId:', decodedToken);
       return decodedToken.user_id;
     } catch (error) {
       console.error('Error decoding token:', error);

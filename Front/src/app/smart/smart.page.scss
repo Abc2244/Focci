@@ -66,70 +66,118 @@
             color: var(--ion-color-medium);
             line-height: 1.4;
           }
+
+          .reminder-action {
+            margin-top: 10px;
+          }
         }
       }
     }
 
-    .smart-planning {
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
+    .ideal-times-section {
       margin-bottom: 30px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 
       h2 {
         font-size: 20px;
         font-weight: 600;
         color: var(--ion-color-medium);
-        margin-top: 0;
-        margin-bottom: 20px;
+        margin-bottom: 16px;
+      }
+
+      .ideal-time-card {
+        background: white;
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+        .ideal-time-header {
+          display: flex;
+          align-items: center;
+          margin-bottom: 10px;
+
+          ion-icon {
+            font-size: 22px;
+            color: var(--ion-color-primary);
+            margin-right: 12px;
+          }
+
+          .ideal-time-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ion-color-medium);
+          }
+        }
+
+        .ideal-time-content {
+          padding-left: 34px;
+
+          .ideal-time-schedule {
+            font-size: 14px;
+            color: var(--ion-color-medium);
+            margin-bottom: 4px;
+          }
+
+          .ideal-time-reason {
+            font-size: 13px;
+            color: var(--ion-color-medium-shade);
+            font-style: italic;
+          }
+        }
+      }
+    }
+
+    .schedule-section {
+      margin-bottom: 30px;
+
+      h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--ion-color-medium);
+        margin-bottom: 16px;
       }
 
       .timeline {
         position: relative;
+        padding-left: 20px;
 
-        &::before {
+        &:before {
           content: "";
           position: absolute;
-          top: 0;
-          bottom: 0;
-          left: 24px;
+          left: 0;
+          top: 8px;
+          bottom: 8px;
           width: 2px;
-          background: rgba(var(--ion-color-primary-rgb), 0.2);
+          background: var(--ion-color-primary-tint);
+          opacity: 0.5;
         }
 
         .timeline-item {
+          display: flex;
+          margin-bottom: 20px;
           position: relative;
-          padding-left: 50px;
-          margin-bottom: 24px;
 
-          &:last-child {
-            margin-bottom: 0;
-          }
-
-          &::before {
+          &:before {
             content: "";
             position: absolute;
-            top: 0;
-            left: 18px;
-            width: 14px;
-            height: 14px;
+            left: -24px;
+            top: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             background: var(--ion-color-primary);
-            border: 3px solid white;
-            box-shadow: 0 0 0 2px rgba(var(--ion-color-primary-rgb), 0.3);
           }
 
           .timeline-time {
-            font-size: 14px;
+            min-width: 80px;
             font-weight: 600;
             color: var(--ion-color-primary);
-            margin-bottom: 4px;
           }
 
           .timeline-content {
+            flex: 1;
+
             .timeline-title {
-              font-size: 16px;
               font-weight: 600;
               color: var(--ion-color-medium);
               margin-bottom: 4px;
@@ -137,7 +185,7 @@
 
             .timeline-details {
               font-size: 14px;
-              color: var(--ion-color-medium);
+              color: var(--ion-color-medium-shade);
             }
           }
         }
@@ -145,6 +193,8 @@
     }
 
     .study-tips {
+      margin-bottom: 30px;
+
       h2 {
         font-size: 20px;
         font-weight: 600;
@@ -183,13 +233,13 @@
           .tip-title {
             font-size: 16px;
             font-weight: 600;
-            color: var(--ion-color-medium);
+            color: var(--ion-color-dark);
             margin-bottom: 8px;
           }
 
           .tip-text {
             font-size: 14px;
-            color: var(--ion-color-medium);
+            color: var(--ion-color-dark-shade);
             line-height: 1.4;
           }
         }

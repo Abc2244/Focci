@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 
@@ -76,72 +76,34 @@ export class ScheduleService {
    * Encuentra espacios libres en el horario del usuario para el día actual
    */
   findFreeTimeSlots(userId: string): Observable<TimeSlot[]> {
-    return this.getUserSchedule(userId).pipe(
-      map((schedule) => {
-        const today = new Date();
-        const dayOfWeek = [
-          'sunday',
-          'monday',
-          'tuesday',
-          'wednesday',
-          'thursday',
-          'friday',
-          'saturday',
-        ][today.getDay()];
+    if (!userId) {
+      console.warn('No se proporcionó ID de usuario para findFreeTimeSlots');
+      return of([]);
+    }
 
-        // Filtrar actividades de hoy
-        const todayActivities = schedule.filter(
-          (item) => item.day.toLowerCase() === dayOfWeek
-        );
+    console.log('Buscando slots libres para el usuario:', userId);
 
-        // Convertir a slots ocupados
-        const busySlots = todayActivities.map((activity) => {
-          const [startHour, startMinute] = activity.startTime
-            .split(':')
-            .map(Number);
-          const [endHour, endMinute] = activity.endTime.split(':').map(Number);
-
-          const start = new Date(today);
-          start.setHours(startHour, startMinute, 0, 0);
-
-          const end = new Date(today);
-          end.setHours(endHour, endMinute, 0, 0);
-
-          return { start, end };
-        });
-
-        // Crear slots de 30 minutos para todo el día (8am a 10pm)
-        const freeSlots: TimeSlot[] = [];
-
-        for (let hour = 8; hour < 22; hour++) {
-          for (let minute of [0, 30]) {
-            const start = new Date(today);
-            start.setHours(hour, minute, 0, 0);
-
-            const end = new Date(start);
-            end.setMinutes(end.getMinutes() + 30);
-
-            // Verificar si este slot está ocupado
-            const isOccupied = busySlots.some(
-              (busySlot) =>
-                (start >= busySlot.start && start < busySlot.end) ||
-                (end > busySlot.start && end <= busySlot.end) ||
-                (start <= busySlot.start && end >= busySlot.end)
-            );
-
-            if (!isOccupied) {
-              freeSlots.push({
-                start,
-                end,
-                isFree: true,
-              });
-            }
+    return this.http
+      .get<any>(`${this.apiUrl}/schedule/users/${userId}/free-slots`)
+      .pipe(
+        tap((response) => console.log('Respuesta de free-slots:', response)),
+        map((response) => {
+          if (response && response.free_slots) {
+            return response.free_slots.map((slot: any) => ({
+              start: new Date(slot.start),
+              end: new Date(slot.end),
+              isFree: true,
+              duration: slot.duration_minutes,
+            }));
           }
-        }
-
-        return freeSlots;
-      })
-    );
+          console.warn('No se encontraron slots libres en la respuesta');
+          return [];
+        }),
+        catchError((error) => {
+          console.error('Error obteniendo slots libres:', error);
+          return of([]);
+        })
+      );
   }
 
   /**

@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
+import { ScheduleService } from '../services/schedule.service';
 import { Task } from '../interfaces/task.interface';
 import { Subject } from '../interfaces/subject.interface';
-import { NotificationsService } from '../services/notifications.service';
 import { Router } from '@angular/router';
 import { ToastService } from '../services/toast.service';
-import { ScheduleService } from '../services/schedule.service';
+import { SmartAssistantService } from '../services/smart-assistant.service';
+import { firstValueFrom } from 'rxjs';
 
+// Definir interfaces para las recomendaciones
 interface StudyRecommendation {
   taskId: string;
   description: string;
@@ -15,7 +17,7 @@ interface StudyRecommendation {
   dueDate: string;
   priority: number;
   urgencyLevel: 'baja' | 'media' | 'alta';
-  estimatedTime?: number; // Añadido para el template
+  estimatedTime: number;
 }
 
 interface ReminderRecommendation {
@@ -27,18 +29,22 @@ interface ReminderRecommendation {
     start: string;
     end: string;
   };
-}
-
-interface TimeSlot {
-  start: Date;
-  end: Date;
-  isFree: boolean;
-}
-
-interface StudyTimeRecommendation {
-  timeSlot: TimeSlot;
-  subject: string;
   reason: string;
+}
+
+// Interfaz para los horarios ideales
+interface IdealTimeSlot {
+  subjectId: string;
+  subjectName: string;
+  startTime: string;
+  endTime: string;
+  reason: string;
+}
+
+// Interfaz para la planificación sugerida
+interface ScheduleSlot {
+  description: string;
+  details: string;
 }
 
 @Component({
@@ -47,284 +53,240 @@ interface StudyTimeRecommendation {
   styleUrls: ['./smart.page.scss'],
 })
 export class SmartPage implements OnInit {
-  tasks: Task[] = [];
-  subjects: Subject[] = [];
-  subjectMap: Map<string, string> = new Map();
   isLoading = true;
+  userId: string | null = null;
   studyRecommendations: StudyRecommendation[] = [];
   reminderRecommendations: ReminderRecommendation[] = [];
-  availableTimeSlots: TimeSlot[] = [];
-  studyTimeRecommendations: StudyTimeRecommendation[] = [];
+  idealTimeSlots: IdealTimeSlot[] = [];
+  suggestedSchedule: ScheduleSlot[] = [];
+  subjects: Subject[] = [];
+  subjectMap: Map<string, string> = new Map(); // Mapa de ID a nombre de materia
 
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
-    private notificationsService: NotificationsService,
+    private scheduleService: ScheduleService,
     private router: Router,
     private toastService: ToastService,
-    private scheduleService: ScheduleService
+    private smartAssistant: SmartAssistantService
   ) {}
 
-  ngOnInit() {
-    this.loadUserData();
+  async ngOnInit() {
+    this.userId = this.authService.getCurrentUserId();
+    if (this.userId) {
+      await this.loadData();
+    }
   }
 
-  async loadUserData() {
-    this.isLoading = true;
-    const userId = this.authService.getCurrentUserId();
-
-    if (!userId) {
-      this.toastService.showToast('No se pudo identificar al usuario', 'error');
-      this.isLoading = false;
-      return;
+  async ionViewWillEnter() {
+    this.userId = this.authService.getCurrentUserId();
+    if (this.userId) {
+      await this.loadData();
     }
+  }
 
+  async loadData() {
+    this.isLoading = true;
     try {
-      // Obtener datos en paralelo para mejorar rendimiento
-      const [subjects, tasks, timeStats, schedule] = await Promise.all([
-        this.apiService.getUserSubjects(userId).toPromise(),
-        this.apiService.getPendingTasks(userId).toPromise(),
-        this.apiService.getTasksTimeStats(userId).toPromise(),
-        this.scheduleService.getUserSchedule(userId).toPromise(),
-      ]);
-
-      // Inicializar arrays vacíos si los datos son undefined
-      this.subjects = subjects || [];
-      this.tasks = tasks || [];
-
-      // Crear mapa de materias para acceso rápido
-      this.createSubjectMap();
-
-      // Encontrar espacios libres en el horario
-      this.availableTimeSlots = this.findFreeTimeSlots(schedule || []);
+      // Cargar materias para tener los nombres
+      await this.loadSubjects();
 
       // Generar recomendaciones
-      this.generateStudyRecommendations();
-      this.generateReminderRecommendations();
+      await this.generateRecommendations();
 
-      // Mejorar recomendaciones con estadísticas si están disponibles
-      if (timeStats) this.enhanceRecommendationsWithTimeStats(timeStats);
+      // Generar horarios ideales
+      this.generateIdealTimeSlots();
 
-      this.isLoading = false;
+      // Generar planificación sugerida
+      this.generateSuggestedSchedule();
     } catch (error) {
-      console.error('Error cargando datos:', error);
-      this.toastService.showToast('Error cargando datos', 'error');
+      console.error('Error loading data:', error);
+      this.toastService.showToast('Error al cargar los datos', 'error');
+    } finally {
       this.isLoading = false;
     }
   }
 
-  findFreeTimeSlots(scheduleItems: any[]): TimeSlot[] {
-    const freeSlots: TimeSlot[] = [];
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+  async loadSubjects() {
+    if (!this.userId) return;
 
-    // Crear array de slots de 30 minutos para todo el día
-    for (let hour = 8; hour < 22; hour++) {
-      // 8 AM a 10 PM
-      for (let minute of [0, 30]) {
-        const start = new Date(today);
-        start.setHours(hour, minute);
+    try {
+      // Obtener materias del usuario
+      const subjects = await firstValueFrom(
+        this.apiService.getUserSubjects(this.userId)
+      );
 
-        const end = new Date(start);
-        end.setMinutes(end.getMinutes() + 30);
+      this.subjects = subjects || [];
 
-        const slot: TimeSlot = {
-          start,
-          end,
-          isFree: true,
-        };
-
-        // Verificar si el slot coincide con alguna clase o actividad programada
-        const isOccupied = scheduleItems.some((activity) => {
-          // Convertir strings de tiempo a objetos Date para comparación
-          const activityStart = this.getDateFromTimeString(
-            activity.startTime,
-            today
-          );
-          const activityEnd = this.getDateFromTimeString(
-            activity.endTime,
-            today
-          );
-
-          // Verificar si hay solapamiento
-          return (
-            (slot.start >= activityStart && slot.start < activityEnd) ||
-            (slot.end > activityStart && slot.end <= activityEnd) ||
-            (slot.start <= activityStart && slot.end >= activityEnd)
-          );
-        });
-
-        if (!isOccupied) {
-          freeSlots.push(slot);
-        }
-      }
-    }
-
-    return freeSlots;
-  }
-
-  // Método auxiliar para convertir strings de tiempo (HH:MM) a objetos Date
-  private getDateFromTimeString(timeString: string, baseDate: Date): Date {
-    const [hours, minutes] = timeString.split(':').map(Number);
-    const date = new Date(baseDate);
-    date.setHours(hours, minutes, 0, 0);
-    return date;
-  }
-
-  // Método para clasificar el tipo de tarea basado en su descripción
-  classifyTaskType(description: string): string {
-    description = description.toLowerCase();
-
-    if (
-      description.includes('examen') ||
-      description.includes('prueba') ||
-      description.includes('test')
-    ) {
-      return 'examen';
-    } else if (
-      description.includes('proyecto') ||
-      description.includes('trabajo') ||
-      description.includes('informe')
-    ) {
-      return 'proyecto';
-    } else if (
-      description.includes('leer') ||
-      description.includes('lectura') ||
-      description.includes('libro')
-    ) {
-      return 'lectura';
-    } else {
-      return 'otro';
-    }
-  }
-
-  // Método para generar recomendaciones de estudio
-  generateStudyRecommendations() {
-    // Ordenar tareas por prioridad
-    const priorityTasks = [...this.tasks].sort(
-      (a, b) => (b.priority || 0) - (a.priority || 0)
-    );
-
-    // Asignar tareas a espacios libres considerando el tipo de tarea
-    this.studyTimeRecommendations = [];
-
-    priorityTasks.forEach((task) => {
-      const taskType = this.classifyTaskType(task.description);
-      const preferredTimeSlots = this.getPreferredTimeSlots(taskType);
-
-      if (preferredTimeSlots.length > 0) {
-        // Encontrar el mejor slot para esta tarea
-        const bestSlot = preferredTimeSlots[0]; // Simplificado, podríamos usar algoritmos más complejos
-
-        this.studyTimeRecommendations.push({
-          timeSlot: bestSlot,
-          subject: this.subjectMap.get(task.subject_id) || 'Sin materia',
-          reason: this.getRecommendationReason(taskType, bestSlot),
-        });
-
-        // Eliminar este slot de los disponibles para evitar duplicados
-        this.availableTimeSlots = this.availableTimeSlots.filter(
-          (slot) => slot !== bestSlot
-        );
-      }
-    });
-  }
-
-  // Método para obtener slots de tiempo preferidos según el tipo de tarea
-  getPreferredTimeSlots(taskType: string): TimeSlot[] {
-    // Filtrar espacios libres según el tipo de tarea
-    return this.availableTimeSlots.filter((slot) => {
-      const hour = slot.start.getHours();
-      switch (taskType) {
-        case 'examen':
-          return hour >= 8 && hour <= 12; // Mañana para concentración
-        case 'proyecto':
-          return hour >= 14 && hour <= 18; // Tarde para creatividad
-        case 'lectura':
-          return hour >= 19; // Noche para lectura tranquila
-        default:
-          return true; // Cualquier momento para otras tareas
-      }
-    });
-  }
-
-  // Método para generar la razón de la recomendación
-  getRecommendationReason(taskType: string, timeSlot: TimeSlot): string {
-    const hour = timeSlot.start.getHours();
-    if (hour < 12) {
-      return 'Mayor concentración durante la mañana';
-    } else if (hour < 18) {
-      return 'Mejor momento para trabajo creativo';
-    } else {
-      return 'Ambiente tranquilo para lectura y revisión';
-    }
-  }
-
-  enhanceRecommendationsWithTimeStats(timeStats: any) {
-    // Si hay estadísticas de tiempo disponibles, mejorar las recomendaciones
-    if (timeStats && timeStats.productiveHours) {
-      // Ejemplo: Ajustar los mejores momentos para estudiar basado en horas productivas
-      this.reminderRecommendations.forEach((rec, index) => {
-        if (timeStats.productiveHours.morning && index === 0) {
-          rec.bestTimeToStudy = { start: '9:00 AM', end: '12:00 PM' };
-        } else if (timeStats.productiveHours.afternoon && index === 1) {
-          rec.bestTimeToStudy = { start: '2:00 PM', end: '5:00 PM' };
-        } else if (timeStats.productiveHours.evening && index === 2) {
-          rec.bestTimeToStudy = { start: '7:00 PM', end: '10:00 PM' };
+      // Crear mapa de ID a nombre de materia
+      this.subjectMap.clear();
+      this.subjects.forEach((subject) => {
+        if (subject._id) {
+          this.subjectMap.set(subject._id, subject.name);
         }
       });
+    } catch (error) {
+      console.error('Error loading subjects:', error);
+      this.subjects = [];
     }
   }
 
-  suggestBestTimeToStudy(taskType: string): { start: string; end: string } {
-    // Sugerencias basadas en el tipo de tarea
-    switch (taskType) {
-      case 'examen':
-        // Mañana para exámenes (mayor concentración)
-        return { start: '9:00 AM', end: '12:00 PM' };
-      case 'proyecto':
-        // Tarde para proyectos (creatividad)
-        return { start: '3:00 PM', end: '6:00 PM' };
-      case 'lectura':
-        // Noche para lecturas (tranquilidad)
-        return { start: '8:00 PM', end: '10:00 PM' };
-      default:
-        // Mediodía para tareas generales
-        return { start: '12:00 PM', end: '3:00 PM' };
+  // Obtener el nombre de una materia por su ID
+  getSubjectName(subjectId: string): string {
+    // Primero buscar en el mapa de materias
+    const name = this.subjectMap.get(subjectId);
+    if (name) return name;
+
+    // Si no se encuentra, buscar en la lista de materias
+    const subject = this.subjects.find((s) => s._id === subjectId);
+    if (subject) return subject.name;
+
+    // Si no se encuentra, mostrar un nombre genérico con el ID acortado
+    const shortId =
+      subjectId.length > 4
+        ? subjectId.substring(subjectId.length - 4)
+        : subjectId;
+    return `Materia ${shortId}`;
+  }
+
+  async generateRecommendations() {
+    if (!this.userId) return;
+
+    try {
+      // Obtener tareas pendientes
+      const tasks = await firstValueFrom(
+        this.apiService.getPendingTasks(this.userId)
+      );
+
+      // Generar recomendaciones de estudio
+      this.studyRecommendations = tasks
+        .filter((task) => task.subject_id && !task.completed)
+        .map((task) => ({
+          taskId: task._id || '',
+          description: task.description,
+          subject: this.getSubjectName(task.subject_id || ''),
+          dueDate: task.due_date || new Date().toISOString(),
+          priority: task.priority || 1,
+          urgencyLevel: this.getUrgencyLevel(task.due_date || ''),
+          estimatedTime: task.estimated_time || 30,
+        }))
+        .sort((a, b) => b.priority - a.priority)
+        .slice(0, 3); // Limitar a 3 recomendaciones
+
+      // Generar recomendaciones de recordatorios
+      this.reminderRecommendations = tasks
+        .filter(
+          (task) =>
+            !task.completed && this.getDaysUntilDue(task.due_date || '') <= 7
+        )
+        .map((task) => ({
+          taskId: task._id || '',
+          description: task.description,
+          subject: this.getSubjectName(task.subject_id || ''),
+          recommendedInsistenceLevel: this.calculateInsistenceLevel(task),
+          bestTimeToStudy: {
+            start: '08:00',
+            end: '10:00',
+          },
+          reason: 'Mayor concentración durante la mañana',
+        }))
+        .slice(0, 3); // Limitar a 3 recomendaciones
+    } catch (error) {
+      console.error('Error generating recommendations:', error);
+      this.studyRecommendations = [];
+      this.reminderRecommendations = [];
     }
   }
 
-  getDaysUntil(dateString: string): number {
-    const dueDate = new Date(dateString);
+  generateIdealTimeSlots() {
+    // Limpiar slots anteriores
+    this.idealTimeSlots = [];
+
+    // Generar slots ideales basados en las materias
+    this.subjects.forEach((subject, index) => {
+      if (subject._id) {
+        const timeSlot = {
+          subjectId: subject._id,
+          subjectName: subject.name,
+          startTime: `${8 + (index % 3) * 2}:00`,
+          endTime: `${10 + (index % 3) * 2}:00`,
+          reason:
+            index % 2 === 0
+              ? 'Mayor concentración durante la mañana'
+              : 'Menos distracciones en este horario',
+        };
+        this.idealTimeSlots.push(timeSlot);
+      }
+    });
+  }
+
+  generateSuggestedSchedule() {
+    // Limpiar horario anterior
+    this.suggestedSchedule = [];
+
+    // Usar las recomendaciones de estudio para generar un horario
+    this.studyRecommendations.forEach((rec, index) => {
+      this.suggestedSchedule.push({
+        description: rec.description,
+        details: `Tiempo recomendado: ${rec.estimatedTime} minutos`,
+      });
+    });
+  }
+
+  // Determinar el nivel de urgencia basado en la fecha de vencimiento
+  getUrgencyLevel(dueDate: string): 'baja' | 'media' | 'alta' {
+    const daysUntilDue = this.getDaysUntilDue(dueDate);
+
+    if (daysUntilDue <= 2) return 'alta';
+    if (daysUntilDue <= 5) return 'media';
+    return 'baja';
+  }
+
+  // Calcular el nivel de insistencia recomendado para recordatorios
+  calculateInsistenceLevel(task: Task): number {
+    const daysUntilDue = this.getDaysUntilDue(task.due_date || '');
+    const priority = task.priority || 1;
+
+    // Fórmula simple: más prioridad y menos días = mayor insistencia
+    let level = Math.min(5, Math.max(1, 6 - daysUntilDue + priority));
+
+    return Math.round(level);
+  }
+
+  // Calcular días hasta la fecha de vencimiento
+  getDaysUntilDue(dateString: string): number {
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalizar a inicio del día
+
+    const dueDate = new Date(dateString);
+    dueDate.setHours(0, 0, 0, 0); // Normalizar a inicio del día
+
     const diffTime = dueDate.getTime() - today.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return Math.max(0, diffDays); // Asegurar que no sea negativo
   }
 
+  // Método para crear un recordatorio
+  createReminder(taskId: string, insistenceLevel: number) {
+    // Aquí iría la lógica para crear un recordatorio
+    console.log(
+      `Creando recordatorio para tarea ${taskId} con nivel ${insistenceLevel}`
+    );
+    this.toastService.showToast('Recordatorio creado con éxito');
+  }
+
+  // Método para obtener la hora para un índice en la planificación
   getTimeForIndex(index: number): string {
-    const baseHour = 9; // Empezar a las 9 AM
+    const baseHour = 9; // Hora de inicio (9:00 AM)
     const hour = baseHour + index;
     return `${hour}:00`;
   }
 
-  getSubjectName(subjectId: string): string {
-    return this.subjectMap.get(subjectId) || 'Sin materia';
-  }
-
-  createReminder(taskId: string, priority: number) {
-    console.log(
-      `Creando recordatorio para tarea ${taskId} con prioridad ${priority}`
-    );
-    this.toastService.showToast('Recordatorio creado', 'success');
-  }
-
-  createSubjectMap() {
-    this.subjects.forEach((subject) => {
-      this.subjectMap.set(subject._id, subject.name);
+  // Método para refrescar los datos
+  doRefresh(event: any) {
+    this.loadData().then(() => {
+      event.target.complete();
     });
-  }
-
-  generateReminderRecommendations() {
-    // Implementación del método para generar recomendaciones de recordatorio
   }
 }

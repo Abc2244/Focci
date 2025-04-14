@@ -1,4 +1,9 @@
 <ion-content class="smart-content">
+  <!-- Añadir pull-to-refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
   <div class="page-container">
     <div class="page-title">
       <h1>Asistente Inteligente</h1>
@@ -34,7 +39,7 @@
           </div>
         </div>
 
-        <!-- Recomendación de priorización -->
+        <!-- Recomendación de priorización de tareas -->
         <div
           class="recommendation-card"
           *ngIf="studyRecommendations.length > 0"
@@ -45,22 +50,19 @@
           <div class="recommendation-content">
             <div class="recommendation-title">Prioriza esta tarea</div>
             <div class="recommendation-text">
-              <strong>{{ studyRecommendations[0].description }}</strong> de {{
+              {{ studyRecommendations[0].description }} de {{
               studyRecommendations[0].subject }} requiere tu atención inmediata.
-              Vence en {{ getDaysUntil(studyRecommendations[0].dueDate) }} días.
-            </div>
-            <div
-              class="recommendation-actions"
-              *ngIf="studyRecommendations[0].urgencyLevel === 'alta'"
-            >
-              <ion-button
-                size="small"
-                fill="clear"
-                (click)="createReminder(studyRecommendations[0].taskId, studyRecommendations[0].priority + 2)"
+              <span
+                *ngIf="getDaysUntilDue(studyRecommendations[0].dueDate) > 0"
               >
-                Crear recordatorio
-                <ion-icon name="add-circle-outline" slot="end"></ion-icon>
-              </ion-button>
+                Vence en {{ getDaysUntilDue(studyRecommendations[0].dueDate) }}
+                días.
+              </span>
+              <span
+                *ngIf="getDaysUntilDue(studyRecommendations[0].dueDate) === 0"
+              >
+                ¡Vence hoy!
+              </span>
             </div>
           </div>
         </div>
@@ -68,7 +70,7 @@
         <!-- Recomendación de recordatorios -->
         <div
           class="recommendation-card"
-          *ngIf="reminderRecommendations.length > 1"
+          *ngIf="reminderRecommendations.length > 0"
         >
           <div class="recommendation-icon">
             <ion-icon name="notifications-outline"></ion-icon>
@@ -76,60 +78,56 @@
           <div class="recommendation-content">
             <div class="recommendation-title">Recordatorios inteligentes</div>
             <div class="recommendation-text">
-              Para tu tarea
-              <strong>{{ reminderRecommendations[1].description }}</strong>, te
+              Para tu tarea {{ reminderRecommendations[0].description }} , te
               recomendamos configurar recordatorios con nivel de insistencia {{
-              reminderRecommendations[1].recommendedInsistenceLevel }}.
-            </div>
-            <div class="recommendation-actions">
-              <ion-button
-                size="small"
-                fill="clear"
-                (click)="createReminder(reminderRecommendations[1].taskId, reminderRecommendations[1].recommendedInsistenceLevel)"
-              >
-                Configurar
-                <ion-icon name="settings-outline" slot="end"></ion-icon>
-              </ion-button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Recomendaciones basadas en horario -->
-        <div
-          class="recommendation-card"
-          *ngFor="let rec of studyTimeRecommendations"
-        >
-          <div class="recommendation-icon">
-            <ion-icon name="calendar-outline"></ion-icon>
-          </div>
-          <div class="recommendation-content">
-            <div class="recommendation-title">
-              Momento ideal para {{ rec.subject }}
-            </div>
-            <div class="recommendation-text">
-              Te recomendamos estudiar de {{ rec.timeSlot.start |
-              date:'shortTime' }} a {{ rec.timeSlot.end | date:'shortTime' }}
-              <br />
-              <small>{{ rec.reason }}</small>
+              reminderRecommendations[0].recommendedInsistenceLevel }}.
+              <div class="reminder-action">
+                <ion-button
+                  size="small"
+                  (click)="createReminder(reminderRecommendations[0].taskId, reminderRecommendations[0].recommendedInsistenceLevel)"
+                >
+                  Crear recordatorio
+                </ion-button>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Planificación diaria -->
-      <div class="daily-planning">
+      <!-- Horarios ideales para estudiar -->
+      <div class="ideal-times-section">
+        <h2>Horarios ideales para estudiar</h2>
+
+        <div class="ideal-time-card" *ngFor="let slot of idealTimeSlots">
+          <div class="ideal-time-header">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <div class="ideal-time-title">
+              Momento ideal para {{ slot.subjectName }}
+            </div>
+          </div>
+          <div class="ideal-time-content">
+            <div class="ideal-time-schedule">
+              Te recomendamos estudiar de {{ slot.startTime }} a {{ slot.endTime
+              }}
+            </div>
+            <div class="ideal-time-reason">{{ slot.reason }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Planificación sugerida -->
+      <div class="schedule-section">
         <h2>Planificación sugerida</h2>
+
         <div class="timeline">
           <div
             class="timeline-item"
-            *ngFor="let rec of studyRecommendations; let i = index"
+            *ngFor="let slot of suggestedSchedule; let i = index"
           >
             <div class="timeline-time">{{ getTimeForIndex(i) }}</div>
             <div class="timeline-content">
-              <div class="timeline-title">{{ rec.description }}</div>
-              <div class="timeline-details">
-                Tiempo recomendado: {{ rec.estimatedTime }} minutos
-              </div>
+              <div class="timeline-title">{{ slot.description }}</div>
+              <div class="timeline-details">{{ slot.details }}</div>
             </div>
           </div>
         </div>

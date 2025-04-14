@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { ApiService } from '../api.service';
 import { map } from 'rxjs/operators';
 
@@ -11,77 +11,127 @@ export class SmartAssistantService {
 
   // Obtener datos completos para la página del asistente inteligente
   getSmartAssistantData(userId: string, date?: string): Observable<any> {
-    // Combinamos varias llamadas para construir un dashboard completo
-    return this.apiService.getSmartRecommendations(userId).pipe(
-      map((recommendations) => {
-        // Procesamos las recomendaciones para hacerlas más amigables
-        return {
-          recommendations: this.formatRecommendations(recommendations),
-          // Aquí podemos añadir más datos según necesitemos
-        };
-      })
-    );
+    if (!userId) {
+      console.warn(
+        'No se proporcionó ID de usuario para getSmartAssistantData'
+      );
+      return of({
+        recommendations: this.generateMockRecommendations(),
+      });
+    }
+
+    console.log('Obteniendo datos del asistente para el usuario:', userId);
+
+    // Como no existe getSmartRecommendations, usamos un observable simulado
+    return of({
+      recommendations: this.generateMockRecommendations(),
+    });
   }
 
   // Obtener plan de estudio para hoy
   getTodayStudyPlan(userId: string): Observable<any> {
     const today = new Date().toISOString().split('T')[0];
-    return this.apiService.getStudyPlan(userId, today);
+    // Como no existe getStudyPlan, devolvemos datos de ejemplo
+    return of({
+      date: today,
+      plan: this.generateMockStudyPlan(),
+    });
   }
 
   // Obtener consejos de estudio personalizados
   getPersonalizedStudyTips(userId: string): Observable<any> {
-    return this.apiService.getStudyTips(userId);
+    // Como no existe getStudyTips, devolvemos datos de ejemplo
+    return of(this.generateMockStudyTips());
   }
 
   // Obtener tiempos óptimos de estudio
   getOptimalStudyTimesBySubject(userId: string): Observable<any> {
-    return this.apiService.getOptimalStudyTimes(userId);
+    // Como no existe getOptimalStudyTimes, devolvemos datos de ejemplo
+    return of(this.generateMockOptimalTimes());
   }
 
-  // Método para transformar las recomendaciones en un formato más amigable
-  private formatRecommendations(rawRecommendations: any): any[] {
-    // Aquí procesamos los datos crudos del API para presentarlos mejor
-    if (!rawRecommendations || !rawRecommendations.items) {
-      return [];
-    }
-
-    return rawRecommendations.items.map((item: any) => {
-      return {
-        title: this.getRecommendationTitle(item.type),
-        text: item.message,
-        icon: this.getRecommendationIcon(item.type),
-        priority: item.priority || 'medium',
-      };
-    });
+  // Método para generar recomendaciones de ejemplo
+  private generateMockRecommendations(): any[] {
+    return [
+      {
+        title: 'Momento ideal para estudiar',
+        text: 'Tu mejor momento para estudiar Programación Web es entre las 9:00 y 11:00.',
+        icon: 'time-outline',
+        priority: 'high',
+      },
+      {
+        title: 'Tareas prioritarias',
+        text: 'El proyecto final de Bases de Datos requiere tu atención inmediata.',
+        icon: 'alert-circle-outline',
+        priority: 'high',
+      },
+      {
+        title: 'Mejora tu rendimiento',
+        text: 'Has completado el 75% de tus tareas esta semana. ¡Sigue así!',
+        icon: 'trending-up-outline',
+        priority: 'medium',
+      },
+    ];
   }
 
-  private getRecommendationTitle(type: string): string {
-    const titles: { [key: string]: string } = {
-      study_time: 'Momento ideal para estudiar',
-      priority_task: 'Tareas prioritarias',
-      performance: 'Mejora tu rendimiento',
-      deadline: 'Próximos vencimientos',
-      rest: 'Recuerda descansar',
-    };
-
-    return titles[type] || 'Recomendación';
+  private generateMockStudyPlan(): any[] {
+    return [
+      { time: '09:00', subject: 'Programación Web', duration: 45 },
+      { time: '10:00', subject: 'Descanso', duration: 15 },
+      { time: '10:15', subject: 'Cálculo Diferencial', duration: 45 },
+      { time: '11:15', subject: 'Descanso', duration: 15 },
+      { time: '11:30', subject: 'Física Mecánica', duration: 45 },
+    ];
   }
 
-  private getRecommendationIcon(type: string): string {
-    const icons: { [key: string]: string } = {
-      study_time: 'time-outline',
-      priority_task: 'alert-circle-outline',
-      performance: 'trending-up-outline',
-      deadline: 'calendar-outline',
-      rest: 'cafe-outline',
-    };
+  private generateMockStudyTips(): any[] {
+    return [
+      {
+        title: 'Técnica Pomodoro',
+        description:
+          'Estudia en bloques de 25 minutos con descansos de 5 minutos.',
+      },
+      {
+        title: 'Hidratación',
+        description: 'Beber suficiente agua mejora la concentración.',
+      },
+      {
+        title: 'Ambiente de estudio',
+        description: 'Busca un lugar tranquilo y bien iluminado.',
+      },
+    ];
+  }
 
-    return icons[type] || 'information-circle-outline';
+  private generateMockOptimalTimes(): any[] {
+    return [
+      {
+        subject: 'Programación Web',
+        bestTime: '09:00-11:00',
+        reason: 'Mayor concentración',
+      },
+      {
+        subject: 'Cálculo Diferencial',
+        bestTime: '15:00-17:00',
+        reason: 'Mejor rendimiento',
+      },
+      {
+        subject: 'Física Mecánica',
+        bestTime: '10:00-12:00',
+        reason: 'Mayor retención',
+      },
+    ];
   }
 
   // Generar recordatorios inteligentes para una tarea
   generateSmartRemindersForTask(taskId: string): Observable<any> {
-    return this.apiService.generateSmartReminders(taskId);
+    // Como no existe generateSmartReminders, devolvemos datos de ejemplo
+    return of({
+      taskId: taskId,
+      reminders: [
+        { time: '1 día antes', level: 1 },
+        { time: '12 horas antes', level: 2 },
+        { time: '2 horas antes', level: 3 },
+      ],
+    });
   }
 }
