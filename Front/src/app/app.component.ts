@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SplashScreen } from '@capacitor/splash-screen';
 import {
   ActionPerformed,
@@ -6,15 +6,20 @@ import {
   PushNotifications,
   Token,
 } from '@capacitor/push-notifications';
+import { ThemeService } from './services/theme.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
 })
-export class AppComponent {
-  constructor() {
+export class AppComponent implements OnInit {
+  constructor(private themeService: ThemeService) {
     this.initializeApp();
+  }
+
+  ngOnInit() {
+    // El servicio de temas se inicializa automáticamente
   }
 
   initializeApp() {

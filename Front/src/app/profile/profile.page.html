@@ -1,4 +1,3 @@
-
 <ion-content class="profile-content" fullscreen>
   <div class="profile-container">
     <!-- Encabezado del perfil -->
@@ -74,7 +73,12 @@
                 color="primary"
               ></ion-icon>
               <ion-label>
-                <h2 style="color: #333 !important; font-weight: 500">
+                <h2
+                  style="
+                    color: var(--app-text-color) !important;
+                    font-weight: 500;
+                  "
+                >
                   Notificaciones
                 </h2>
               </ion-label>
@@ -91,7 +95,12 @@
                 color="primary"
               ></ion-icon>
               <ion-label>
-                <h2 style="color: #333 !important; font-weight: 500">
+                <h2
+                  style="
+                    color: var(--app-text-color) !important;
+                    font-weight: 500;
+                  "
+                >
                   Modo Oscuro
                 </h2>
               </ion-label>
@@ -108,20 +117,50 @@
                 color="primary"
               ></ion-icon>
               <ion-label>
-                <h2 style="color: #333 !important; font-weight: 500">Idioma</h2>
-                <p style="color: #666 !important">{{ getLanguageName() }}</p>
+                <h2
+                  style="
+                    color: var(--app-text-color) !important;
+                    font-weight: 500;
+                  "
+                >
+                  Idioma
+                </h2>
+                <p style="color: var(--app-text-color-medium) !important">
+                  {{ getLanguageName() }}
+                </p>
+              </ion-label>
+            </ion-item>
+
+            <ion-item button detail (click)="openThemeSelector()">
+              <ion-icon
+                name="color-palette-outline"
+                slot="start"
+                color="primary"
+              ></ion-icon>
+              <ion-label>
+                <h2
+                  style="
+                    color: var(--app-text-color) !important;
+                    font-weight: 500;
+                  "
+                >
+                  Tema
+                </h2>
+                <p style="color: var(--app-text-color-medium) !important">
+                  {{ getThemeName() }}
+                </p>
               </ion-label>
             </ion-item>
           </ion-list>
         </ion-card-content>
       </ion-card>
 
-      <!-- Ajustes de la App -->
+      <!-- Datos y almacenamiento -->
       <ion-card class="profile-card">
         <ion-card-header>
           <div class="card-header-content">
-            <ion-icon name="apps" class="section-icon"></ion-icon>
-            <ion-card-title>Ajustes de la App</ion-card-title>
+            <ion-icon name="save" class="section-icon"></ion-icon>
+            <ion-card-title>Datos y Almacenamiento</ion-card-title>
           </div>
         </ion-card-header>
 
@@ -159,7 +198,7 @@
               ></ion-icon>
               <ion-label>
                 <h2>Acerca de</h2>
-                <p>Versión 1.0.0</p>
+                <p>Información de la aplicación</p>
               </ion-label>
             </ion-item>
           </ion-list>
@@ -214,7 +253,7 @@
               formControlName="username"
               type="text"
               placeholder="Ingresa tu nombre de usuario"
-              style="--color: #333"
+              style="--color: var(--app-text-color)"
             ></ion-input>
           </ion-item>
 
@@ -224,7 +263,7 @@
               formControlName="email"
               type="email"
               placeholder="Ingresa tu correo electrónico"
-              style="--color: #333"
+              style="--color: var(--app-text-color)"
             ></ion-input>
           </ion-item>
         </div>
@@ -304,6 +343,56 @@
           </div>
         </div>
       </form>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- Modal para seleccionar tema -->
+<ion-modal
+  [isOpen]="showThemeSelectorModal"
+  (didDismiss)="showThemeSelectorModal = false"
+  class="profile-modal"
+>
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button (click)="showThemeSelectorModal = false">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-title>Seleccionar Tema</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="modal-content">
+      <div class="theme-selector-container">
+        <ion-list>
+          <ion-item
+            *ngFor="let theme of themeOptions"
+            (click)="changeTheme(theme.value)"
+            [class.selected-theme]="themeService.getCurrentTheme() === theme.value"
+            button
+          >
+            <ion-icon [name]="theme.icon" slot="start"></ion-icon>
+            <ion-label>{{ theme.label }}</ion-label>
+          </ion-item>
+        </ion-list>
+
+        <!-- Selector de color personalizado -->
+        <div
+          class="custom-color-container"
+          *ngIf="themeService.getCurrentTheme() === 'custom'"
+        >
+          <ion-item>
+            <ion-label position="stacked">Color personalizado</ion-label>
+            <ion-input type="color" [(ngModel)]="customColorInput"></ion-input>
+          </ion-item>
+          <ion-button expand="block" (click)="applyCustomColor()">
+            <ion-icon name="color-palette-outline" slot="start"></ion-icon>
+            Aplicar color personalizado
+          </ion-button>
+        </div>
+      </div>
     </ion-content>
   </ng-template>
 </ion-modal>
