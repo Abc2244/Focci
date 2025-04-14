@@ -1,5 +1,4 @@
 <ion-content class="smart-content">
-  <!-- Añadir pull-to-refresh -->
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
@@ -14,156 +13,227 @@
       <div class="shimmer-card" *ngFor="let i of [1, 2, 3]"></div>
     </div>
 
-    <!-- Contenido cuando no está cargando -->
     <div *ngIf="!isLoading">
-      <!-- Recomendaciones personalizadas -->
-      <div class="recommendations-section">
-        <h2>Recomendaciones para hoy</h2>
+      <!-- Sección de planes de estudio -->
+      <div class="study-plans-section">
+        <h2>Planes de Estudio y Recordatorios</h2>
 
-        <!-- Recomendación de momento ideal para estudiar -->
-        <div
-          class="recommendation-card"
-          *ngIf="reminderRecommendations.length > 0"
-        >
-          <div class="recommendation-icon">
-            <ion-icon name="time-outline"></ion-icon>
-          </div>
-          <div class="recommendation-content">
-            <div class="recommendation-title">Momento ideal para estudiar</div>
-            <div class="recommendation-text">
-              Según tus patrones de actividad, tu mejor momento para estudiar {{
-              reminderRecommendations[0].subject }} es entre las {{
-              reminderRecommendations[0].bestTimeToStudy.start }} y {{
-              reminderRecommendations[0].bestTimeToStudy.end }}.
+        <div class="plan-cards">
+          <div class="plan-card" *ngFor="let plan of taskPlans">
+            <div class="plan-header">
+              <ion-icon [name]="getTaskIcon(plan.task.task_type)"></ion-icon>
+              <h3 class="task-name">{{ plan.task.description }}</h3>
             </div>
-          </div>
-        </div>
 
-        <!-- Recomendación de priorización de tareas -->
-        <div
-          class="recommendation-card"
-          *ngIf="studyRecommendations.length > 0"
-        >
-          <div class="recommendation-icon">
-            <ion-icon name="alert-circle-outline"></ion-icon>
-          </div>
-          <div class="recommendation-content">
-            <div class="recommendation-title">Prioriza esta tarea</div>
-            <div class="recommendation-text">
-              {{ studyRecommendations[0].description }} de {{
-              studyRecommendations[0].subject }} requiere tu atención inmediata.
-              <span
-                *ngIf="getDaysUntilDue(studyRecommendations[0].dueDate) > 0"
+            <div class="plan-details">
+              <p class="subject">{{ getSubjectName(plan.task.subject_id) }}</p>
+              <p
+                class="due-date"
+                [class.urgent]="getDaysUntilDue(plan.task.due_date) < 3"
               >
-                Vence en {{ getDaysUntilDue(studyRecommendations[0].dueDate) }}
-                días.
-              </span>
-              <span
-                *ngIf="getDaysUntilDue(studyRecommendations[0].dueDate) === 0"
-              >
-                ¡Vence hoy!
-              </span>
+                Fecha límite: {{ plan.task.due_date | date:'mediumDate' }}
+              </p>
             </div>
-          </div>
-        </div>
 
-        <!-- Recomendación de recordatorios -->
-        <div
-          class="recommendation-card"
-          *ngIf="reminderRecommendations.length > 0"
-        >
-          <div class="recommendation-icon">
-            <ion-icon name="notifications-outline"></ion-icon>
-          </div>
-          <div class="recommendation-content">
-            <div class="recommendation-title">Recordatorios inteligentes</div>
-            <div class="recommendation-text">
-              Para tu tarea {{ reminderRecommendations[0].description }} , te
-              recomendamos configurar recordatorios con nivel de insistencia {{
-              reminderRecommendations[0].recommendedInsistenceLevel }}.
-              <div class="reminder-action">
-                <ion-button
-                  size="small"
-                  (click)="createReminder(reminderRecommendations[0].taskId, reminderRecommendations[0].recommendedInsistenceLevel)"
+            <!-- Plan de recordatorios -->
+            <div class="reminder-plan" *ngIf="plan.reminderPlan">
+              <h4>Plan de Recordatorios</h4>
+              <div
+                class="reminder-status"
+                [class.accepted]="plan.reminderPlan.accepted"
+              >
+                <ion-icon name="notifications-outline"></ion-icon>
+                <span
+                  >{{ plan.reminderPlan.accepted ? 'Plan aceptado' : 'Plan
+                  sugerido' }}</span
                 >
-                  Crear recordatorio
+              </div>
+              <ion-button
+                expand="block"
+                color="primary"
+                (click)="showReminderPlan(plan)"
+                [disabled]="plan.reminderPlan.accepted"
+              >
+                <ion-icon name="calendar-outline" slot="start"></ion-icon>
+                {{ plan.reminderPlan.accepted ? 'Ver plan' : 'Ver y aceptar
+                plan' }}
+              </ion-button>
+            </div>
+
+            <div class="available-slots" *ngIf="plan.availableSlots.length > 0">
+              <h4>Horarios Recomendados</h4>
+              <ion-chip
+                *ngFor="let slot of plan.availableSlots"
+                (click)="scheduleStudySession(plan, slot)"
+                [class.selected]="plan.selectedSlot === slot"
+              >
+                {{ formatTimeRange(slot.start, slot.end) }}
+              </ion-chip>
+            </div>
+
+            <div class="plan-actions">
+              <ion-button
+                expand="block"
+                color="primary"
+                (click)="viewTaskDetails(plan.task)"
+              >
+                <ion-icon name="eye-outline" slot="start"></ion-icon>
+                Ver Detalles
+              </ion-button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal de detalles -->
+      <ion-modal
+        [isOpen]="showTaskDetailsModal"
+        (didDismiss)="closeTaskDetails()"
+        class="task-details-modal"
+      >
+        <ng-template>
+          <ion-header>
+            <ion-toolbar color="primary">
+              <ion-title>Detalles de la Tarea</ion-title>
+              <ion-buttons slot="end">
+                <ion-button (click)="closeTaskDetails()">
+                  <ion-icon name="close" size="large"></ion-icon>
                 </ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content
+            class="ion-padding task-details-content"
+            *ngIf="selectedTask"
+          >
+            <h2 class="task-title">{{ selectedTask.description }}</h2>
+            <ion-item lines="none" class="detail-item">
+              <ion-icon
+                name="book-outline"
+                slot="start"
+                color="primary"
+              ></ion-icon>
+              <ion-label>
+                <h3>Materia</h3>
+                <p>{{ getSubjectName(selectedTask.subject_id) }}</p>
+              </ion-label>
+            </ion-item>
+            <ion-item lines="none" class="detail-item">
+              <ion-icon
+                name="calendar-outline"
+                slot="start"
+                color="primary"
+              ></ion-icon>
+              <ion-label>
+                <h3>Fecha límite</h3>
+                <p>{{ selectedTask.due_date | date:'fullDate' }}</p>
+              </ion-label>
+            </ion-item>
+            <ion-item lines="none" class="detail-item">
+              <ion-icon
+                name="document-text-outline"
+                slot="start"
+                color="primary"
+              ></ion-icon>
+              <ion-label>
+                <h3>Tipo</h3>
+                <p>{{ selectedTask.task_type || 'General' }}</p>
+              </ion-label>
+            </ion-item>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+
+      <!-- Modal de plan de recordatorios -->
+      <ion-modal
+        [isOpen]="showReminderPlanModal"
+        (didDismiss)="cancelReminderPlan()"
+        class="reminder-plan-modal"
+      >
+        <ng-template>
+          <ion-header>
+            <ion-toolbar color="primary">
+              <ion-title>Plan de Recordatorios</ion-title>
+              <ion-buttons slot="end">
+                <ion-button (click)="cancelReminderPlan()">
+                  <ion-icon name="close" size="large"></ion-icon>
+                </ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content
+            class="ion-padding reminder-plan-content"
+            *ngIf="currentReminderPlan"
+          >
+            <div class="reminder-plan-header">
+              <h3 class="plan-title-blue">Plan de Recordatorios</h3>
+              <div class="priority-info">
+                <div class="priority-badge">
+                  <span
+                    >Prioridad: {{ currentReminderPlan.taskPriority || 3
+                    }}/5</span
+                  >
+                </div>
+                <div class="insistence-badge">
+                  <span
+                    >Insistencia: {{ currentReminderPlan.insistenceLevel || 1
+                    }}/5</span
+                  >
+                </div>
+              </div>
+              <p class="reminder-explanation">
+                Basado en la prioridad ({{ currentReminderPlan.taskPriority || 3
+                }}/5) y el nivel de insistencia ({{
+                currentReminderPlan.insistenceLevel || 1 }}/5) de la tarea, te
+                sugerimos los siguientes recordatorios:
+              </p>
+            </div>
+
+            <div class="reminder-timeline">
+              <div
+                class="timeline-item"
+                *ngFor="let reminder of currentReminderPlan.reminders"
+              >
+                <div
+                  class="timeline-dot"
+                  [ngClass]="{'high': reminder.level >= 7, 'medium': reminder.level >= 4 && reminder.level < 7, 'low': reminder.level < 4}"
+                ></div>
+                <div class="timeline-content">
+                  <div class="timeline-date">
+                    {{ reminder.date | date:'MMM d, y, h:mm a' }}
+                  </div>
+                  <div class="timeline-title">{{ reminder.time }}</div>
+                  <div class="timeline-description">
+                    {{ reminder.description }}
+                  </div>
+                  <ion-chip
+                    [ngClass]="{'high': reminder.level >= 7, 'medium': reminder.level >= 4 && reminder.level < 7, 'low': reminder.level < 4}"
+                  >
+                    <ion-icon name="alert-outline"></ion-icon>
+                    <ion-label
+                      >Prioridad: {{ reminder.level >= 7 ? 'Alta' :
+                      (reminder.level >= 4 ? 'Media' : 'Baja') }}</ion-label
+                    >
+                  </ion-chip>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Horarios ideales para estudiar -->
-      <div class="ideal-times-section">
-        <h2>Horarios ideales para estudiar</h2>
-
-        <div class="ideal-time-card" *ngFor="let slot of idealTimeSlots">
-          <div class="ideal-time-header">
-            <ion-icon name="calendar-outline"></ion-icon>
-            <div class="ideal-time-title">
-              Momento ideal para {{ slot.subjectName }}
+            <div class="plan-actions">
+              <ion-button
+                expand="block"
+                color="primary"
+                (click)="acceptReminderPlan()"
+                [disabled]="currentReminderPlan.accepted"
+              >
+                <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+                {{ currentReminderPlan.accepted ? 'Plan ya aceptado' : 'Aceptar
+                y crear recordatorios' }}
+              </ion-button>
             </div>
-          </div>
-          <div class="ideal-time-content">
-            <div class="ideal-time-schedule">
-              Te recomendamos estudiar de {{ slot.startTime }} a {{ slot.endTime
-              }}
-            </div>
-            <div class="ideal-time-reason">{{ slot.reason }}</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Planificación sugerida -->
-      <div class="schedule-section">
-        <h2>Planificación sugerida</h2>
-
-        <div class="timeline">
-          <div
-            class="timeline-item"
-            *ngFor="let slot of suggestedSchedule; let i = index"
-          >
-            <div class="timeline-time">{{ getTimeForIndex(i) }}</div>
-            <div class="timeline-content">
-              <div class="timeline-title">{{ slot.description }}</div>
-              <div class="timeline-details">{{ slot.details }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Consejos de estudio -->
-      <div class="study-tips">
-        <h2>Consejos de estudio</h2>
-
-        <div class="tip-card">
-          <div class="tip-icon">
-            <ion-icon name="bulb-outline"></ion-icon>
-          </div>
-          <div class="tip-content">
-            <div class="tip-title">Técnica Pomodoro</div>
-            <div class="tip-text">
-              Estudia en bloques de 25 minutos con descansos de 5 minutos entre
-              ellos. Después de 4 bloques, toma un descanso más largo de 15-30
-              minutos.
-            </div>
-          </div>
-        </div>
-
-        <div class="tip-card">
-          <div class="tip-icon">
-            <ion-icon name="water-outline"></ion-icon>
-          </div>
-          <div class="tip-content">
-            <div class="tip-title">Mantente hidratado</div>
-            <div class="tip-text">
-              Beber suficiente agua mejora la concentración y el rendimiento
-              cognitivo. Intenta beber al menos 8 vasos de agua al día.
-            </div>
-          </div>
-        </div>
-      </div>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
     </div>
   </div>
 </ion-content>

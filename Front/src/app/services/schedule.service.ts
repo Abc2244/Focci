@@ -107,30 +107,74 @@ export class ScheduleService {
   }
 
   /**
-   * Encuentra los mejores momentos para estudiar basados en el tipo de tarea
+   * Encuentra los mejores momentos para estudiar basados en el tipo de tarea y prioridad
    */
-  findBestStudyTimes(userId: string, taskType: string): Observable<TimeSlot[]> {
+  findBestStudyTimes(
+    userId: string,
+    taskType: string,
+    priority: number = 3
+  ): Observable<TimeSlot[]> {
+    console.log(
+      'Buscando mejores horarios para tipo de tarea:',
+      taskType,
+      'con prioridad:',
+      priority
+    );
+
     return this.findFreeTimeSlots(userId).pipe(
+      tap((slots) =>
+        console.log('Total slots libres encontrados:', slots.length)
+      ),
       map((freeSlots) => {
         // Filtrar por las horas más adecuadas según el tipo de tarea
-        return freeSlots.filter((slot) => {
+        let filteredSlots = freeSlots.filter((slot) => {
           const hour = slot.start.getHours();
 
-          switch (taskType.toLowerCase()) {
+          // Normalizar el tipo de tarea a minúsculas y sin espacios
+          const normalizedType = taskType.toLowerCase().trim();
+          console.log(
+            'Tipo de tarea normalizado:',
+            normalizedType,
+            'hora:',
+            hour
+          );
+
+          switch (normalizedType) {
+            case 'exam':
             case 'examen':
+            case 'quiz':
               // Mañana: mayor concentración
               return hour >= 8 && hour <= 12;
+            case 'project':
             case 'proyecto':
               // Tarde: más creatividad
               return hour >= 14 && hour <= 18;
+            case 'reading':
             case 'lectura':
+            case 'lab':
+            case 'laboratorio':
               // Noche: más tranquilidad
               return hour >= 19 && hour <= 22;
             default:
-              // Cualquier momento libre está bien
-              return true;
+              // Limitar a horas razonables (8am-8pm)
+              return hour >= 8 && hour <= 20;
           }
         });
+
+        // Ajustar según la prioridad
+        if (priority >= 4) {
+          // Para tareas de alta prioridad, preferir slots más tempranos
+          filteredSlots.sort((a, b) => a.start.getTime() - b.start.getTime());
+        } else if (priority <= 2) {
+          // Para tareas de baja prioridad, pueden ir en slots más tardíos
+          filteredSlots.sort((a, b) => b.start.getTime() - a.start.getTime());
+        }
+
+        console.log(
+          'Slots filtrados por tipo de tarea y prioridad:',
+          filteredSlots.length
+        );
+        return filteredSlots;
       })
     );
   }

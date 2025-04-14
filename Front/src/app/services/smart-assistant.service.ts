@@ -3,6 +3,21 @@ import { Observable, of } from 'rxjs';
 import { ApiService } from '../api.service';
 import { map } from 'rxjs/operators';
 
+// Definir la interfaz ReminderPlan
+export interface ReminderSuggestion {
+  time: string;
+  level: number;
+  description: string;
+}
+
+export interface ReminderPlan {
+  taskId: string;
+  reminders: ReminderSuggestion[];
+  accepted: boolean;
+  taskPriority?: number;
+  insistenceLevel?: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -123,15 +138,32 @@ export class SmartAssistantService {
   }
 
   // Generar recordatorios inteligentes para una tarea
-  generateSmartRemindersForTask(taskId: string): Observable<any> {
-    // Como no existe generateSmartReminders, devolvemos datos de ejemplo
+  generateSmartRemindersForTask(taskId: string): Observable<ReminderPlan> {
+    console.log('Generando recordatorios para tarea:', taskId);
+
+    // Usamos el sistema de prioridad del backend (1-5)
     return of({
       taskId: taskId,
       reminders: [
-        { time: '1 día antes', level: 1 },
-        { time: '12 horas antes', level: 2 },
-        { time: '2 horas antes', level: 3 },
+        {
+          time: '1 día antes',
+          level: 3, // Prioridad media
+          description: 'Recordatorio: 1 día antes para completar la tarea.',
+        },
+        {
+          time: '12 horas antes',
+          level: 4, // Prioridad media-alta
+          description: 'Recordatorio: 12 horas antes para completar la tarea.',
+        },
+        {
+          time: '2 horas antes',
+          level: 5, // Prioridad alta
+          description: 'Recordatorio: 2 horas antes para completar la tarea.',
+        },
       ],
+      accepted: false,
+      taskPriority: 3,
+      insistenceLevel: 4,
     });
   }
 }

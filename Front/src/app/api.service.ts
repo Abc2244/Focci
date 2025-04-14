@@ -289,6 +289,18 @@ export class ApiService {
       .pipe(catchError(this.handleError));
   }
 
+  // Obtener una tarea por su ID
+  getTaskById(taskId: string): Observable<TaskResponse> {
+    return this.http
+      .get<TaskResponse>(`${this.apiUrl}/tasks/${taskId}`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(
+        tap((task) => console.log('Retrieved task:', task)),
+        catchError(this.handleError)
+      );
+  }
+
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
     return new HttpHeaders({
