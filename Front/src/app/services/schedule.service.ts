@@ -37,11 +37,13 @@ export class ScheduleService {
    * Obtiene el horario completo del usuario
    */
   getUserSchedule(userId: string): Observable<ScheduleItem[]> {
+    console.log('🔍 Obteniendo horario para usuario:', userId);
     return this.http
       .get<ScheduleItem[]>(`${this.apiUrl}/schedule/users/${userId}`)
       .pipe(
+        tap((schedule) => console.log('📅 Horario obtenido:', schedule)),
         catchError((error) => {
-          console.error('Error obteniendo horario:', error);
+          console.error('❌ Error obteniendo horario:', error);
           return of([]);
         })
       );
@@ -185,13 +187,15 @@ export class ScheduleService {
   createScheduleItem(
     scheduleItem: Partial<ScheduleItem>
   ): Observable<ScheduleItem> {
+    console.log('📝 Creando nuevo elemento en el horario:', scheduleItem);
     return this.http
       .post<ScheduleItem>(`${this.apiUrl}/schedule`, scheduleItem, {
         headers: this.getAuthHeaders(),
       })
       .pipe(
+        tap((item) => console.log('✅ Elemento creado:', item)),
         catchError((error) => {
-          console.error('Error creando elemento de horario:', error);
+          console.error('❌ Error creando elemento de horario:', error);
           throw error;
         })
       );

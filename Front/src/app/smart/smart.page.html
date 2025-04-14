@@ -67,7 +67,9 @@
                 (click)="scheduleStudySession(plan, slot)"
                 [class.selected]="plan.selectedSlot === slot"
               >
-                {{ formatTimeRange(slot.start, slot.end) }}
+                <ion-icon name="calendar-outline"></ion-icon>
+                {{ formatDate(slot.start) }} - {{ formatTimeRange(slot.start,
+                slot.end) }}
               </ion-chip>
             </div>
 

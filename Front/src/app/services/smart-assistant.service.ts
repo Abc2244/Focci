@@ -2,12 +2,16 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { ApiService } from '../api.service';
 import { map } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
+import { forkJoin } from 'rxjs';
 
-// Definir la interfaz ReminderPlan
+// Actualizar la interfaz ReminderSuggestion para que sea compatible con ExtendedReminderSuggestion
 export interface ReminderSuggestion {
-  time: string;
+  time?: string; // Hacer que time sea opcional
   level: number;
   description: string;
+  date?: string | null; // Añadir date como opcional
 }
 
 export interface ReminderPlan {
@@ -22,7 +26,9 @@ export interface ReminderPlan {
   providedIn: 'root',
 })
 export class SmartAssistantService {
-  constructor(private apiService: ApiService) {}
+  private apiUrl = environment.apiUrl;
+
+  constructor(private http: HttpClient, private apiService: ApiService) {}
 
   // Obtener datos completos para la página del asistente inteligente
   getSmartAssistantData(userId: string, date?: string): Observable<any> {
@@ -165,5 +171,150 @@ export class SmartAssistantService {
       taskPriority: 3,
       insistenceLevel: 4,
     });
+  }
+
+  /**
+   * Crea recordatorios basados en un plan
+   * @param plan Plan de recordatorios
+   * @param userId ID del usuario
+   * @returns Observable con los resultados de la creación de recordatorios
+   */
+  createRemindersFromPlan(
+    plan: ReminderPlan,
+    userId: string
+  ): Observable<any[]> {
+    if (!plan || !plan.reminders || plan.reminders.length === 0) {
+      console.warn('Plan de recordatorios vacío o sin recordatorios');
+      return of([]);
+    }
+
+    console.log('Creando recordatorios para el plan:', plan);
+
+    // Crear un array de observables para cada recordatorio
+    const reminderObservables = plan.reminders.map((reminder) => {
+      // Verificar si reminder.time existe
+      if (!reminder.time) {
+        console.warn('Recordatorio sin tiempo definido, omitiendo');
+        return of(null);
+      }
+
+      let reminderDate = new Date();
+      const timeStr = reminder.time;
+
+      if (timeStr.includes('semana')) {
+        const weeks = parseInt(timeStr.split(' ')[0]);
+        reminderDate.setDate(reminderDate.getDate() + weeks * 7);
+      } else if (timeStr.includes('día')) {
+        const days = parseInt(timeStr.split(' ')[0]);
+        reminderDate.setDate(reminderDate.getDate() + days);
+      } else if (timeStr.includes('hora')) {
+        const hours = parseInt(timeStr.split(' ')[0]);
+        reminderDate.setHours(reminderDate.getHours() + hours);
+      }
+
+      // Crear el recordatorio
+      const reminderData = {
+        user_id: userId,
+        task_id: plan.taskId,
+        reminder_date: reminderDate.toISOString(),
+        message: reminder.description,
+        priority: plan.taskPriority || 3,
+        status: 'pendiente',
+        insistence_level: plan.insistenceLevel || 1,
+      };
+
+      // Usar el ApiService para crear el recordatorio
+      return this.apiService.createReminder(reminderData);
+    });
+
+    // Filtrar los nulos y combinar todos los observables
+    return forkJoin(
+      reminderObservables.filter((obs) => obs !== null) as Observable<any>[]
+    );
+  }
+
+  /**
+   * Actualiza el estado de un plan de recordatorios
+   * @param taskId ID de la tarea
+   * @param accepted Estado de aceptación
+   * @returns Observable con el resultado de la actualización
+   */
+  updateReminderPlanStatus(taskId: string, accepted: boolean): Observable<any> {
+    // Aquí podrías hacer una llamada a la API si tuvieras un endpoint para esto
+    console.log(
+      `Actualizando estado del plan para tarea ${taskId} a ${
+        accepted ? 'aceptado' : 'rechazado'
+      }`
+    );
+    return of({ success: true, taskId, accepted });
+  }
+
+  /**
+   * Genera un plan de recordatorios para una tarea
+   * @param task Tarea
+   * @param taskPriority Prioridad de la tarea
+   * @param insistenceLevel Nivel de insistencia
+   * @returns Plan de recordatorios generado
+   */
+  generateReminderPlanForTask(
+    task: any,
+    taskPriority: number = 3,
+    insistenceLevel: number = 1
+  ): ReminderPlan {
+    // Generar plan de recordatorios
+    const reminderPlan: ReminderPlan = {
+      taskId: task._id || '',
+      accepted: false,
+      taskPriority,
+      insistenceLevel,
+      reminders: [],
+    };
+
+    // Generar recordatorios basados en la prioridad e insistencia
+    if (taskPriority >= 4 || insistenceLevel >= 4) {
+      // Alta prioridad o insistencia: más recordatorios
+      reminderPlan.reminders = [
+        {
+          time: '1 semana antes',
+          description: `Recuerda que tienes que completar: ${task.description}`,
+          level: 3,
+        },
+        {
+          time: '3 días antes',
+          description: `No olvides tu tarea: ${task.description}`,
+          level: 4,
+        },
+        {
+          time: '1 día antes',
+          description: `¡Mañana vence tu tarea: ${task.description}!`,
+          level: 5,
+        },
+      ];
+    } else if (taskPriority >= 3 || insistenceLevel >= 2) {
+      // Prioridad media: recordatorios moderados
+      reminderPlan.reminders = [
+        {
+          time: '3 días antes',
+          description: `Recuerda tu tarea: ${task.description}`,
+          level: 3,
+        },
+        {
+          time: '1 día antes',
+          description: `Mañana vence tu tarea: ${task.description}`,
+          level: 4,
+        },
+      ];
+    } else {
+      // Baja prioridad: pocos recordatorios
+      reminderPlan.reminders = [
+        {
+          time: '1 día antes',
+          description: `Mañana vence tu tarea: ${task.description}`,
+          level: 3,
+        },
+      ];
+    }
+
+    return reminderPlan;
   }
 }
