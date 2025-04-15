@@ -100,14 +100,6 @@
   --ion-color-primary-shade: #ac09bb;
   --ion-color-primary-tint: #ca23d8;
 
-  // Color secundario
-  --ion-color-secondary: #26a69a;
-  --ion-color-secondary-rgb: 38, 166, 154;
-  --ion-color-secondary-contrast: #ffffff;
-  --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #219288;
-  --ion-color-secondary-tint: #3cafa4;
-
   // Color de advertencia
   --ion-color-warning: #fbc02d;
   --ion-color-warning-rgb: 251, 192, 45;
@@ -593,5 +585,86 @@ ion-fab-button {
 
   &::part(native) {
     color: black !important;
+  }
+}
+
+/* Estilos para el selector de tiempo en ion-datetime */
+ion-datetime {
+  &::part(time-button) {
+    background-color: var(--ion-color-primary) !important;
+    color: var(--ion-color-primary) !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
+  }
+
+  &::part(datetime-time) {
+    color: var(--ion-color-primary-contrast) !important;
+  }
+
+  .time-button {
+    background-color: var(--ion-color-primary) !important;
+    color: var(--ion-color-primary-contrast) !important;
+    border-radius: 8px !important;
+  }
+
+  .datetime-time {
+    color: var(--ion-color-primary-contrast) !important;
+  }
+}
+
+/* Estilos para los selectores (triángulos) */
+ion-select::part(icon) {
+  color: var(--ion-color-primary) !important;
+  opacity: 1 !important;
+}
+
+/* Estilos para los ion-select */
+ion-select {
+  --padding-start: 0;
+  --padding-end: 32px; /* Espacio para el icono */
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  min-height: 40px;
+  padding: 8px 0;
+
+  &::part(icon) {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    color: var(--ion-color-primary) !important;
+    opacity: 1 !important;
+  }
+
+  &::part(text) {
+    color: var(--app-text-color) !important;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0;
+  }
+
+  &::part(placeholder) {
+    color: var(--ion-color-primary) !important;
+    opacity: 1;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+}
+
+/* Estilos para los ion-item que contienen ion-select */
+ion-item.custom-input {
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
+  --min-height: 40px;
+  --background: transparent;
+
+  &::part(native) {
+    padding: 0;
   }
 }

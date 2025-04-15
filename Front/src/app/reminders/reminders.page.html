@@ -67,13 +67,6 @@
             </ion-chip>
           </div>
 
-          <div class="task-info">
-            <ion-chip class="task-chip">
-              <ion-icon name="list-outline" class="chip-icon"></ion-icon>
-              <span class="chip-text">{{ getTaskName(reminder.task_id) }}</span>
-            </ion-chip>
-          </div>
-
           <div class="reminder-actions">
             <ion-button
               fill="clear"
@@ -134,7 +127,7 @@
                     name="calendar-outline"
                     class="date-icon"
                   ></ion-icon>
-                  {{ reminder.reminder_date | date:'MMM d, y, h:mm a' }}
+                  {{ reminder.completed_date | date:'MMM d, y, h:mm a' }}
                 </ion-card-subtitle>
               </div>
             </div>
@@ -154,12 +147,6 @@
                 <ion-icon name="checkmark-done-outline"></ion-icon>
                 Completado: {{ reminder.completed_date | date:'MMM d, y, h:mm a'
                 }}
-              </ion-chip>
-              <ion-chip class="task-chip">
-                <ion-icon name="list-outline" class="chip-icon"></ion-icon>
-                <span class="chip-text"
-                  >{{ getTaskName(reminder.task_id) }}</span
-                >
               </ion-chip>
             </div>
 
@@ -225,12 +212,6 @@
               <ion-chip color="medium">
                 <ion-icon name="ban-outline"></ion-icon>
                 <span>Cancelado</span>
-              </ion-chip>
-              <ion-chip class="task-chip">
-                <ion-icon name="list-outline" class="chip-icon"></ion-icon>
-                <span class="chip-text"
-                  >{{ getTaskName(reminder.task_id) }}</span
-                >
               </ion-chip>
             </div>
 
@@ -303,19 +284,20 @@
   [breakpoints]="[0, 1.0]"
   [initialBreakpoint]="1.0"
   class="reminder-modal"
+  (willDismiss)="onWillDismiss($event)"
 >
   <ng-template>
     <ion-header class="ion-no-border">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-button class="modal-button" (click)="cancelModal()">
-            <ion-icon name="close-outline" class="modal-icon"></ion-icon>
+          <ion-button (click)="dismissModal()" color="primary">
+            <ion-icon name="close-outline" slot="icon-only"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-title>{{ isEditing ? 'Editar' : 'Nuevo' }} Recordatorio</ion-title>
         <ion-buttons slot="end">
-          <ion-button class="modal-button save-button" (click)="saveReminder()">
-            <span class="save-button-text">Guardar</span>
+          <ion-button (click)="saveReminder()" color="primary" [strong]="true">
+            <span>{{ isEditing ? 'Actualizar' : 'Crear' }}</span>
           </ion-button>
         </ion-buttons>
       </ion-toolbar>

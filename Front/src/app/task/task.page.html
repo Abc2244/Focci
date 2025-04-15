@@ -169,6 +169,7 @@
   [breakpoints]="[0, 1.0]"
   [initialBreakpoint]="1.0"
   class="task-modal"
+  (willDismiss)="onWillDismiss($event)"
 >
   <ng-template>
     <ion-header class="ion-no-border">
@@ -200,17 +201,22 @@
         <div class="form-container">
           <div class="input-group">
             <ion-item class="custom-input">
-              <ion-label position="floating" class="form-label large-label">Descripción</ion-label><br>
-              <ion-input formControlName="description" type="text" class="large-input"></ion-input>
+              <ion-label position="floating" class="form-label large-label"
+                >Descripción</ion-label
+              >
+              <ion-input
+                formControlName="description"
+                type="text"
+                class="large-input"
+              ></ion-input>
             </ion-item>
-            
 
             <ion-item class="custom-input">
-              <ion-label position="floating" class="form-label large-label">Materia</ion-label>
               <ion-select
                 formControlName="subject_id"
                 interface="action-sheet"
                 class="large-input"
+                placeholder="Materia"
               >
                 <ion-select-option
                   *ngFor="let subject of subjects"
@@ -220,7 +226,7 @@
                   {{ subject.name }}
                 </ion-select-option>
               </ion-select>
-            </ion-item>            
+            </ion-item>
 
             <ion-item class="custom-input">
               <ion-label position="floating" class="form-label large-label"
@@ -233,7 +239,7 @@
                 [hourValues]="hourValues"
                 [minuteValues]="minuteValues"
                 locale="es-ES"
-                class="large-input"
+                class="large-input custom-datetime"
               ></ion-datetime>
             </ion-item>
 
