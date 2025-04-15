@@ -617,3 +617,54 @@ ion-select::part(icon) {
   color: var(--ion-color-primary) !important;
   opacity: 1 !important;
 }
+
+/* Estilos para los ion-select */
+ion-select {
+  --padding-start: 0;
+  --padding-end: 32px; /* Espacio para el icono */
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  min-height: 40px;
+  padding: 8px 0;
+
+  &::part(icon) {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    color: var(--ion-color-primary) !important;
+    opacity: 1 !important;
+  }
+
+  &::part(text) {
+    color: var(--app-text-color) !important;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0;
+  }
+
+  &::part(placeholder) {
+    color: var(--ion-color-primary) !important;
+    opacity: 1;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+}
+
+/* Estilos para los ion-item que contienen ion-select */
+ion-item.custom-input {
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
+  --min-height: 40px;
+  --background: transparent;
+
+  &::part(native) {
+    padding: 0;
+  }
+}

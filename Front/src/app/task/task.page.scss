@@ -305,3 +305,40 @@
   color: var(--ion-color-primary) !important;
   opacity: 1 !important;
 }
+
+/* Estilos específicos para los ion-select en la página de tareas */
+.custom-input {
+  ion-select {
+    background: transparent;
+    min-height: 40px;
+
+    &::part(text) {
+      padding: 8px 0;
+      font-size: 1rem;
+    }
+
+    &::part(icon) {
+      margin-right: 4px;
+    }
+  }
+
+  ion-label {
+    &.large-label {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+  }
+
+  &.select-input {
+    --min-height: 56px;
+  }
+}
+
+.large-input {
+  font-size: 1rem;
+}
+
+.large-option {
+  font-size: 1rem;
+  color: var(--app-text-color);
+}

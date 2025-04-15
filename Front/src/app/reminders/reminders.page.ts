@@ -59,7 +59,7 @@ export class RemindersPage implements OnInit {
   }
 
   // Método para cerrar el modal
-  closeModal() {
+  dismissModal() {
     this.showModal = false;
     this.isEditing = false;
     this.currentReminderId = null;
@@ -71,11 +71,6 @@ export class RemindersPage implements OnInit {
       status: 'pendiente',
       insistence_level: 1,
     });
-  }
-
-  // Método para cancelar el modal (usado en el HTML)
-  cancelModal() {
-    this.closeModal();
   }
 
   loadReminders(): void {
@@ -323,7 +318,7 @@ export class RemindersPage implements OnInit {
                 'success'
               );
               this.loadReminders();
-              this.closeModal();
+              this.dismissModal();
 
               // Actualizar la notificación
               await this.notificationsService.cancelNotification(
@@ -348,7 +343,7 @@ export class RemindersPage implements OnInit {
             console.log('Reminder created:', response);
             this.toastService.showToast('Recordatorio creado', 'success');
             this.loadReminders();
-            this.closeModal();
+            this.dismissModal();
 
             // Programar la notificación para el nuevo recordatorio
             await this.notificationsService.scheduleNotification({
@@ -446,5 +441,19 @@ export class RemindersPage implements OnInit {
     } catch (error) {
       console.error('Error general en scheduleAllPendingReminders:', error);
     }
+  }
+
+  onWillDismiss(event: any) {
+    this.showModal = false;
+    this.reminderForm.reset({
+      reminder_date: new Date().toISOString(),
+      priority: 3,
+      task_id: '',
+      message: '',
+      status: 'pendiente',
+      insistence_level: 1,
+    });
+    this.currentReminderId = null;
+    this.isEditing = false;
   }
 }

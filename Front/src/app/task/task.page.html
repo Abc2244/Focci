@@ -212,13 +212,11 @@
             </ion-item>
 
             <ion-item class="custom-input">
-              <ion-label position="floating" class="form-label large-label"
-                >Materia</ion-label
-              >
               <ion-select
                 formControlName="subject_id"
                 interface="action-sheet"
                 class="large-input"
+                placeholder="Materia"
               >
                 <ion-select-option
                   *ngFor="let subject of subjects"
