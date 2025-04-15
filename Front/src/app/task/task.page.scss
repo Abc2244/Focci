@@ -301,74 +301,7 @@
   }
 }
 
-// Estilos para el selector
 ::ng-deep ion-select::part(icon) {
-  color: var(--ion-color-secondary) !important;
+  color: var(--ion-color-primary) !important;
   opacity: 1 !important;
-}
-
-// Modal styles
-.task-modal {
-  ion-header {
-    ion-toolbar {
-      --background: var(--app-card-color);
-
-      ion-title {
-        color: var(--ion-color-primary);
-      }
-
-      ion-button {
-        --color: var(--ion-color-primary);
-      }
-    }
-  }
-
-  .form-container {
-    padding: 1.5rem;
-    background: var(--app-card-color);
-
-    ion-item {
-      --background: transparent;
-      margin-bottom: 1.5rem;
-
-      &.custom-input {
-        --padding-start: 0;
-        --padding-end: 0;
-        --inner-padding-end: 0;
-
-        ion-label {
-          color: var(--ion-color-primary) !important;
-        }
-
-        ion-input,
-        ion-select,
-        ion-datetime {
-          --color: var(--app-text-color);
-          --placeholder-color: var(--ion-color-primary);
-        }
-      }
-    }
-  }
-}
-
-.custom-input {
-  --background: transparent;
-  --border-color: transparent;
-  background: var(--input-background);
-  border-radius: 10px;
-  box-shadow: var(--card-shadow);
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-
-  ion-input,
-  ion-select,
-  ion-datetime {
-    --color: var(--app-text-color);
-    --placeholder-color: var(--app-text-color-medium);
-  }
-
-  ion-label {
-    color: var(--ion-color-primary);
-    font-weight: 500;
-  }
 }

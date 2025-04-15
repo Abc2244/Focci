@@ -107,6 +107,9 @@ export class ThemeService {
 
     this._colorTheme.next(theme);
     localStorage.setItem('app-color-theme', theme);
+
+    // Disparar evento personalizado para actualizar el calendario
+    document.dispatchEvent(new CustomEvent('themeChanged'));
   }
 
   public applyDarkMode(isDark: boolean) {
@@ -126,6 +129,9 @@ export class ThemeService {
 
     this._isDark.next(isDark);
     localStorage.setItem('app-is-dark', isDark.toString());
+
+    // Disparar evento personalizado para actualizar el calendario
+    document.dispatchEvent(new CustomEvent('themeChanged'));
   }
 
   // Método para actualizar colores personalizados

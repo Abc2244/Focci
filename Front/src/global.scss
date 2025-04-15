@@ -587,3 +587,33 @@ ion-fab-button {
     color: black !important;
   }
 }
+
+/* Estilos para el selector de tiempo en ion-datetime */
+ion-datetime {
+  &::part(time-button) {
+    background-color: var(--ion-color-primary) !important;
+    color: var(--ion-color-primary) !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
+  }
+
+  &::part(datetime-time) {
+    color: var(--ion-color-primary-contrast) !important;
+  }
+
+  .time-button {
+    background-color: var(--ion-color-primary) !important;
+    color: var(--ion-color-primary-contrast) !important;
+    border-radius: 8px !important;
+  }
+
+  .datetime-time {
+    color: var(--ion-color-primary-contrast) !important;
+  }
+}
+
+/* Estilos para los selectores (triángulos) */
+ion-select::part(icon) {
+  color: var(--ion-color-primary) !important;
+  opacity: 1 !important;
+}

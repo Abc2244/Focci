@@ -22,6 +22,424 @@
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent"
     />
+    <style>
+      /* Estilos directos para forzar colores dentro del Shadow DOM */
+      ion-datetime::part(calendar-day-active) {
+        background: var(--ion-color-primary) !important;
+        color: var(--ion-color-primary-contrast) !important;
+        border: none !important;
+      }
+
+      ion-datetime::part(calendar-day-today) {
+        border-color: var(--ion-color-primary) !important;
+        color: var(--ion-color-primary) !important;
+      }
+
+      ion-datetime::part(calendar-day):hover {
+        background: rgba(var(--ion-color-primary-rgb), 0.1) !important;
+      }
+
+      /* Estilos para el BOTÓN DE TIEMPO (17:00) */
+      ion-datetime::part(time-button) {
+        background-color: var(--ion-color-primary) !important;
+        color: var(--ion-color-primary-contrast) !important;
+        border-radius: 8px !important;
+        padding: 10px !important;
+      }
+
+      ion-datetime::part(datetime-time) {
+        color: var(--ion-color-primary-contrast) !important;
+      }
+
+      /* Selector de hora rueda */
+      ion-datetime::part(time-button-active),
+      ion-datetime::part(wheel-item-active),
+      ion-datetime::part(month-year-button-text) {
+        color: var(--ion-color-primary) !important;
+      }
+
+      /* Estilos adicionales para el selector de hora */
+      ion-datetime::part(wheel-item) {
+        color: var(--app-text-color) !important;
+      }
+
+      ion-datetime::part(wheel-item-active) {
+        color: var(--ion-color-primary) !important;
+        font-weight: bold !important;
+      }
+
+      ion-datetime::part(wheel-col) {
+        background: var(--app-card-color) !important;
+      }
+
+      ion-datetime::part(time-text) {
+        color: var(--ion-color-primary) !important;
+      }
+
+      /* Botones del fondo del datetime */
+      ion-datetime::part(native-button) {
+        color: var(--ion-color-primary) !important;
+      }
+
+      ion-datetime::part(wheel-highlight) {
+        background: rgba(var(--ion-color-primary-rgb), 0.2) !important;
+        border: none;
+      }
+
+      /* Estilos específicos para el botón de tiempo (17:00) */
+      ion-datetime::part(time-button) {
+        background-color: var(--ion-color-primary) !important;
+        color: var(--ion-color-primary) !important;
+        border-radius: 8px !important;
+        padding: 10px !important;
+      }
+
+      /* Para asegurar que el texto de la hora sea visible */
+      ion-datetime::part(datetime-time) {
+        color: var(--ion-color-primary) !important;
+      }
+
+      /* Para el tiempo en el calendario */
+      .time-button {
+        background-color: var(--ion-color-primary) !important;
+        color: var(--ion-color-primary) !important;
+        border-radius: 8px !important;
+      }
+
+      .datetime-time {
+        color: var(--ion-color-primary-contrast) !important;
+      }
+    </style>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Función central para actualizar colores
+        function updateCalendarColors() {
+          const primaryColor = getComputedStyle(document.documentElement)
+            .getPropertyValue("--ion-color-primary")
+            .trim();
+          const primaryContrast = getComputedStyle(document.documentElement)
+            .getPropertyValue("--ion-color-primary-contrast")
+            .trim();
+          const primaryRgb = getComputedStyle(document.documentElement)
+            .getPropertyValue("--ion-color-primary-rgb")
+            .trim();
+          const appTextColor = getComputedStyle(document.documentElement)
+            .getPropertyValue("--app-text-color")
+            .trim();
+
+          // Seleccionar todos los datepickers
+          const datetimes = document.querySelectorAll("ion-datetime");
+          datetimes.forEach((datetime) => {
+            // Asegurar que se apliquen variables CSS al componente
+            datetime.style.setProperty(
+              "--ion-color-base",
+              primaryColor,
+              "important"
+            );
+            datetime.style.setProperty(
+              "--ion-color-contrast",
+              primaryContrast,
+              "important"
+            );
+
+            // Acceder al shadow DOM
+            if (datetime.shadowRoot) {
+              // DÍAS DEL CALENDARIO
+              // Días seleccionados
+              const activeDays = datetime.shadowRoot.querySelectorAll(
+                ".calendar-day.calendar-day-active"
+              );
+              activeDays.forEach((day) => {
+                day.style.setProperty("background", primaryColor, "important");
+                day.style.setProperty("color", primaryContrast, "important");
+                day.style.setProperty("border", "none", "important");
+                // Eliminar cualquier borde
+                day.style.setProperty("border-width", "0", "important");
+                day.style.setProperty("border-style", "none", "important");
+              });
+
+              // Día actual (hoy)
+              const todayDays = datetime.shadowRoot.querySelectorAll(
+                ".calendar-day.calendar-day-today"
+              );
+              todayDays.forEach((day) => {
+                if (!day.classList.contains("calendar-day-active")) {
+                  day.style.setProperty(
+                    "border-color",
+                    primaryColor,
+                    "important"
+                  );
+                  day.style.setProperty("color", primaryColor, "important");
+                }
+              });
+
+              // BOTÓN DE TIEMPO (17:00)
+              const timeButtons = datetime.shadowRoot.querySelectorAll(
+                ".time-button, [role='button'].time-button, button.time-button"
+              );
+
+              timeButtons.forEach((button) => {
+                // Aplicar estilo al botón
+                button.style.setProperty(
+                  "background",
+                  primaryColor,
+                  "important"
+                );
+                button.style.setProperty(
+                  "background-color",
+                  primaryColor,
+                  "important"
+                );
+                button.style.setProperty("color", primaryContrast, "important");
+                button.style.setProperty("border-radius", "8px", "important");
+                button.style.setProperty("padding", "10px", "important");
+                button.style.setProperty("border", "none", "important");
+
+                // Buscar todos los elementos de texto dentro del botón
+                const textElements = button.querySelectorAll("*");
+                textElements.forEach((el) => {
+                  el.style.setProperty("color", primaryContrast, "important");
+                });
+
+                // Específicamente buscar el elemento con la hora
+                const timeText = button.querySelector(".datetime-time, span");
+                if (timeText) {
+                  timeText.style.setProperty(
+                    "color",
+                    primaryContrast,
+                    "important"
+                  );
+                }
+              });
+
+              // Aplicar estilo al botón de tiempo directamente (casos especiales)
+              const timeButtonDirect =
+                datetime.shadowRoot.querySelector(".time-button");
+              if (timeButtonDirect) {
+                timeButtonDirect.setAttribute(
+                  "style",
+                  `background-color: ${primaryColor} !important; 
+                   color: ${primaryContrast} !important; 
+                   border-radius: 8px !important; 
+                   padding: 10px !important; 
+                   border: none !important;`
+                );
+
+                // Agregar un pequeño elemento de estilo dentro del shadow DOM
+                const styleElement = document.createElement("style");
+                styleElement.textContent = `
+                  .time-button { 
+                    background-color: ${primaryColor} !important; 
+                    color: ${primaryContrast} !important;
+                    border-radius: 8px !important;
+                  }
+                  .time-button * { 
+                    color: ${primaryContrast} !important; 
+                  }
+                  .datetime-time { 
+                    color: ${primaryContrast} !important; 
+                  }
+                `;
+                datetime.shadowRoot.appendChild(styleElement);
+              }
+
+              // SELECTOR DE HORA
+              // Componentes del selector de tiempo
+              const timeElements = datetime.shadowRoot.querySelectorAll(
+                ".time-button.active, .time-body span.active, .time-item.active, .wheel-item.active"
+              );
+              timeElements.forEach((el) => {
+                el.style.setProperty("color", primaryColor, "important");
+                el.style.setProperty("font-weight", "bold", "important");
+              });
+
+              // Todos los elementos del selector de tiempo
+              const allTimeElements = datetime.shadowRoot.querySelectorAll(
+                ".wheel-item, .time-button, .time-body span"
+              );
+              allTimeElements.forEach((el) => {
+                if (!el.classList.contains("active")) {
+                  el.style.setProperty("color", appTextColor, "important");
+                }
+              });
+
+              // Encabezados y botones de navegación
+              const navElements = datetime.shadowRoot.querySelectorAll(
+                ".datetime-header, .calendar-month-year, .calendar-next-prev, .month-year"
+              );
+              navElements.forEach((el) => {
+                el.style.setProperty("color", primaryColor, "important");
+              });
+
+              // Elementos de la hora específicos
+              const timeTexts = datetime.shadowRoot.querySelectorAll(
+                ".time-text, .datetime-time, .wheel-col-title"
+              );
+              timeTexts.forEach((el) => {
+                el.style.setProperty("color", primaryColor, "important");
+              });
+
+              // Fondo de selección de hora
+              const wheelHighlight =
+                datetime.shadowRoot.querySelector(".wheel-highlight");
+              if (wheelHighlight) {
+                wheelHighlight.style.setProperty(
+                  "background",
+                  `rgba(${primaryRgb}, 0.2)`,
+                  "important"
+                );
+                wheelHighlight.style.setProperty("border", "none", "important");
+              }
+
+              // Botones de acción
+              const actionButtons = datetime.shadowRoot.querySelectorAll(
+                "button.datetime-button"
+              );
+              actionButtons.forEach((btn) => {
+                btn.style.setProperty("color", primaryColor, "important");
+              });
+
+              // También aplicar estilos a datetime-button si está presente
+              const datetimeButtons = document.querySelectorAll(
+                "ion-datetime-button"
+              );
+              datetimeButtons.forEach((button) => {
+                button.style.setProperty(
+                  "background-color",
+                  primaryColor,
+                  "important"
+                );
+                button.style.setProperty("color", primaryContrast, "important");
+                button.style.setProperty("border-radius", "8px", "important");
+                button.style.setProperty("padding", "6px 10px", "important");
+
+                // Forzar estilo en el contenido del botón
+                if (button.shadowRoot) {
+                  const buttonContent = button.shadowRoot.querySelector(
+                    ".datetime-button-native"
+                  );
+                  if (buttonContent) {
+                    buttonContent.style.setProperty(
+                      "color",
+                      primaryContrast,
+                      "important"
+                    );
+                  }
+                }
+              });
+            }
+          });
+
+          // IMPORTANTE: También buscar fuera del shadow DOM
+          const externalTimeButtons = document.querySelectorAll(".time-button");
+          externalTimeButtons.forEach((button) => {
+            button.style.backgroundColor = primaryColor;
+            button.style.color = primaryContrast;
+          });
+        }
+
+        // Interceptar y gestionar clics en el documento
+        document.addEventListener(
+          "click",
+          function (e) {
+            // Aplicar colores inmediatamente y después de un tiempo para asegurar que se capturan todas las actualizaciones
+            setTimeout(updateCalendarColors, 10);
+            setTimeout(updateCalendarColors, 100);
+          },
+          true
+        );
+
+        // Observar cambios en el DOM para detectar nuevos elementos
+        const observer = new MutationObserver(function (mutations) {
+          updateCalendarColors();
+        });
+
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+        });
+
+        // Escuchar eventos de cambio de tema
+        document.addEventListener("themeChanged", updateCalendarColors);
+
+        // Aplicar inicialmente
+        updateCalendarColors();
+
+        // Programar actualizaciones para asegurar que se aplique
+        [100, 300, 500, 1000].forEach((delay) => {
+          setTimeout(updateCalendarColors, delay);
+        });
+
+        // Actualizar cada vez que se abra un modal o diálogo
+        document.addEventListener("ionModalDidPresent", function () {
+          // Ejecutar varias veces con retraso para asegurar que se aplica
+          for (let i = 1; i <= 5; i++) {
+            setTimeout(updateCalendarColors, i * 200);
+          }
+        });
+        document.addEventListener("ionPopoverDidPresent", updateCalendarColors);
+
+        // Crear un MutationObserver específico para ion-datetime
+        const datetimeObserver = new MutationObserver(function (mutations) {
+          mutations.forEach(function (mutation) {
+            if (
+              mutation.target &&
+              (mutation.target.nodeName === "ION-DATETIME" ||
+                (mutation.target.closest &&
+                  mutation.target.closest("ion-datetime")))
+            ) {
+              updateCalendarColors();
+            }
+          });
+        });
+
+        // Observar cambios en atributos y contenido
+        datetimeObserver.observe(document.body, {
+          attributes: true,
+          childList: true,
+          subtree: true,
+          attributeFilter: ["class", "style"],
+        });
+
+        // Función para actualizar específicamente los botones de tiempo
+        function forceTimeButtonStyles() {
+          const primaryColor = getComputedStyle(document.documentElement)
+            .getPropertyValue("--ion-color-primary")
+            .trim();
+          const primaryContrast = getComputedStyle(document.documentElement)
+            .getPropertyValue("--ion-color-primary-contrast")
+            .trim();
+
+          // Buscar todos los botones de tiempo en todos los datepickers
+          document.querySelectorAll("ion-datetime").forEach((datetime) => {
+            if (datetime.shadowRoot) {
+              const timeButtons =
+                datetime.shadowRoot.querySelectorAll(".time-button");
+              timeButtons.forEach((button) => {
+                button.style.backgroundColor = primaryColor;
+                button.style.color = primaryContrast;
+
+                const timeTexts = button.querySelectorAll("*");
+                timeTexts.forEach((el) => {
+                  el.style.color = primaryContrast;
+                });
+              });
+            }
+          });
+        }
+
+        // Ejecutar esta función específica para los botones de tiempo
+        setInterval(forceTimeButtonStyles, 500);
+
+        // Añadir llamada a forceTimeButtonStyles aquí también
+        document.addEventListener("ionModalDidPresent", function () {
+          setTimeout(forceTimeButtonStyles, 100);
+          setTimeout(forceTimeButtonStyles, 300);
+          setTimeout(forceTimeButtonStyles, 500);
+        });
+      });
+    </script>
   </head>
 
   <body>
