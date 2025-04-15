@@ -100,8 +100,11 @@
           <ion-button
             (click)="saveSubject()"
             [strong]="true"
+            color="primary"
             [disabled]="!subjectForm.valid"
+            class="save-button"
           >
+            <ion-icon name="save-outline" slot="start"></ion-icon>
             {{ isEditing ? 'Actualizar' : 'Crear' }}
           </ion-button>
         </ion-buttons>

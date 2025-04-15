@@ -215,6 +215,24 @@
   }
 }
 
+// Estilo para el botón de guardar en el modal
+ion-modal {
+  ion-header {
+    ion-toolbar {
+      ion-buttons[slot="end"] {
+        ion-button {
+          font-weight: 600;
+          --color: var(--ion-color-primary);
+
+          &[disabled] {
+            opacity: 0.5;
+          }
+        }
+      }
+    }
+  }
+}
+
 // Comentar los estilos del botón FAB
 /*
 // Botón flotante con efecto shimmer
@@ -268,3 +286,9 @@ ion-fab {
   }
 }
 */
+
+.save-button {
+  --padding-start: 0.5rem;
+  --padding-end: 0.5rem;
+  font-weight: 600;
+}

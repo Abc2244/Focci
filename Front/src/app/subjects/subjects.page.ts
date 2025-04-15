@@ -137,7 +137,10 @@ export class SubjectsPage implements OnInit {
       const formData = this.subjectForm.value;
 
       const userId = this.authService.getCurrentUserId();
-      if (!userId) return;
+      if (!userId) {
+        this.toastService.showToast('Error: Usuario no identificado', 'error');
+        return;
+      }
 
       // Verificar que haya al menos un horario
       if (this.selectedScheduleItems.length === 0) {
@@ -175,6 +178,12 @@ export class SubjectsPage implements OnInit {
         this.toastService.showToast('Error al guardar la materia', 'error');
         console.error('Error:', error);
       }
+    } else {
+      // Mostrar mensaje si el formulario no es válido
+      this.toastService.showToast(
+        'Por favor complete todos los campos requeridos',
+        'warning'
+      );
     }
   }
 
