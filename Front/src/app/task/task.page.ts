@@ -228,6 +228,17 @@ export class TaskPage implements OnInit {
     this.showModal = false;
     this.taskForm.reset();
     this.currentTaskId = null;
+    this.isEditing = false;
+
+    // Establecer valores predeterminados
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(12, 0, 0, 0);
+
+    this.taskForm.patchValue({
+      due_date: tomorrow.toISOString(),
+      estimated_time: 30,
+    });
   }
 
   editTask(task: Task) {
@@ -245,5 +256,21 @@ export class TaskPage implements OnInit {
     });
 
     this.showModal = true;
+  }
+
+  onWillDismiss(event: any) {
+    this.showModal = false;
+    this.taskForm.reset();
+    this.currentTaskId = null;
+
+    // Establecer valores predeterminados si es necesario
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(12, 0, 0, 0);
+
+    this.taskForm.patchValue({
+      due_date: tomorrow.toISOString(),
+      estimated_time: 30,
+    });
   }
 }

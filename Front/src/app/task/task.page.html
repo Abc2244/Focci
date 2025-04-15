@@ -169,6 +169,7 @@
   [breakpoints]="[0, 1.0]"
   [initialBreakpoint]="1.0"
   class="task-modal"
+  (willDismiss)="onWillDismiss($event)"
 >
   <ng-template>
     <ion-header class="ion-no-border">
