@@ -46,6 +46,37 @@ export class ThemeService {
     },
   };
 
+  private themeVariables = {
+    light: {
+      '--app-background-light': '#f4f5f8',
+      '--app-background-dark': '#ffffff',
+      '--app-card-color': '#ffffff',
+      '--app-card-color-rgb': '255, 255, 255',
+      '--app-text-color': '#000000',
+      '--app-text-color-medium': '#666666',
+      '--app-text-color-light': '#999999',
+      '--app-shadow-sm': '0 2px 4px rgba(0, 0, 0, 0.1)',
+      '--app-shadow-md': '0 4px 8px rgba(0, 0, 0, 0.1)',
+      '--app-shadow-lg': '0 8px 20px rgba(0, 0, 0, 0.1)',
+      '--card-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)',
+      '--input-background': 'rgba(0, 0, 0, 0.05)',
+    },
+    dark: {
+      '--app-background-light': '#121212',
+      '--app-background-dark': '#1e1e1e',
+      '--app-card-color': '#2d2d2d',
+      '--app-card-color-rgb': '45, 45, 45',
+      '--app-text-color': '#ffffff',
+      '--app-text-color-medium': '#b0b0b0',
+      '--app-text-color-light': '#808080',
+      '--app-shadow-sm': '0 2px 4px rgba(0, 0, 0, 0.2)',
+      '--app-shadow-md': '0 4px 8px rgba(0, 0, 0, 0.3)',
+      '--app-shadow-lg': '0 8px 20px rgba(0, 0, 0, 0.4)',
+      '--card-shadow': '0 4px 8px rgba(0, 0, 0, 0.2)',
+      '--input-background': 'rgba(255, 255, 255, 0.05)',
+    },
+  };
+
   constructor() {
     const savedColorTheme = localStorage.getItem('app-color-theme') || 'blue';
     const savedIsDark = localStorage.getItem('app-is-dark') === 'true';
@@ -79,6 +110,14 @@ export class ThemeService {
   }
 
   public applyDarkMode(isDark: boolean) {
+    const theme = isDark ? this.themeVariables.dark : this.themeVariables.light;
+
+    // Aplicar todas las variables de tema
+    Object.entries(theme).forEach(([key, value]) => {
+      document.documentElement.style.setProperty(key, value);
+    });
+
+    // Mantener el atributo data-theme para compatibilidad
     if (isDark) {
       document.documentElement.setAttribute('data-theme', 'dark');
     } else {

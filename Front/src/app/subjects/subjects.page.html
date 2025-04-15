@@ -73,7 +73,7 @@
 
   <!-- Botón flotante -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button class="custom-fab" (click)="addSubject()">
+    <ion-fab-button (click)="addSubject()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
@@ -139,42 +139,46 @@
                 *ngFor="let item of selectedScheduleItems; let i = index"
                 class="schedule-item"
               >
-                <ion-select
-                  [value]="item.day"
-                  (ionChange)="updateScheduleDay(i, $event.detail.value)"
-                  placeholder="Día"
-                  interface="action-sheet"
-                  class="day-select custom-action-sheet"
-                >
-                  <ion-select-option
-                    *ngFor="let day of availableDays"
-                    [value]="day.value"
+                <div class="day-row">
+                  <ion-select
+                    [value]="item.day"
+                    (ionChange)="updateScheduleDay(i, $event.detail.value)"
+                    placeholder="Día"
+                    interface="action-sheet"
+                    class="day-select custom-action-sheet"
                   >
-                    {{ day.value }}
-                  </ion-select-option>
-                </ion-select>
+                    <ion-select-option
+                      *ngFor="let day of availableDays"
+                      [value]="day.value"
+                    >
+                      {{ day.value }}
+                    </ion-select-option>
+                  </ion-select>
 
-                <ion-input
-                  type="time"
-                  [value]="item.startTime"
-                  (ionChange)="updateScheduleStartTime(i, $event)"
-                  placeholder="Hora inicio"
-                ></ion-input>
+                  <ion-button
+                    fill="clear"
+                    color="primary"
+                    (click)="removeScheduleItem(i)"
+                  >
+                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </div>
 
-                <ion-input
-                  type="time"
-                  [value]="item.endTime"
-                  (ionChange)="updateScheduleEndTime(i, $event)"
-                  placeholder="Hora fin"
-                ></ion-input>
+                <div class="time-row">
+                  <ion-input
+                    type="time"
+                    [value]="item.startTime"
+                    (ionChange)="updateScheduleStartTime(i, $event)"
+                    placeholder="Hora inicio"
+                  ></ion-input>
 
-                <ion-button
-                  fill="clear"
-                  color="danger"
-                  (click)="removeScheduleItem(i)"
-                >
-                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-                </ion-button>
+                  <ion-input
+                    type="time"
+                    [value]="item.endTime"
+                    (ionChange)="updateScheduleEndTime(i, $event)"
+                    placeholder="Hora fin"
+                  ></ion-input>
+                </div>
               </div>
             </div>
 

@@ -84,25 +84,31 @@
     gap: 1rem;
 
     .schedule-item {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr auto;
+      display: flex;
+      flex-direction: column;
       gap: 0.5rem;
-      align-items: center;
       padding: 0.5rem;
+      background: rgba(var(--ion-color-primary-rgb), 0.05);
+      border-radius: 8px;
 
-      @media (max-width: 576px) {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto;
-        gap: 0.5rem;
+      .day-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
 
         ion-select {
-          grid-column: 1 / -1;
+          flex: 1;
         }
 
         ion-button {
-          grid-column: 2;
-          justify-self: end;
+          margin-left: 8px;
         }
+      }
+
+      .time-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
       }
     }
   }
@@ -162,25 +168,42 @@
     }
   }
 
-  .modal-content {
-    --background: var(--app-background-light);
-  }
-
   .form-container {
-    padding: 1rem;
+    padding: 1.5rem;
 
     ion-item {
       --background: transparent;
-      margin-bottom: 1rem;
-    }
+      margin-bottom: 1.5rem;
 
-    ion-label {
-      color: var(--ion-color-primary) !important;
-      font-weight: 500;
-      opacity: 1;
+      &.custom-input {
+        --padding-start: 0;
+        --padding-end: 0;
+        --inner-padding-end: 0;
+
+        ion-label {
+          color: var(--ion-color-primary) !important;
+          font-weight: 500;
+          margin-bottom: 8px;
+          transform-origin: left;
+          transition: all 0.2s ease;
+
+          &.label-floating {
+            transform: translateY(4px) scale(1.1);
+          }
+        }
+
+        ion-input {
+          --padding-start: 0;
+          --padding-top: 8px;
+          font-size: 1.1rem;
+          --color: var(--app-text-color);
+        }
+      }
     }
 
     .schedule-selector {
+      margin-top: 2rem;
+
       ion-label {
         color: var(--ion-color-primary) !important;
         font-size: 1.1rem;
@@ -192,33 +215,56 @@
   }
 }
 
-// Ajustes para modo oscuro
-:host-context([data-theme="dark"]) {
-  .subject-modal {
-    ion-header ion-toolbar {
-      --background: var(--app-card-color);
+// Comentar los estilos del botón FAB
+/*
+// Botón flotante con efecto shimmer
+ion-fab {
+  ion-fab-button.custom-fab {
+    --background: var(--ion-color-primary) !important;
+    --background-activated: var(--ion-color-primary-shade) !important;
+    --background-hover: var(--ion-color-primary-tint) !important;
+    position: relative;
+    overflow: hidden;
+    border-radius: 50% !important;
 
-      ion-title {
-        color: var(--ion-color-primary);
-      }
+    // Efecto de brillo
+    &::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(30deg);
+      animation: shimmer 3s infinite;
+      z-index: 1;
+      pointer-events: none;
+      border-radius: 50%;
     }
 
-    .modal-content {
-      --background: var(--app-background-dark);
-    }
-
-    .form-container {
-      ion-item {
-        --background: var(--app-card-color);
-      }
-
-      ion-label {
-        opacity: 1;
-      }
-    }
-
-    .schedule-selector {
-      background: var(--app-card-color);
+    ion-icon {
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      position: relative;
+      z-index: 2;
     }
   }
 }
+
+// Animación de brillo
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) rotate(30deg);
+  }
+  100% {
+    transform: translateX(100%) rotate(30deg);
+  }
+}
+*/
