@@ -248,55 +248,6 @@
   }
 }
 
-// Botón flotante con efecto shimmer
-ion-fab {
-  ion-fab-button.custom-fab {
-    --background: var(--ion-color-primary) !important;
-    --background-activated: var(--ion-color-primary-shade) !important;
-    --background-hover: var(--ion-color-primary-tint) !important;
-    position: relative;
-    overflow: hidden;
-    border-radius: 50% !important;
-
-    &::before {
-      content: "";
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(
-        to right,
-        rgba(var(--ion-color-primary-contrast-rgb), 0) 0%,
-        rgba(var(--ion-color-primary-contrast-rgb), 0.3) 50%,
-        rgba(var(--ion-color-primary-contrast-rgb), 0) 100%
-      );
-      transform: rotate(30deg);
-      animation: shimmer 3s infinite;
-      z-index: 1;
-      pointer-events: none;
-      border-radius: 50%;
-    }
-
-    ion-icon {
-      color: var(--ion-color-primary-contrast);
-      font-size: 24px;
-      font-weight: bold;
-      position: relative;
-      z-index: 2;
-    }
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%) rotate(30deg);
-  }
-  100% {
-    transform: translateX(100%) rotate(30deg);
-  }
-}
-
 // Estilos para los chips de tipo y prioridad
 .type-chip {
   &.type-examen {

@@ -200,11 +200,6 @@ ion-item {
 ion-button {
   --border-radius: var(--app-border-radius-md);
   font-weight: 500;
-
-  &.custom-fab {
-    --background: var(--ion-color-primary);
-    --box-shadow: var(--app-shadow-lg);
-  }
 }
 
 // Toast personalizado
@@ -428,21 +423,6 @@ ion-toolbar {
   }
 }
 
-// Estilos para el botón flotante
-ion-fab {
-  ion-fab-button.custom-fab {
-    --background: var(--ion-color-primary);
-    --background-activated: var(--ion-color-primary-shade);
-    --background-hover: var(--ion-color-primary-tint);
-
-    ion-icon {
-      color: var(--app-card-color);
-      font-size: 24px;
-      font-weight: bold;
-    }
-  }
-}
-
 // Estilos para las tabs
 ion-tab-bar {
   --background: white;
@@ -567,4 +547,51 @@ ion-input {
   --background: var(--app-card-color);
   --color: var(--app-text-color);
   --placeholder-color: var(--ion-color-primary);
+}
+
+/* Estilos para el botón FAB que se sincroniza con el ThemeService */
+ion-fab-button {
+  /* Forzar color específico para ion-fab-button sobrescribiendo las variables */
+  --background: var(--ion-color-primary) !important;
+  --color: var(--ion-color-primary-contrast) !important;
+  --background-activated: var(--ion-color-primary-shade) !important;
+  --background-focused: var(--ion-color-primary) !important;
+  --background-hover: var(--ion-color-primary-tint) !important;
+
+  &::part(native) {
+    background: var(--ion-color-primary) !important;
+    color: var(--ion-color-primary-contrast) !important;
+  }
+
+  ion-icon {
+    color: var(--ion-color-primary-contrast) !important;
+    stroke: var(--ion-color-primary-contrast) !important;
+    fill: var(--ion-color-primary-contrast) !important;
+  }
+}
+
+/* Modo claro: forzar cruz blanca */
+:root:not([data-theme="dark"]) ion-fab-button {
+  ion-icon {
+    color: white !important;
+    stroke: white !important;
+    fill: white !important;
+  }
+
+  &::part(native) {
+    color: white !important;
+  }
+}
+
+/* Modo oscuro: forzar cruz negra */
+[data-theme="dark"] ion-fab-button {
+  ion-icon {
+    color: black !important;
+    stroke: black !important;
+    fill: black !important;
+  }
+
+  &::part(native) {
+    color: black !important;
+  }
 }
