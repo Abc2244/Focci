@@ -353,8 +353,8 @@ ion-card-content ion-list ion-item ion-label p {
       border-radius: 8px;
 
       &.selected-theme {
-        --background: var(--ion-color-primary-tint);
-        --color: var(--ion-color-primary);
+        --background: rgba(var(--ion-color-primary-rgb), 0.1);
+        --color: var(--app-text-color);
         font-weight: 600;
 
         ion-icon {
@@ -385,7 +385,7 @@ ion-card-content ion-list ion-item ion-label p {
           color: #607d8b;
         }
         &[name="color-palette-outline"] {
-          color: #e91e63;
+          color: var(--custom-primary-color, #e91e63);
         }
       }
     }

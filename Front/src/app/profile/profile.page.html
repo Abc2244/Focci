@@ -385,7 +385,10 @@
         >
           <ion-item>
             <ion-label position="stacked">Color personalizado</ion-label>
-            <ion-input type="color" [(ngModel)]="customColorInput"></ion-input>
+            <ion-input 
+              type="color" 
+              [(ngModel)]="customColorInput"
+            ></ion-input>
           </ion-item>
           <ion-button expand="block" (click)="applyCustomColor()">
             <ion-icon name="color-palette-outline" slot="start"></ion-icon>

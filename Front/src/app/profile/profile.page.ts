@@ -81,6 +81,7 @@ export class ProfilePage implements OnInit {
     const savedColor = localStorage.getItem('custom-primary-color');
     if (savedColor) {
       this.customColorInput = savedColor;
+      document.documentElement.style.setProperty('--custom-primary-color', savedColor);
     }
   }
 
@@ -122,14 +123,16 @@ export class ProfilePage implements OnInit {
 
   changeTheme(theme: ColorTheme) {
     if (theme === 'custom') {
-      this.themeService.updateCustomColors(this.customColorInput);
+      // No aplicamos el tema inmediatamente para permitir la selección del color
+      this.themeService.applyTheme(theme);
     } else {
       this.themeService.applyTheme(theme);
+      this.showThemeSelectorModal = false;
     }
-    this.showThemeSelectorModal = false;
   }
 
   applyCustomColor() {
+    document.documentElement.style.setProperty('--custom-primary-color', this.customColorInput);
     this.themeService.updateCustomColors(this.customColorInput);
     this.themeService.applyTheme('custom');
     this.showThemeSelectorModal = false;
