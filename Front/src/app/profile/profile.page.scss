@@ -44,16 +44,17 @@ $profile-text-light: var(--app-text-color-light, #777);
     align-items: center;
     margin-bottom: 2rem;
     text-align: center;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--app-card-color);
     border-radius: 16px;
     padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--app-shadow-md);
     backdrop-filter: blur(10px);
+    border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
 
     h1 {
       font-size: 28px;
       font-weight: 700;
-      color: black;
+      color: var(--app-text-color);
       margin: 0;
     }
 
@@ -67,18 +68,18 @@ $profile-text-light: var(--app-text-color-light, #777);
         border-radius: 50%;
         background: linear-gradient(
           135deg,
-          $profile-primary-tint,
-          $profile-primary
+          var(--ion-color-primary-tint),
+          var(--ion-color-primary)
         );
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        border: 4px solid white;
+        box-shadow: var(--app-shadow-md);
+        border: 4px solid var(--app-card-color);
 
         .avatar-icon {
           font-size: 60px;
-          color: white;
+          color: var(--ion-color-primary-contrast);
         }
       }
 
@@ -89,16 +90,16 @@ $profile-text-light: var(--app-text-color-light, #777);
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: $profile-primary;
+        background: var(--ion-color-primary);
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--app-shadow-sm);
         cursor: pointer;
 
         ion-icon {
           font-size: 20px;
-          color: white;
+          color: var(--ion-color-primary-contrast);
         }
       }
     }
@@ -107,13 +108,13 @@ $profile-text-light: var(--app-text-color-light, #777);
       margin: 0;
       font-size: 1.8rem;
       font-weight: 600;
-      color: $profile-text-dark;
+      color: var(--app-text-color);
     }
 
     .user-email {
       margin: 0.5rem 0 0;
       font-size: 1rem;
-      color: $profile-text-medium;
+      color: var(--app-text-color-medium);
     }
   }
 
@@ -122,12 +123,13 @@ $profile-text-light: var(--app-text-color-light, #777);
     .profile-card {
       margin-bottom: 1.5rem;
       border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      background: rgba(255, 255, 255, 0.9);
+      box-shadow: var(--app-shadow-md);
+      background: var(--app-card-color);
+      border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
 
       ion-card-header {
-        background-color: rgba(255, 255, 255, 0.9);
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        background: var(--app-card-color);
+        border-bottom: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
 
         .card-header-content {
           display: flex;
@@ -136,28 +138,28 @@ $profile-text-light: var(--app-text-color-light, #777);
           .section-icon {
             font-size: 24px;
             margin-right: 10px;
-            color: $profile-primary;
+            color: var(--ion-color-primary);
           }
 
           ion-card-title {
             font-size: 1.2rem;
             font-weight: 600;
             margin: 0;
-            color: $profile-text-dark;
+            color: var(--ion-color-primary);
           }
         }
       }
 
       ion-card-content {
         padding: 0;
-        background-color: rgba(255, 255, 255, 0.9);
+        background: var(--app-card-color);
 
         ion-list {
-          background-color: transparent;
+          background: transparent;
           padding: 0;
 
           ion-item {
-            --background: rgba(255, 255, 255, 0.9);
+            --background: var(--app-card-color);
             --padding-start: 16px;
             --padding-end: 16px;
             --padding-top: 12px;
@@ -166,28 +168,29 @@ $profile-text-light: var(--app-text-color-light, #777);
 
             ion-icon {
               margin-right: 16px;
+              color: var(--ion-color-primary);
             }
 
             ion-label {
               h2 {
                 font-size: 1rem;
                 font-weight: 500;
-                color: $profile-text-dark;
+                color: var(--app-text-color);
                 margin-bottom: 4px;
               }
 
               p {
                 font-size: 0.85rem;
-                color: $profile-text-light;
+                color: var(--app-text-color-medium);
                 margin: 0;
               }
             }
 
             ion-toggle {
-              --background: #e0e0e0;
+              --background: rgba(var(--ion-color-primary-rgb), 0.2);
               --background-checked: var(--ion-color-primary);
-              --handle-background: white;
-              --handle-background-checked: white;
+              --handle-background: var(--app-card-color);
+              --handle-background-checked: var(--app-card-color);
             }
           }
         }
@@ -198,7 +201,7 @@ $profile-text-light: var(--app-text-color-light, #777);
     .logout-button {
       margin-top: 1rem;
       --border-radius: 12px;
-      --box-shadow: 0 4px 8px rgba(var(--ion-color-danger-rgb), 0.3);
+      --box-shadow: var(--app-shadow-md);
       font-weight: 600;
     }
   }
@@ -206,30 +209,61 @@ $profile-text-light: var(--app-text-color-light, #777);
 
 // Estilos para el modal
 .profile-modal {
+  --height: auto;
+  --width: 90%;
+  --max-width: 500px;
   --border-radius: 16px;
   --background: var(--app-background-light);
+
+  &::part(content) {
+    border-radius: 16px;
+    box-shadow: var(--app-shadow-lg);
+  }
+
+  ion-header {
+    ion-toolbar {
+      --background: var(--app-card-color);
+      --color: var(--app-text-color);
+      border-bottom: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
+
+      ion-title {
+        color: var(--ion-color-primary);
+        font-weight: 600;
+      }
+
+      ion-button {
+        --color: var(--ion-color-primary);
+        font-weight: 600;
+      }
+    }
+  }
 
   .modal-content {
     --background: var(--app-background-light);
 
     .form-container {
-      padding: 16px;
+      padding: 1.5rem;
 
       .custom-input {
-        --background: white;
+        --background: var(--app-card-color);
         --border-radius: 8px;
         margin-bottom: 16px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        box-shadow: var(--app-shadow-sm);
+        border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
 
         ion-label {
-          color: $profile-text-medium;
-          font-size: 0.9rem;
+          color: var(--ion-color-primary) !important;
+          font-weight: 500;
+          margin-bottom: 8px;
         }
 
         ion-input {
-          --color: $profile-text-dark;
-          --placeholder-color: $profile-text-light;
+          --color: var(--app-text-color);
+          --placeholder-color: var(--app-text-color-medium);
           --placeholder-opacity: 0.7;
+          font-size: 1rem;
+          transform: none !important;
+          transition: none !important;
         }
       }
 
@@ -241,10 +275,6 @@ $profile-text-light: var(--app-text-color-light, #777);
         padding-left: 16px;
       }
     }
-  }
-
-  ion-header ion-toolbar {
-    --background: var(--app-card-color);
   }
 }
 
@@ -296,25 +326,62 @@ $profile-text-light: var(--app-text-color-light, #777);
   }
 
   .profile-modal {
-    ion-header ion-toolbar {
-      --background: var(--app-card-color);
-      --color: var(--app-text-color);
-    }
+    --background: var(--app-background-dark);
 
     .modal-content {
-      --background: var(--app-background-light);
+      --background: var(--app-background-dark);
 
       .custom-input {
         --background: var(--app-card-color);
-
+        
         ion-label {
-          color: var(--app-text-color-medium);
+          color: var(--app-text-color-medium) !important;
         }
 
         ion-input {
-          --color: var(--app-text-color);
-          --placeholder-color: var(--app-text-color-medium);
+          --color: var(--app-text-color) !important;
+          --placeholder-color: var(--app-text-color-medium) !important;
         }
+      }
+    }
+
+    ion-header ion-toolbar {
+      --background: var(--app-card-color);
+      --color: var(--app-text-color);
+
+      ion-title {
+        color: var(--app-text-color);
+      }
+
+      ion-button {
+        --color: var(--app-text-color);
+      }
+    }
+  }
+
+  .theme-selector-container {
+    ion-list {
+      ion-item {
+        --background: var(--app-card-color);
+        --color: var(--app-text-color);
+
+        &.selected-theme {
+          --background: var(--ion-color-primary-shade);
+          --color: var(--ion-color-primary-contrast);
+        }
+      }
+    }
+  }
+
+  .custom-color-container {
+    background: var(--app-card-color);
+    
+    ion-item {
+      --background: var(--app-card-color);
+      --color: var(--app-text-color);
+      
+      ion-label {
+        color: var(--app-text-color);
       }
     }
   }
@@ -343,17 +410,18 @@ ion-card-content ion-list ion-item ion-label p {
   padding: 1rem;
 
   ion-list {
-    background: transparent;
+    background: transparent !important;
     padding: 0;
 
     ion-item {
       --background: var(--app-card-color);
-      --background-activated: var(--app-card-color);
+      --color: var(--app-text-color);
       margin-bottom: 0.5rem;
       border-radius: 8px;
+      border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
 
       &.selected-theme {
-        --background: var(--ion-color-primary-tint);
+        --background: rgba(var(--ion-color-primary-rgb), 0.1);
         --color: var(--ion-color-primary);
         font-weight: 600;
 
@@ -367,26 +435,24 @@ ion-card-content ion-list ion-item ion-label p {
         margin-right: 1rem;
 
         &[name="water-outline"] {
-          color: #2196f3;
+          color: var(--ion-color-primary);
         }
         &[name="leaf-outline"] {
-          color: #4caf50;
+          color: var(--ion-color-success);
         }
         &[name="flame-outline"] {
-          color: #ff9800;
+          color: var(--ion-color-warning);
         }
         &[name="flower-outline"] {
-          color: #9c27b0;
-        }
-        &[name="sunny-outline"] {
-          color: #ffc107;
-        }
-        &[name="moon-outline"] {
-          color: #607d8b;
+          color: var(--ion-color-secondary);
         }
         &[name="color-palette-outline"] {
-          color: #e91e63;
+          color: var(--ion-color-tertiary);
         }
+      }
+
+      ion-label {
+        color: var(--app-text-color);
       }
     }
   }
@@ -397,8 +463,65 @@ ion-card-content ion-list ion-item ion-label p {
   padding: 1rem;
   background: var(--app-card-color);
   border-radius: 8px;
+  border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
 
-  ion-button {
-    margin-top: 1rem;
+  ion-item {
+    --background: transparent;
+    --border-color: transparent;
+    --padding-start: 0;
+    --inner-padding-end: 0;
+
+    ion-label {
+      color: var(--app-text-color);
+      margin-bottom: 1rem;
+    }
   }
+}
+
+.color-preview-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: transparent;
+
+  .color-picker {
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: transparent;
+
+    &::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    &::-webkit-color-swatch {
+      border: none;
+      border-radius: 8px;
+    }
+  }
+
+  .color-preview {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
+  }
+
+  .color-value {
+    font-family: monospace;
+    color: var(--app-text-color);
+    font-size: 1rem;
+  }
+}
+
+.apply-color-button {
+  margin-top: 1rem;
+  --border-radius: 8px;
+  --box-shadow: var(--app-shadow-md);
+  font-weight: 600;
 }

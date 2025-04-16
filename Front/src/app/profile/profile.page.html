@@ -364,30 +364,48 @@
         <ion-title>Seleccionar Tema</ion-title>
       </ion-toolbar>
     </ion-header>
+
     <ion-content class="modal-content">
       <div class="theme-selector-container">
-        <ion-list>
+        <ion-list lines="none">
           <ion-item
             *ngFor="let theme of themeOptions"
-            (click)="changeTheme(theme.value)"
-            [class.selected-theme]="themeService.getCurrentTheme() === theme.value"
+            (click)="selectTheme(theme.value)"
+            [class.selected-theme]="selectedTheme === theme.value"
             button
+            detail="false"
           >
             <ion-icon [name]="theme.icon" slot="start"></ion-icon>
             <ion-label>{{ theme.label }}</ion-label>
+            <ion-icon 
+              name="checkmark" 
+              slot="end" 
+              *ngIf="selectedTheme === theme.value"
+              color="primary"
+            ></ion-icon>
           </ion-item>
         </ion-list>
 
-        <!-- Selector de color personalizado -->
-        <div
-          class="custom-color-container"
-          *ngIf="themeService.getCurrentTheme() === 'custom'"
-        >
-          <ion-item>
+        <div class="custom-color-container" *ngIf="selectedTheme === 'custom'">
+          <ion-item lines="none">
             <ion-label position="stacked">Color personalizado</ion-label>
-            <ion-input type="color" [(ngModel)]="customColorInput"></ion-input>
+            <div class="color-preview-container">
+              <input 
+                type="color" 
+                [(ngModel)]="customColorInput" 
+                (change)="onColorChange($event)"
+                class="color-picker"
+              >
+              <div class="color-preview" [style.background-color]="customColorInput"></div>
+              <span class="color-value">{{customColorInput}}</span>
+            </div>
           </ion-item>
-          <ion-button expand="block" (click)="applyCustomColor()">
+          <ion-button 
+            expand="block" 
+            (click)="applyCustomColor()" 
+            class="apply-color-button"
+            [disabled]="!customColorInput"
+          >
             <ion-icon name="color-palette-outline" slot="start"></ion-icon>
             Aplicar color personalizado
           </ion-button>
