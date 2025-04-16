@@ -29,18 +29,15 @@ export class ProfilePage implements OnInit {
   showThemeSelectorModal = false;
   profileForm: FormGroup;
   passwordForm: FormGroup;
-  customColorInput: string = '#ff00ff'; // Color rosa por defecto
+  selectedTheme: ColorTheme = 'blue';
+  customColorInput: string = '#2196F3'; // Color azul por defecto
 
   themeOptions = [
     { value: 'blue' as ColorTheme, label: 'Azul', icon: 'water-outline' },
     { value: 'green' as ColorTheme, label: 'Verde', icon: 'leaf-outline' },
     { value: 'orange' as ColorTheme, label: 'Naranja', icon: 'flame-outline' },
     { value: 'purple' as ColorTheme, label: 'Morado', icon: 'flower-outline' },
-    {
-      value: 'custom' as ColorTheme,
-      label: 'Personalizado',
-      icon: 'color-palette-outline',
-    },
+    { value: 'custom' as ColorTheme, label: 'Personalizado', icon: 'color-palette-outline' },
   ];
 
   constructor(
@@ -77,6 +74,7 @@ export class ProfilePage implements OnInit {
     this.loadUserProfile();
     this.loadSettings();
     this.settings.darkMode = this.themeService.isDarkMode();
+    this.selectedTheme = this.themeService.getCurrentTheme();
 
     const savedColor = localStorage.getItem('custom-primary-color');
     if (savedColor) {
@@ -120,27 +118,36 @@ export class ProfilePage implements OnInit {
     this.saveSettings();
   }
 
-  changeTheme(theme: ColorTheme) {
-    if (theme === 'custom') {
-      this.themeService.updateCustomColors(this.customColorInput);
-    } else {
-      this.themeService.applyTheme(theme);
-    }
-    this.showThemeSelectorModal = false;
-  }
-
-  applyCustomColor() {
-    this.themeService.updateCustomColors(this.customColorInput);
-    this.themeService.applyTheme('custom');
-    this.showThemeSelectorModal = false;
-  }
-
   openThemeSelector() {
+    this.selectedTheme = this.themeService.getCurrentTheme();
     this.showThemeSelectorModal = true;
   }
 
+  selectTheme(theme: ColorTheme) {
+    console.log('Selecting theme:', theme); // Para debugging
+    this.selectedTheme = theme;
+    if (theme !== 'custom') {
+      this.themeService.applyTheme(theme);
+      this.showThemeSelectorModal = false;
+      this.presentToast(`Tema ${this.getThemeName()} aplicado`, 'success');
+    }
+  }
+
+  onColorChange(event: any) {
+    this.customColorInput = event.target.value;
+  }
+
+  applyCustomColor() {
+    if (this.customColorInput) {
+      this.themeService.updateCustomColors(this.customColorInput);
+      this.themeService.applyTheme('custom');
+      this.selectedTheme = 'custom';
+      this.showThemeSelectorModal = false;
+      this.presentToast('Color personalizado aplicado', 'success');
+    }
+  }
+
   getThemeName() {
-    const currentTheme = this.themeService.getCurrentTheme();
     const themeMap: { [key: string]: string } = {
       blue: 'Azul',
       green: 'Verde',
@@ -148,7 +155,7 @@ export class ProfilePage implements OnInit {
       purple: 'Morado',
       custom: 'Personalizado',
     };
-    return themeMap[currentTheme] || 'Azul';
+    return themeMap[this.selectedTheme] || 'Azul';
   }
 
   openLanguageSelector() {
