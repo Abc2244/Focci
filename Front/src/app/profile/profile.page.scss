@@ -5,10 +5,10 @@ $profile-primary: var(--ion-color-primary);
 $profile-primary-tint: var(--ion-color-primary-tint);
 $profile-primary-shade: var(--ion-color-primary-shade);
 $profile-light-bg: var(--app-background-light);
-$profile-card-bg: var(--app-card-color, white);
+$profile-card-bg: var(--app-card-color);
 $profile-text-dark: var(--app-text-color);
-$profile-text-medium: var(--app-text-color-medium, #555);
-$profile-text-light: var(--app-text-color-light, #777);
+$profile-text-medium: var(--app-text-color-medium);
+$profile-text-light: var(--app-text-color-light);
 
 .profile-content {
   --background: linear-gradient(
@@ -44,7 +44,7 @@ $profile-text-light: var(--app-text-color-light, #777);
     align-items: center;
     margin-bottom: 2rem;
     text-align: center;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--app-card-color);
     border-radius: 16px;
     padding: 1.5rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -53,7 +53,7 @@ $profile-text-light: var(--app-text-color-light, #777);
     h1 {
       font-size: 28px;
       font-weight: 700;
-      color: black;
+      color: var(--app-text-color);
       margin: 0;
     }
 
@@ -107,13 +107,13 @@ $profile-text-light: var(--app-text-color-light, #777);
       margin: 0;
       font-size: 1.8rem;
       font-weight: 600;
-      color: $profile-text-dark;
+      color: var(--app-text-color);
     }
 
     .user-email {
       margin: 0.5rem 0 0;
       font-size: 1rem;
-      color: $profile-text-medium;
+      color: var(--app-text-color-medium);
     }
   }
 
@@ -123,11 +123,11 @@ $profile-text-light: var(--app-text-color-light, #777);
       margin-bottom: 1.5rem;
       border-radius: 16px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      background: rgba(255, 255, 255, 0.9);
+      background: var(--app-card-color);
 
       ion-card-header {
-        background-color: rgba(255, 255, 255, 0.9);
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        background: var(--app-card-color);
+        border-bottom: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
 
         .card-header-content {
           display: flex;
@@ -136,28 +136,28 @@ $profile-text-light: var(--app-text-color-light, #777);
           .section-icon {
             font-size: 24px;
             margin-right: 10px;
-            color: $profile-primary;
+            color: var(--ion-color-primary);
           }
 
           ion-card-title {
             font-size: 1.2rem;
             font-weight: 600;
             margin: 0;
-            color: $profile-text-dark;
+            color: var(--app-text-color);
           }
         }
       }
 
       ion-card-content {
         padding: 0;
-        background-color: rgba(255, 255, 255, 0.9);
+        background: var(--app-card-color);
 
         ion-list {
-          background-color: transparent;
+          background: transparent;
           padding: 0;
 
           ion-item {
-            --background: rgba(255, 255, 255, 0.9);
+            --background: var(--app-card-color);
             --padding-start: 16px;
             --padding-end: 16px;
             --padding-top: 12px;
@@ -172,13 +172,13 @@ $profile-text-light: var(--app-text-color-light, #777);
               h2 {
                 font-size: 1rem;
                 font-weight: 500;
-                color: $profile-text-dark;
+                color: var(--app-text-color);
                 margin-bottom: 4px;
               }
 
               p {
                 font-size: 0.85rem;
-                color: $profile-text-light;
+                color: var(--app-text-color-medium);
                 margin: 0;
               }
             }
@@ -206,8 +206,12 @@ $profile-text-light: var(--app-text-color-light, #777);
 
 // Estilos para el modal
 .profile-modal {
-  --border-radius: 16px;
   --background: var(--app-background-light);
+
+  ion-header ion-toolbar {
+    --background: var(--app-card-color);
+    --color: var(--app-text-color);
+  }
 
   .modal-content {
     --background: var(--app-background-light);
@@ -216,19 +220,19 @@ $profile-text-light: var(--app-text-color-light, #777);
       padding: 16px;
 
       .custom-input {
-        --background: white;
+        --background: var(--app-card-color);
         --border-radius: 8px;
         margin-bottom: 16px;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
 
         ion-label {
-          color: $profile-text-medium;
+          color: var(--app-text-color-medium);
           font-size: 0.9rem;
         }
 
         ion-input {
-          --color: $profile-text-dark;
-          --placeholder-color: $profile-text-light;
+          --color: var(--app-text-color);
+          --placeholder-color: var(--app-text-color-medium);
           --placeholder-opacity: 0.7;
         }
       }
@@ -241,10 +245,6 @@ $profile-text-light: var(--app-text-color-light, #777);
         padding-left: 16px;
       }
     }
-  }
-
-  ion-header ion-toolbar {
-    --background: var(--app-card-color);
   }
 }
 
@@ -339,6 +339,7 @@ ion-card-content ion-list ion-item ion-label p {
   color: var(--app-text-color-medium) !important;
 }
 
+// Estilos para el selector de tema
 .theme-selector-container {
   padding: 1rem;
 
@@ -351,6 +352,7 @@ ion-card-content ion-list ion-item ion-label p {
       --background-activated: var(--app-card-color);
       margin-bottom: 0.5rem;
       border-radius: 8px;
+      --color: var(--app-text-color);
 
       &.selected-theme {
         --background: rgba(var(--ion-color-primary-rgb), 0.1);
@@ -397,6 +399,19 @@ ion-card-content ion-list ion-item ion-label p {
   padding: 1rem;
   background: var(--app-card-color);
   border-radius: 8px;
+
+  ion-item {
+    --background: var(--app-card-color);
+    --color: var(--app-text-color);
+    
+    ion-label {
+      color: var(--app-text-color);
+    }
+    
+    ion-input {
+      --color: var(--app-text-color);
+    }
+  }
 
   ion-button {
     margin-top: 1rem;
