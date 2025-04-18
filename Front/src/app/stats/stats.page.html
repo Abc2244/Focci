@@ -1,7 +1,9 @@
 <ion-content class="stats-content">
   <div class="page-container">
-    <div class="page-title">
+    <!-- Encabezado -->
+    <div class="page-header">
       <h1>Estadísticas</h1>
+      <p>Resumen de tu actividad</p>
     </div>
 
     <!-- Selector de período -->
@@ -9,27 +11,28 @@
       [(ngModel)]="selectedPeriod"
       (ionChange)="segmentChanged($event)"
       class="period-segment"
+      mode="ios"
     >
-      <ion-segment-button value="week">
+      <ion-segment-button value="week" mode="ios">
         <ion-label>Semana</ion-label>
       </ion-segment-button>
-      <ion-segment-button value="month">
+      <ion-segment-button value="month" mode="ios">
         <ion-label>Mes</ion-label>
       </ion-segment-button>
-      <ion-segment-button value="semester">
+      <ion-segment-button value="semester" mode="ios">
         <ion-label>Semestre</ion-label>
       </ion-segment-button>
     </ion-segment>
 
     <!-- Pantalla de carga -->
     <div class="loading-container" *ngIf="isLoading">
-      <ion-spinner name="crescent"></ion-spinner>
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
       <p>Cargando estadísticas...</p>
     </div>
 
     <!-- Mensaje de error -->
     <div class="error-container" *ngIf="error && !isLoading">
-      <ion-icon name="alert-circle-outline"></ion-icon>
+      <ion-icon name="alert-circle-outline" color="danger"></ion-icon>
       <h3>No se pudieron cargar las estadísticas</h3>
       <p>{{ error }}</p>
       <ion-button (click)="loadStats()" fill="outline" size="small">
@@ -46,8 +49,10 @@
             <div class="stat-icon">
               <ion-icon name="create-outline"></ion-icon>
             </div>
-            <div class="stat-value">{{ stats.tasksCreated }}</div>
-            <div class="stat-label">Tareas Creadas</div>
+            <div class="stat-info">
+              <div class="stat-value">{{ stats.tasksCreated }}</div>
+              <div class="stat-label">Tareas Creadas</div>
+            </div>
           </ion-card-content>
         </ion-card>
 
@@ -56,8 +61,10 @@
             <div class="stat-icon">
               <ion-icon name="checkmark-circle-outline"></ion-icon>
             </div>
-            <div class="stat-value">{{ stats.tasksCompleted }}</div>
-            <div class="stat-label">Tareas Completadas</div>
+            <div class="stat-info">
+              <div class="stat-value">{{ stats.tasksCompleted }}</div>
+              <div class="stat-label">Completadas</div>
+            </div>
           </ion-card-content>
         </ion-card>
 
@@ -66,50 +73,66 @@
             <div class="stat-icon">
               <ion-icon name="trending-up-outline"></ion-icon>
             </div>
-            <div class="stat-value">{{ stats.completionRate }}%</div>
-            <div class="stat-label">Tasa de Completado</div>
+            <div class="stat-info">
+              <div class="stat-value">{{ stats.completionRate }}%</div>
+              <div class="stat-label">Tasa de Éxito</div>
+            </div>
           </ion-card-content>
         </ion-card>
       </div>
 
-      <!-- Tarjetas de puntualidad -->
-      <div class="stats-detail" *ngIf="stats.tasksCompleted > 0">
-        <ion-card class="detail-card">
+      <!-- Gráficos y detalles -->
+      <div class="stats-details">
+        <!-- Puntualidad -->
+        <ion-card class="detail-card" *ngIf="stats.tasksCompleted > 0">
           <ion-card-header>
-            <ion-card-title>Puntualidad</ion-card-title>
+            <ion-card-title>
+              <ion-icon name="time-outline"></ion-icon>
+              Puntualidad
+            </ion-card-title>
           </ion-card-header>
           <ion-card-content>
             <div class="chart-container">
-              <canvas id="punctualityChart" height="200"></canvas>
+              <canvas id="punctualityChart"></canvas>
             </div>
             <div class="punctuality-stats">
-              <div class="punctuality-item on-time">
-                <div class="punctuality-value">{{ stats.onTimeRate }}%</div>
-                <div class="punctuality-label">A tiempo</div>
+              <div class="stat-item on-time">
+                <div class="stat-circle">
+                  <ion-icon name="checkmark-outline"></ion-icon>
+                </div>
+                <div class="stat-details">
+                  <span class="stat-value">{{ stats.onTimeRate }}%</span>
+                  <span class="stat-label">A tiempo</span>
+                </div>
               </div>
-              <div class="punctuality-item late">
-                <div class="punctuality-value">{{ stats.lateRate }}%</div>
-                <div class="punctuality-label">Con retraso</div>
+              <div class="stat-item late">
+                <div class="stat-circle">
+                  <ion-icon name="time-outline"></ion-icon>
+                </div>
+                <div class="stat-details">
+                  <span class="stat-value">{{ stats.lateRate }}%</span>
+                  <span class="stat-label">Con retraso</span>
+                </div>
               </div>
             </div>
           </ion-card-content>
         </ion-card>
-      </div>
 
-      <!-- Distribución por materias -->
-      <div
-        class="stats-detail"
-        *ngIf="subjectDistribution && subjectDistribution.length > 0"
-      >
-        <ion-card class="detail-card">
+        <!-- Distribución por materias -->
+        <ion-card
+          class="detail-card"
+          *ngIf="subjectDistribution && subjectDistribution.length > 0"
+        >
           <ion-card-header>
-            <ion-card-title>Distribución por Materias</ion-card-title>
+            <ion-card-title>
+              <ion-icon name="book-outline"></ion-icon>
+              Distribución por Materias
+            </ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            <div class="chart-container chart-container-large">
-              <canvas id="subjectChart" height="300"></canvas>
+            <div class="chart-container">
+              <canvas id="subjectChart"></canvas>
             </div>
-            <!-- Lista de materias con sus porcentajes -->
             <div class="subject-list">
               <div
                 class="subject-item"
@@ -119,37 +142,42 @@
                   class="subject-color"
                   [style.background-color]="getSubjectColor(i)"
                 ></div>
-                <div class="subject-name">{{ subject.name }}</div>
-                <div class="subject-percentage">{{ subject.percentage }}%</div>
+                <div class="subject-info">
+                  <span class="subject-name">{{ subject.name }}</span>
+                  <span class="subject-percentage"
+                    >{{ subject.percentage }}%</span
+                  >
+                </div>
               </div>
             </div>
           </ion-card-content>
         </ion-card>
-      </div>
 
-      <!-- Actividad Semanal -->
-      <div
-        class="stats-detail"
-        *ngIf="weeklyActivity && weeklyActivity.length > 0"
-      >
-        <ion-card class="detail-card">
+        <!-- Actividad Semanal -->
+        <ion-card
+          class="detail-card"
+          *ngIf="weeklyActivity && weeklyActivity.length > 0"
+        >
           <ion-card-header>
-            <ion-card-title>Actividad Semanal</ion-card-title>
+            <ion-card-title>
+              <ion-icon name="calendar-outline"></ion-icon>
+              Actividad Semanal
+            </ion-card-title>
           </ion-card-header>
           <ion-card-content>
             <div class="chart-container">
-              <canvas id="weeklyChart" height="200"></canvas>
+              <canvas id="weeklyChart"></canvas>
             </div>
             <div class="weekly-activity">
               <div class="day-activity" *ngFor="let day of weeklyActivity">
-                <div class="day-name">{{ day.day }}</div>
+                <span class="day-name">{{ day.day }}</span>
                 <div class="activity-bar-container">
                   <div
                     class="activity-bar"
                     [style.width.%]="day.percentage"
                   ></div>
                 </div>
-                <div class="day-percentage">{{ day.percentage }}%</div>
+                <span class="day-percentage">{{ day.percentage }}%</span>
               </div>
             </div>
           </ion-card-content>
@@ -158,11 +186,9 @@
 
       <!-- Mensaje cuando no hay datos -->
       <div class="no-data-message" *ngIf="stats.tasksCreated === 0">
-        <ion-icon name="information-circle-outline"></ion-icon>
-        <p>No hay datos suficientes para este período.</p>
-        <p class="no-data-hint">
-          Crea y completa tareas para ver estadísticas.
-        </p>
+        <ion-icon name="information-circle-outline" color="medium"></ion-icon>
+        <h3>No hay datos suficientes</h3>
+        <p>Crea y completa tareas para ver estadísticas detalladas.</p>
       </div>
     </div>
   </div>

@@ -196,6 +196,27 @@ export class CalendarPage implements OnInit {
     });
   }
 
+  // Añadir después del constructor
+  private getEventColor(type: string, index: number = 0): string {
+    const colors = {
+      class: {
+        base: 'primary',
+        variants: ['primary', 'primary-shade', 'primary-tint'],
+      },
+      task: {
+        base: 'secondary',
+        variants: ['secondary', 'secondary-shade', 'secondary-tint'],
+      },
+      reminder: {
+        base: 'tertiary',
+        variants: ['tertiary', 'tertiary-shade', 'tertiary-tint'],
+      },
+    };
+
+    const colorSet = colors[type as keyof typeof colors] || colors.class;
+    return colorSet.variants[index % colorSet.variants.length];
+  }
+
   // Actualizar eventos del calendario según el filtro seleccionado
   updateCalendarEvents() {
     // Limpiar eventos existentes
@@ -206,7 +227,7 @@ export class CalendarPage implements OnInit {
 
     // Agregar clases al calendario
     if (this.eventFilter === 'all' || this.eventFilter === 'class') {
-      this.subjects.forEach((subject) => {
+      this.subjects.forEach((subject, index) => {
         if (subject.schedule && subject.schedule.length > 0) {
           subject.schedule.forEach((scheduleItem: any) => {
             const dayOfWeek = this.getDayNumber(scheduleItem.day);
@@ -220,7 +241,7 @@ export class CalendarPage implements OnInit {
                   details: `Aula: ${subject.classroom || 'No especificada'}`,
                   time: this.ensureTimeFormat(scheduleItem.startTime),
                   type: 'class',
-                  color: 'primary',
+                  color: this.getEventColor('class', index),
                   subjectId: subject._id,
                 });
               }
@@ -230,18 +251,14 @@ export class CalendarPage implements OnInit {
       });
     }
 
-    // Agregar tareas al calendario si el filtro lo permite
+    // Agregar tareas al calendario
     if (this.eventFilter === 'all' || this.eventFilter === 'task') {
-      this.tasks.forEach((task) => {
+      this.tasks.forEach((task, index) => {
         if (task.due_date) {
           const taskDate = new Date(task.due_date);
 
           this.calendarDays.forEach((day) => {
-            if (
-              day.date.getDate() === taskDate.getDate() &&
-              day.date.getMonth() === taskDate.getMonth() &&
-              day.date.getFullYear() === taskDate.getFullYear()
-            ) {
+            if (this.isSameDay(taskDate, day.date)) {
               day.hasEvents = true;
               day.events.push({
                 id: task._id,
@@ -249,7 +266,7 @@ export class CalendarPage implements OnInit {
                 details: this.getSubjectName(task.subject_id),
                 time: this.formatTime(task.due_date),
                 type: 'task',
-                color: 'warning',
+                color: this.getEventColor('task', index),
                 completed: task.completed,
               });
             }
@@ -258,22 +275,14 @@ export class CalendarPage implements OnInit {
       });
     }
 
-    // Agregar recordatorios al calendario si el filtro lo permite
+    // Agregar recordatorios al calendario
     if (this.eventFilter === 'all' || this.eventFilter === 'reminder') {
-      console.log('Procesando recordatorios:', this.reminders);
-
-      this.reminders.forEach((reminder) => {
+      this.reminders.forEach((reminder, index) => {
         if (reminder.reminder_date) {
           const reminderDate = new Date(reminder.reminder_date);
 
-          console.log('Recordatorio:', reminder._id, 'Fecha:', reminderDate);
-
           this.calendarDays.forEach((day) => {
-            if (
-              day.date.getDate() === reminderDate.getDate() &&
-              day.date.getMonth() === reminderDate.getMonth() &&
-              day.date.getFullYear() === reminderDate.getFullYear()
-            ) {
+            if (this.isSameDay(reminderDate, day.date)) {
               day.hasEvents = true;
               day.events.push({
                 id: reminder._id,
@@ -281,7 +290,7 @@ export class CalendarPage implements OnInit {
                 details: this.getTaskName(reminder.task_id),
                 time: this.formatTime(reminder.reminder_date),
                 type: 'reminder',
-                color: 'tertiary',
+                color: this.getEventColor('reminder', index),
                 status: reminder.status,
               });
             }
@@ -290,8 +299,30 @@ export class CalendarPage implements OnInit {
       });
     }
 
-    // Actualizar eventos del día seleccionado
+    // Ordenar eventos por tipo y hora
+    this.calendarDays.forEach((day) => {
+      day.events.sort((a, b) => {
+        if (a.type !== b.type) {
+          const typeOrder = { class: 1, task: 2, reminder: 3 };
+          return (
+            typeOrder[a.type as keyof typeof typeOrder] -
+            typeOrder[b.type as keyof typeof typeOrder]
+          );
+        }
+        return this.compareTimeStrings(a.time, b.time);
+      });
+    });
+
     this.updateSelectedDayEvents();
+  }
+
+  private compareTimeStrings(timeA: string, timeB: string): number {
+    const parseTime = (time: string) => {
+      const [hours, minutes] = time.split(':').map(Number);
+      return hours * 60 + minutes;
+    };
+
+    return parseTime(timeA) - parseTime(timeB);
   }
 
   // Asegurar que el tiempo tenga un formato válido

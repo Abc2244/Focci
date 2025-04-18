@@ -23,6 +23,7 @@ interface EventItem {
   type: 'class' | 'event';
   subjectId?: string;
   date?: Date;
+  color: string;
 }
 
 type DayMap = {
@@ -212,14 +213,19 @@ export class WeekPage implements OnInit {
     }
 
     const selectedDate = new Date(this.weekDays[this.selectedDay].date);
-    this.filteredTasks = this.tasks.filter((task) => {
-      const taskDate = new Date(task.due_date);
-      return (
-        taskDate.getFullYear() === selectedDate.getFullYear() &&
-        taskDate.getMonth() === selectedDate.getMonth() &&
-        taskDate.getDate() === selectedDate.getDate()
-      );
-    });
+    this.filteredTasks = this.tasks
+      .filter((task) => {
+        const taskDate = new Date(task.due_date);
+        return (
+          taskDate.getFullYear() === selectedDate.getFullYear() &&
+          taskDate.getMonth() === selectedDate.getMonth() &&
+          taskDate.getDate() === selectedDate.getDate()
+        );
+      })
+      .map((task, index) => ({
+        ...task,
+        color: this.getEventColor('task', index),
+      }));
 
     // Ordenar las tareas filtradas por la hora de entrega
     this.filteredTasks.sort((a, b) => {
@@ -241,7 +247,7 @@ export class WeekPage implements OnInit {
     const selectedDate = this.weekDays[this.selectedDay].date;
     const selectedDayNumber = selectedDate.getDay();
 
-    subjects.forEach((subject) => {
+    subjects.forEach((subject, index) => {
       if (subject.schedule && Array.isArray(subject.schedule)) {
         subject.schedule.forEach((scheduleItem) => {
           if (
@@ -254,7 +260,6 @@ export class WeekPage implements OnInit {
 
           const scheduleDayNumber = this.getDayNumber(scheduleItem.day);
 
-          // Comparar con el día seleccionado
           if (scheduleDayNumber === selectedDayNumber) {
             const event: EventItem = {
               id: `${subject._id}-${scheduleDayNumber}`,
@@ -264,6 +269,7 @@ export class WeekPage implements OnInit {
               endTime: this.ensureTimeFormat(scheduleItem.endTime),
               type: 'class',
               subjectId: subject._id,
+              color: this.getEventColor('subject', index),
             };
 
             this.morningEvents.push(event);
@@ -552,5 +558,29 @@ export class WeekPage implements OnInit {
       date1.getMonth() === date2.getMonth() &&
       date1.getDate() === date2.getDate()
     );
+  }
+
+  private getEventColor(type: string, index: number = 0): string {
+    const colors = {
+      subject: {
+        base: 'var(--ion-color-primary)',
+        variants: [
+          'var(--ion-color-primary)',
+          'var(--ion-color-primary-shade)',
+          'var(--ion-color-primary-tint)',
+        ],
+      },
+      task: {
+        base: 'var(--ion-color-secondary)',
+        variants: [
+          'var(--ion-color-secondary)',
+          'var(--ion-color-secondary-shade)',
+          'var(--ion-color-secondary-tint)',
+        ],
+      },
+    };
+
+    const colorSet = type === 'subject' ? colors.subject : colors.task;
+    return colorSet.variants[index % colorSet.variants.length];
   }
 }

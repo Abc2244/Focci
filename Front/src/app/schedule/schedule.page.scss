@@ -1,7 +1,7 @@
 .schedule-content {
   --background: linear-gradient(
     135deg,
-    #f5f7fa 0%,
+    var(--app-background-light) 0%,
     var(--ion-color-primary-tint) 100%
   );
   --padding-top: 0;
@@ -16,7 +16,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(30, 136, 229, 0.05)" stroke-width="2"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(var(--ion-color-primary-rgb), 0.05)" stroke-width="2"/></svg>');
     background-size: 300px 300px;
     opacity: 0.5;
     pointer-events: none;
@@ -454,15 +454,15 @@ ion-modal {
   ion-content {
     --background: var(--app-background-light);
   }
-  
+
   ion-header ion-toolbar {
     --background: var(--app-card-color);
     --color: var(--ion-color-primary);
-    
+
     ion-title {
       color: var(--ion-color-primary);
     }
-    
+
     ion-button {
       --color: var(--ion-color-primary);
     }
