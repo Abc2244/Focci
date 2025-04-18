@@ -1,19 +1,6 @@
 <ion-content class="schedule-content">
   <div class="page-container">
-    <!-- Solo el selector flotante y las vistas -->
-    <div class="floating-view-selector">
-      <ion-select
-        [(ngModel)]="currentView"
-        (ionChange)="changeView($event.detail.value)"
-        interface="popover"
-        class="view-selector"
-      >
-        <ion-select-option value="schedule">Vista Horario</ion-select-option>
-        <ion-select-option value="week">Vista Semanal</ion-select-option>
-        <ion-select-option value="calendar">Vista Calendario</ion-select-option>
-      </ion-select>
-    </div>
-
+    <!-- Solo las vistas -->
     <div class="views-wrapper">
       <!-- Calendar View -->
       <div *ngIf="currentView === 'calendar'" class="view-container">
@@ -96,7 +83,7 @@
                     {{ event.title }}
                   </div>
                   <div class="event-time">
-                    {{ event.startTime | date:'HH:mm' }}
+                    {{ event.startTime | date:'h:mm a' }}
                   </div>
                 </div>
               </div>
@@ -118,6 +105,24 @@
       </div>
     </div>
   </div>
+  
+  <!-- Botón flotante para cambiar vistas -->
+  <ion-fab vertical="bottom" horizontal="start" slot="fixed" class="view-selector-fab">
+    <ion-fab-button>
+      <ion-icon name="apps"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-list side="top">
+      <ion-fab-button (click)="changeView('calendar')" [ngClass]="{'active': currentView === 'calendar'}">
+        <ion-icon name="calendar"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button (click)="changeView('schedule')" [ngClass]="{'active': currentView === 'schedule'}">
+        <ion-icon name="time"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button (click)="changeView('week')" [ngClass]="{'active': currentView === 'week'}">
+        <ion-icon name="grid"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
+  </ion-fab>
 
   <!-- Event details modal -->
   <ion-modal #eventModal>

@@ -72,7 +72,7 @@ export class SchedulePage implements OnInit {
     { name: 'Naranja', value: '#f57c00' },
     // Agrega más colores si es necesario
   ];
-  timeSlots = Array.from({ length: 24 }, (_, i) => i);
+  timeSlots = Array.from({ length: 17 }, (_, i) => i + 7); // Comienza desde las 7am hasta las 23 (7am-11pm)
   currentWeekLabel: string = '';
   currentView = 'schedule'; // 'calendar', 'schedule', 'week'
 
@@ -296,20 +296,30 @@ export class SchedulePage implements OnInit {
   }
 
   formatHour(hour: number): string {
-    return `${hour}:00`;
+    const hour12 = hour > 12 ? hour - 12 : hour;
+    const amPm = hour >= 12 ? 'PM' : 'AM';
+    return `${hour12}:00 ${amPm}`;
   }
 
   getEventStyle(event: CalendarEvent) {
-    const startHour = event.startTime.getHours();
-    const startMinute = event.startTime.getMinutes();
-    const endHour = event.endTime.getHours();
-    const endMinute = event.endTime.getMinutes();
+    const startHour = getHours(event.startTime);
+    const startMinute = getMinutes(event.startTime);
+    const endHour = getHours(event.endTime);
+    const endMinute = getMinutes(event.endTime);
 
-    const top = startHour * 60 + startMinute;
-    const height = endHour * 60 + endMinute - (startHour * 60 + startMinute);
+    // Ajustar la hora de inicio para el desplazamiento relativo a las 7am
+    const hourOffset = startHour - 7; // Restamos 7 porque ahora la hora de inicio es 7am
+    const minuteOffset = startMinute / 60;
+    const top = (hourOffset + minuteOffset) * 60;
 
-    const left = (event.day / 7) * 100;
-    const width = 100 / 7;
+    // Calcular la duración en horas
+    const durationHours = (endHour - startHour) + ((endMinute - startMinute) / 60);
+    const height = durationHours * 60;
+
+    // Posición del día (0-6) y ancho (considerando 7 días)
+    const dayWidth = 100 / 7;
+    const left = event.day * dayWidth;
+    const width = dayWidth;
 
     return {
       top: `${top}px`,
@@ -317,8 +327,6 @@ export class SchedulePage implements OnInit {
       left: `${left}%`,
       width: `${width}%`,
       backgroundColor: event.color,
-      opacity: event.type === 'reminder' ? '0.9' : '1',
-      border: event.type === 'reminder' ? '2px dashed white' : 'none',
     };
   }
 

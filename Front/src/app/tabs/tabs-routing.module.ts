@@ -62,7 +62,7 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/tabs/week',
+        redirectTo: '/tabs/schedule',
         pathMatch: 'full',
       },
     ],
@@ -70,7 +70,7 @@ const routes: Routes = [
   {
     // Ruta comodín para redirigir a la página principal
     path: '**',
-    redirectTo: '/tabs/week',
+    redirectTo: '/tabs/schedule',
     pathMatch: 'full',
   },
 ];
