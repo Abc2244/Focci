@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ToastController } from '@ionic/angular';
+import { ThemeService } from './theme.service';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -7,7 +8,10 @@ export type ToastType = 'success' | 'error' | 'warning' | 'info';
   providedIn: 'root',
 })
 export class ToastService {
-  constructor(private toastController: ToastController) {}
+  constructor(
+    private toastController: ToastController,
+    private themeService: ThemeService
+  ) {}
 
   /**
    * Muestra un toast con un estilo consistente en toda la aplicación
@@ -20,38 +24,31 @@ export class ToastService {
     type: ToastType = 'info',
     duration: number = 3000
   ) {
-    // Determinar el ícono según el tipo
-    let icon: string;
+    const isDark = this.themeService.isDarkMode();
+    
+    const toastConfig = {
+      success: { icon: 'checkmark-circle', emoji: '✨' },
+      error: { icon: 'close-circle', emoji: '❌' },
+      warning: { icon: 'warning', emoji: '⚠️' },
+      info: { icon: 'information-circle', emoji: 'ℹ️' }
+    };
 
-    switch (type) {
-      case 'success':
-        icon = 'checkmark-circle';
-        break;
-      case 'error':
-        icon = 'close-circle';
-        break;
-      case 'warning':
-        icon = 'warning';
-        break;
-      case 'info':
-      default:
-        icon = 'information-circle';
-        break;
-    }
+    const config = toastConfig[type];
+    const formattedMessage = `${config.emoji} ${message}`;
 
     const toast = await this.toastController.create({
-      message: message,
+      message: formattedMessage,
       duration: duration,
       position: 'top',
-      cssClass: `app-toast toast-${type}`,
+      cssClass: `app-toast toast-${type} ${isDark ? 'dark-toast' : 'light-toast'}`,
       animated: true,
       buttons: [
         {
-          icon: icon,
+          icon: config.icon,
           side: 'start',
-          role: 'cancel',
-        },
-      ],
+          role: 'cancel'
+        }
+      ]
     });
 
     await toast.present();

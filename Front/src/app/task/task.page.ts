@@ -184,22 +184,24 @@ export class TaskPage implements OnInit {
   async confirmDeleteTask(taskId: string) {
     const alert = await this.alertController.create({
       header: '¿Eliminar tarea?',
-      message:
-        '¿Estás seguro de que deseas eliminar esta tarea? También se eliminarán todos los recordatorios asociados. Esta acción no se puede deshacer.',
+      message: '¿Estás seguro de que deseas eliminar esta tarea? También se eliminarán todos los recordatorios asociados.',
+      cssClass: 'custom-alert delete-alert',
       buttons: [
         {
           text: 'Cancelar',
           role: 'cancel',
-          cssClass: 'secondary',
+          cssClass: 'alert-button-cancel',
+          handler: () => {}
         },
         {
           text: 'Eliminar',
           role: 'destructive',
+          cssClass: 'alert-button-delete',
           handler: () => {
             this.deleteTask(taskId);
-          },
-        },
-      ],
+          }
+        }
+      ]
     });
 
     await alert.present();

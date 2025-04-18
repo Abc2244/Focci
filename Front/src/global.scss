@@ -196,27 +196,63 @@ ion-button {
 
 // Toast personalizado
 .app-toast {
-  --border-radius: 12px;
-  --min-height: 48px;
-
-  &.toast-success {
-    --background: #e8f5e9;
-    --color: var(--ion-color-secondary);
+  font-family: 'Inter', sans-serif;
+  
+  &.dark-toast {
+    --background: var(--app-card-color);
+    --color: var(--ion-color-primary-tint);
   }
 
-  &.toast-error {
-    --background: #fff3e0;
-    --color: var(--ion-color-danger);
-  }
-
-  &.toast-warning {
-    --background: #fff8e1;
-    --color: var(--ion-color-warning);
-  }
-
-  &.toast-info {
-    --background: #e3f2fd;
+  &.light-toast {
+    --background: var(--app-card-color);
     --color: var(--ion-color-primary);
+  }
+
+  &::part(message) {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0;
+    font-weight: 500;
+    font-size: 1rem;
+  }
+
+  &::part(button) {
+    padding: 0;
+    margin: 0;
+    min-width: 24px;
+    height: 24px;
+    color: var(--ion-color-primary);
+    
+    ion-icon {
+      font-size: 20px;
+      --ionicon-stroke-width: 48px;
+      color: var(--ion-color-primary);
+    }
+  }
+
+  &::part(wrapper) {
+    padding: 12px 16px;
+    border-radius: 12px;
+    box-shadow: var(--app-shadow-sm);
+    background: var(--app-card-color);
+  }
+
+  // Estilos específicos para cada tipo de toast
+  &.toast-success ion-icon {
+    color: var(--ion-color-primary);
+  }
+
+  &.toast-error ion-icon {
+    color: var(--ion-color-primary);
+  }
+
+  &.toast-warning ion-icon {
+    color: var(--ion-color-primary);
+  }
+
+  &.toast-info ion-icon {
+    color: var(--ion-color-primary);
   }
 }
 
@@ -277,55 +313,67 @@ ion-select {
 
 // Estilos para los alerts personalizados
 .custom-alert {
-  --background: var(--app-card-color) !important;
-  --backdrop-opacity: 0.6 !important;
+  --backdrop-opacity: 0.6;
 
   .alert-wrapper {
-    background: var(--app-card-color) !important;
-    border-radius: var(--app-border-radius-lg) !important;
-    box-shadow: var(--app-shadow-lg) !important;
-    max-width: 320px !important;
+    background: var(--app-card-color);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 20px;
   }
 
   .alert-head {
-    text-align: center !important;
-    color: var(--app-text-color) !important;
+    padding: 16px;
+    text-align: center;
 
     .alert-title {
-      font-size: 1.3rem !important;
-      font-weight: 600 !important;
-      color: var(--app-text-color) !important;
+      color: var(--app-text-color);
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin: 0;
     }
   }
 
   .alert-message {
-    color: var(--app-text-color) !important;
-    text-align: center !important;
-    padding: 16px !important;
+    color: var(--app-text-color);
+    font-size: 1rem;
+    text-align: center;
+    padding: 0 16px 16px;
+    margin: 0;
   }
 
   .alert-button-group {
-    padding: 8px !important;
-    display: flex !important;
-    flex-direction: column !important;
+    padding: 0 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 
     button {
-      margin: 4px 0 !important;
-      border-radius: 8px !important;
-      color: var(--ion-color-primary) !important;
+      margin: 0;
+      border-radius: 8px;
+      height: 44px;
+      font-size: 1rem;
+      text-transform: none;
       
-      &.delete-button {
-        background-color: var(--ion-color-primary) !important;
-        color: var(--ion-color-primary-contrast) !important;
-        font-weight: 600 !important;
+      &.alert-button-cancel {
+        --background: var(--app-background-light);
+        color: var(--ion-color-medium);
+        font-weight: 500;
       }
       
-      &.cancel-button {
-        background-color: var(--app-background-light) !important;
-        color: var(--app-text-color) !important;
-        border: 1px solid rgba(var(--ion-color-medium-rgb), 0.2) !important;
+      &.alert-button-delete {
+        --background: var(--ion-color-primary);
+        color: white;
+        font-weight: 600;
       }
     }
+  }
+}
+
+// Estilos específicos para el alert de eliminación
+.delete-alert {
+  .alert-title {
+    color: var(--ion-color-primary) !important;
   }
 }
 
@@ -378,48 +426,6 @@ ion-toolbar {
 
 .item-subtitle {
   color: var(--app-text-color);
-}
-
-// Estilos para el toast personalizado
-.app-toast {
-  --border-radius: 8px;
-  --box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
-  --min-height: 48px;
-  --max-width: 90%;
-  font-weight: 500;
-  text-align: center;
-  padding: 12px 16px;
-  margin-top: 16px;
-
-  &::part(message) {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  &.toast-success {
-    --background: #e8f5e9;
-    --color: var(--ion-color-secondary);
-    --button-color: var(--ion-color-secondary);
-  }
-
-  &.toast-error {
-    --background: #fff3e0;
-    --color: var(--ion-color-danger);
-    --button-color: var(--ion-color-danger);
-  }
-
-  &.toast-warning {
-    --background: #fff8e1;
-    --color: var(--ion-color-warning);
-    --button-color: var(--ion-color-warning);
-  }
-
-  &.toast-info {
-    --background: #e3f2fd;
-    --color: var(--ion-color-primary);
-    --button-color: var(--ion-color-primary);
-  }
 }
 
 // Estilos para las tabs
