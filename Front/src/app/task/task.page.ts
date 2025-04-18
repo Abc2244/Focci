@@ -25,17 +25,32 @@ export class TaskPage implements OnInit {
   taskForm: FormGroup;
   currentTaskId: string | null = null;
   minDate: string;
-
-  // Modificar estas propiedades para permitir todas las horas
-  hourValues: number[] = Array.from({ length: 24 }, (_, i) => i); // 0-23 horas
-  minuteValues: number[] = [0, 15, 30, 45]; // Intervalos de 15 minutos
+  hourValues: number[] = Array.from({ length: 24 }, (_, i) => i);
+  minuteValues: number[] = [0, 15, 30, 45];
 
   get incompleteTasks() {
-    return this.tasks.filter((task) => !task.completed);
+    return this.tasks
+      .filter((task) => !task.completed)
+      .sort((a, b) => {
+        // Primero por prioridad (mayor a menor)
+        const priorityA = a.priority || 0;
+        const priorityB = b.priority || 0;
+        if (priorityA !== priorityB) {
+          return priorityB - priorityA;
+        }
+        // Luego por fecha de entrega (más cercana primero)
+        return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+      });
   }
 
   get completedTasks() {
-    return this.tasks.filter((task) => task.completed);
+    return this.tasks
+      .filter((task) => task.completed)
+      .sort(
+        (a, b) =>
+          new Date(b.completed_date!).getTime() -
+          new Date(a.completed_date!).getTime()
+      );
   }
 
   constructor(
@@ -46,7 +61,7 @@ export class TaskPage implements OnInit {
     private fb: FormBuilder
   ) {
     this.taskForm = this.fb.group({
-      description: ['', Validators.required],
+      description: ['', [Validators.required, Validators.minLength(3)]],
       due_date: ['', Validators.required],
       subject_id: ['', Validators.required],
       estimated_time: [30, [Validators.required, Validators.min(0)]],
@@ -58,15 +73,11 @@ export class TaskPage implements OnInit {
   ngOnInit() {
     this.loadSubjects();
     this.loadTasks();
-
-    // Asegurarse de que los valores de hora estén correctamente inicializados
-    this.hourValues = Array.from({ length: 24 }, (_, i) => i);
   }
 
   ionViewWillEnter() {
-    // Este método se llama cada vez que la página está a punto de ser mostrada
-    this.loadSubjects(); // Recargar las materias
-    this.loadTasks(); // Recargar las tareas
+    this.loadSubjects();
+    this.loadTasks();
   }
 
   loadSubjects() {
@@ -75,6 +86,7 @@ export class TaskPage implements OnInit {
       this.apiService.getUserSubjects(userId).subscribe({
         next: (subjects) => {
           this.subjects = subjects as Subject[];
+          this.subjectMap.clear();
           subjects.forEach((subject: any) => {
             this.subjectMap.set(subject._id, subject.name);
           });
@@ -103,8 +115,7 @@ export class TaskPage implements OnInit {
   }
 
   getSubjectName(subjectId: string): string {
-    const subject = this.subjects.find((s) => s._id === subjectId);
-    return subject ? subject.name : 'Materia no encontrada';
+    return this.subjectMap.get(subjectId) || 'Materia no encontrada';
   }
 
   isTaskLate(task: Task): boolean {
@@ -114,13 +125,41 @@ export class TaskPage implements OnInit {
     return new Date() > new Date(task.due_date);
   }
 
-  async completeTask(taskId: string | undefined) {
-    if (!taskId) return;
+  isUrgent(task: Task): boolean {
+    if (task.completed) return false;
 
+    const now = new Date();
+    const dueDate = new Date(task.due_date);
+    const diffHours = (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+    return diffHours <= 24; // Es urgente si faltan 24 horas o menos
+  }
+
+  getTaskTypeIcon(type: string | undefined): string {
+    switch (type?.toLowerCase()) {
+      case 'examen':
+        return 'school-outline';
+      case 'proyecto':
+        return 'build-outline';
+      case 'tarea':
+        return 'document-text-outline';
+      default:
+        return 'clipboard-outline';
+    }
+  }
+
+  getTotalEstimatedTime(): number {
+    return this.incompleteTasks.reduce(
+      (total, task) => total + (task.estimated_time || 0),
+      0
+    );
+  }
+
+  async completeTask(taskId: string) {
     this.apiService.completeTask(taskId).subscribe({
       next: () => {
         this.loadTasks();
-        this.toastService.showToast('Tarea completada exitosamente', 'success');
+        this.toastService.showToast('¡Tarea completada! 🎉', 'success');
       },
       error: (error) => {
         this.toastService.showToast('Error al completar la tarea', 'error');
@@ -129,48 +168,68 @@ export class TaskPage implements OnInit {
     });
   }
 
-  uncompleteTask(taskId: string | undefined) {
-    if (!taskId) return;
-
+  async uncompleteTask(taskId: string) {
     this.apiService.uncompleteTask(taskId).subscribe({
       next: () => {
         this.loadTasks();
-        this.toastService.showToast('Tarea marcada como pendiente', 'info');
+        this.toastService.showToast('Tarea reabierta', 'warning');
       },
       error: (error) => {
-        this.toastService.showToast('Error al desmarcar la tarea', 'error');
-        console.error('Error al desmarcar la tarea:', error);
+        this.toastService.showToast('Error al reabrir la tarea', 'error');
+        console.error('Error:', error);
       },
     });
   }
 
-  deleteTask(taskId: string | undefined) {
-    if (!taskId) return;
+  async confirmDeleteTask(taskId: string) {
+    const alert = await this.alertController.create({
+      header: '¿Eliminar tarea?',
+      message:
+        '¿Estás seguro de que deseas eliminar esta tarea? Esta acción no se puede deshacer.',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary',
+        },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: () => {
+            this.deleteTask(taskId);
+          },
+        },
+      ],
+    });
 
+    await alert.present();
+  }
+
+  private deleteTask(taskId: string) {
     this.apiService.deleteTask(taskId).subscribe({
       next: () => {
         this.loadTasks();
-        this.toastService.showToast('Tarea eliminada con éxito', 'success');
+        this.toastService.showToast('Tarea eliminada', 'success');
       },
       error: (error) => {
         this.toastService.showToast('Error al eliminar la tarea', 'error');
-        console.error('Error al eliminar la tarea:', error);
+        console.error('Error:', error);
       },
     });
   }
 
-  async addTask() {
+  addTask() {
     this.isEditing = false;
     this.currentTaskId = null;
     this.taskForm.reset();
 
-    // Establecer una fecha predeterminada (ahora + 1 día)
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(12, 0, 0, 0); // Mediodía por defecto
+    tomorrow.setHours(12, 0, 0, 0);
 
     this.taskForm.patchValue({
       due_date: tomorrow.toISOString(),
+      estimated_time: 30,
     });
 
     this.showModal = true;
@@ -185,15 +244,12 @@ export class TaskPage implements OnInit {
       }
 
       try {
-        // Formatear la fecha correctamente
         const formValue = this.taskForm.value;
-        const dueDate = new Date(formValue.due_date);
-
         const taskData: CreateTaskDTO = {
           user_id: userId,
           subject_id: formValue.subject_id,
-          description: formValue.description,
-          due_date: dueDate.toISOString(), // Asegurarse de que la fecha esté en formato ISO
+          description: formValue.description.trim(),
+          due_date: new Date(formValue.due_date).toISOString(),
           estimated_time: formValue.estimated_time,
         };
 
@@ -201,14 +257,14 @@ export class TaskPage implements OnInit {
           await this.apiService
             .updateTask(this.currentTaskId, taskData)
             .toPromise();
-          this.toastService.showToast('Tarea actualizada con éxito', 'success');
+          this.toastService.showToast('Tarea actualizada', 'success');
         } else {
           const response = await this.apiService
             .createTask(taskData)
             .toPromise();
           if (response) {
             this.toastService.showToast(
-              `Tarea creada: ${response.task_type} (Prioridad: ${response.adjusted_priority})`,
+              `Nueva tarea creada: ${response.task_type} (Prioridad: ${response.adjusted_priority})`,
               'success'
             );
           }
@@ -216,12 +272,23 @@ export class TaskPage implements OnInit {
         this.dismissModal();
         this.loadTasks();
       } catch (error: any) {
-        console.error('Error completo:', error);
+        console.error('Error:', error);
         const errorMessage =
           error.error?.detail || error.message || 'Error al guardar la tarea';
         this.toastService.showToast(errorMessage, 'error');
       }
+    } else {
+      this.markFormGroupTouched(this.taskForm);
     }
+  }
+
+  private markFormGroupTouched(formGroup: FormGroup) {
+    Object.values(formGroup.controls).forEach((control) => {
+      control.markAsTouched();
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
+    });
   }
 
   dismissModal() {
@@ -229,24 +296,11 @@ export class TaskPage implements OnInit {
     this.taskForm.reset();
     this.currentTaskId = null;
     this.isEditing = false;
-
-    // Establecer valores predeterminados
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(12, 0, 0, 0);
-
-    this.taskForm.patchValue({
-      due_date: tomorrow.toISOString(),
-      estimated_time: 30,
-    });
   }
 
   editTask(task: Task) {
     this.isEditing = true;
     this.currentTaskId = task._id || null;
-
-    // Asegurarse de que los valores de hora estén correctamente configurados
-    this.hourValues = Array.from({ length: 24 }, (_, i) => i);
 
     this.taskForm.patchValue({
       description: task.description,
@@ -256,21 +310,5 @@ export class TaskPage implements OnInit {
     });
 
     this.showModal = true;
-  }
-
-  onWillDismiss(event: any) {
-    this.showModal = false;
-    this.taskForm.reset();
-    this.currentTaskId = null;
-
-    // Establecer valores predeterminados si es necesario
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(12, 0, 0, 0);
-
-    this.taskForm.patchValue({
-      due_date: tomorrow.toISOString(),
-      estimated_time: 30,
-    });
   }
 }

@@ -1,22 +1,63 @@
 <ion-content class="tasks-content">
-  <!-- Título de la página -->
+  <!-- Header con estadísticas -->
+  <div class="tasks-header">
+    <div class="stats-container">
+      <div class="stat-item">
+        <ion-icon name="list-outline"></ion-icon>
+        <div class="stat-info">
+          <span class="stat-value">{{incompleteTasks.length}}</span>
+          <span class="stat-label"
+            >Pendiente{{incompleteTasks.length !== 1 ? 's' : ''}}</span
+          >
+        </div>
+      </div>
+      <div class="stat-item">
+        <ion-icon name="checkmark-done-outline"></ion-icon>
+        <div class="stat-info">
+          <span class="stat-value">{{completedTasks.length}}</span>
+          <span class="stat-label"
+            >Lista{{completedTasks.length !== 1 ? 's' : ''}}</span
+          >
+        </div>
+      </div>
+      <div class="stat-item">
+        <ion-icon name="time-outline"></ion-icon>
+        <div class="stat-info">
+          <span class="stat-value">{{getTotalEstimatedTime()}}</span>
+          <span class="stat-label">Min</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor principal de tareas -->
   <div class="tasks-container">
-    <div class="page-title">
-      <ion-icon name="checkbox-outline" class="title-icon"></ion-icon>
-      <h1>Tareas</h1>
+    <!-- Sección de tareas pendientes -->
+    <div class="section-header">
+      <h2>
+        <ion-icon name="hourglass-outline"></ion-icon>
+        Tareas Pendientes
+      </h2>
     </div>
 
     <div class="task-list">
       <!-- Tareas Pendientes -->
-      <ion-card class="task-card" *ngFor="let task of incompleteTasks">
+      <ion-card
+        class="task-card"
+        *ngFor="let task of incompleteTasks"
+        [attr.priority]="task.priority"
+      >
         <ion-card-header>
           <div class="card-header-content">
-            <ion-icon name="clipboard-outline" class="task-icon"></ion-icon>
+            <ion-icon
+              [name]="getTaskTypeIcon(task.task_type || '')"
+              class="task-icon"
+            ></ion-icon>
             <div class="card-title-container">
               <ion-card-title>{{ task.description }}</ion-card-title>
               <ion-card-subtitle>
-                <ion-icon name="book-outline" class="subject-icon"></ion-icon>
-                {{ getSubjectName(task.subject_id) }}
+                <ion-icon name="book-outline"></ion-icon>
+                <span>{{ getSubjectName(task.subject_id) }}</span>
               </ion-card-subtitle>
             </div>
           </div>
@@ -24,22 +65,19 @@
 
         <ion-card-content>
           <div class="task-info">
-            <ion-chip class="date-chip">
+            <ion-chip class="date-chip" [class.urgent]="isUrgent(task)">
               <ion-icon name="calendar-outline"></ion-icon>
-              <ion-label>{{ task.due_date | date:'mediumDate' }}</ion-label>
+              <ion-label>{{ task.due_date | date:'dd MMM, HH:mm' }}</ion-label>
             </ion-chip>
 
-            <ion-chip [class]="'type-chip type-' + task.task_type">
-              <ion-icon name="bookmark-outline"></ion-icon>
-              <ion-label>{{task.task_type | titlecase}}</ion-label>
+            <ion-chip [class]="'type-chip type-' + (task.task_type || 'tarea')">
+              <ion-icon
+                [name]="getTaskTypeIcon(task.task_type || '')"
+              ></ion-icon>
+              <ion-label>{{task.task_type || 'Tarea' | titlecase}}</ion-label>
             </ion-chip>
 
-            <ion-chip [class]="'priority-chip priority-' + task.priority">
-              <ion-icon name="flag-outline"></ion-icon>
-              <ion-label>Prioridad {{task.priority}}</ion-label>
-            </ion-chip>
-
-            <ion-chip *ngIf="task.estimated_time" class="time-estimate-chip">
+            <ion-chip class="time-chip" *ngIf="task.estimated_time">
               <ion-icon name="time-outline"></ion-icon>
               <ion-label>{{task.estimated_time}} min</ion-label>
             </ion-chip>
@@ -48,116 +86,114 @@
           <div class="task-actions">
             <ion-button
               fill="clear"
-              color="primary"
               (click)="completeTask(task._id!)"
-              class="action-button"
+              class="action-button complete-button"
             >
-              <ion-icon
-                name="checkmark-circle-outline"
-                slot="icon-only"
-              ></ion-icon>
+              <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+              <span class="button-text">Completar</span>
             </ion-button>
             <ion-button
               fill="clear"
-              color="primary"
               (click)="editTask(task)"
-              class="action-button"
+              class="action-button edit-button"
             >
-              <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+              <ion-icon name="create-outline" slot="start"></ion-icon>
+              <span class="button-text">Editar</span>
             </ion-button>
             <ion-button
               fill="clear"
-              color="primary"
-              (click)="deleteTask(task._id!)"
-              class="action-button"
+              (click)="confirmDeleteTask(task._id!)"
+              class="action-button delete-button"
             >
-              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+              <ion-icon name="trash-outline" slot="start"></ion-icon>
+              <span class="button-text">Eliminar</span>
             </ion-button>
           </div>
         </ion-card-content>
       </ion-card>
 
-      <!-- Divider for Completed Tasks -->
-      <div class="completed-tasks-divider" *ngIf="completedTasks.length > 0">
-        <h2>Tareas Completadas</h2>
+      <!-- Estado vacío para tareas pendientes -->
+      <div class="empty-state" *ngIf="incompleteTasks.length === 0">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        <h3>¡Todo al día!</h3>
+        <p>No tienes tareas pendientes</p>
       </div>
+    </div>
 
-      <!-- Tareas Completadas -->
-      <div class="completed-tasks-section" *ngIf="completedTasks.length > 0">
-        <ion-card
-          class="task-card completed"
-          *ngFor="let task of completedTasks"
-        >
-          <ion-card-header>
-            <div class="card-header-content">
-              <ion-icon
-                name="checkmark-circle"
-                class="task-icon completed-icon"
-              ></ion-icon>
-              <div class="card-title-container">
-                <ion-card-title>{{ task.description }}</ion-card-title>
-                <ion-card-subtitle>
-                  <ion-icon name="book-outline" class="subject-icon"></ion-icon>
-                  {{ getSubjectName(task.subject_id) }}
-                </ion-card-subtitle>
+    <!-- Sección de tareas completadas -->
+    <div
+      class="section-header completed-section"
+      *ngIf="completedTasks.length > 0"
+    >
+      <h2>
+        <ion-icon name="checkmark-done-outline"></ion-icon>
+        Tareas Completadas
+      </h2>
+    </div>
+
+    <div class="completed-tasks-section">
+      <ion-card class="task-card completed" *ngFor="let task of completedTasks">
+        <ion-card-header>
+          <div class="card-header-content">
+            <ion-icon
+              name="checkmark-circle"
+              class="task-icon completed-icon"
+            ></ion-icon>
+            <div class="card-title-container">
+              <ion-card-title>{{ task.description }}</ion-card-title>
+              <div class="completion-info">
+                <span class="completion-date">
+                  <ion-icon name="checkmark-done-outline"></ion-icon>
+                  Completada: {{ task.completed_date | date:'dd MMM, HH:mm' }}
+                </span>
+                <span class="completion-status" [class.late]="isTaskLate(task)">
+                  {{ isTaskLate(task) ? '(Tarde)' : '(A tiempo)' }}
+                </span>
               </div>
             </div>
-          </ion-card-header>
+          </div>
+        </ion-card-header>
 
-          <ion-card-content>
-            <div class="task-info">
-              <ion-chip class="date-chip">
-                <ion-icon name="calendar-outline" class="chip-icon"></ion-icon>
-                <ion-label class="chip-text"
-                  >Creada: {{ task.created_at | date:'shortDate' }}</ion-label
-                >
-              </ion-chip>
+        <ion-card-content>
+          <div class="task-info">
+            <ion-chip class="subject-chip">
+              <ion-icon name="book-outline"></ion-icon>
+              <ion-label>{{ getSubjectName(task.subject_id) }}</ion-label>
+            </ion-chip>
 
-              <ion-chip
-                [class]="{'date-chip': true, 'late-chip': isTaskLate(task)}"
+            <ion-chip [class]="'type-chip type-' + (task.task_type || 'tarea')">
+              <ion-icon
+                [name]="getTaskTypeIcon(task.task_type || '')"
+              ></ion-icon>
+              <ion-label>{{task.task_type || 'Tarea' | titlecase}}</ion-label>
+            </ion-chip>
+
+            <ion-chip class="due-date-chip" [class.late]="isTaskLate(task)">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <ion-label
+                >Límite: {{ task.due_date | date:'dd MMM, HH:mm' }}</ion-label
               >
-                <ion-icon name="alarm-outline" class="chip-icon"></ion-icon>
-                <ion-label class="chip-text"
-                  >Límite: {{ task.due_date | date:'shortDate' }}</ion-label
-                >
-              </ion-chip>
+            </ion-chip>
+          </div>
 
-              <ion-chip *ngIf="task.completed" class="completion-chip">
-                <ion-icon
-                  name="checkmark-circle-outline"
-                  class="chip-icon"
-                ></ion-icon>
-                <ion-label class="chip-text"
-                  >Completada: {{ task.completed_date | date:'shortDate'
-                  }}</ion-label
-                >
-              </ion-chip>
-            </div>
-
-            <div class="task-actions">
-              <ion-button
-                fill="clear"
-                (click)="uncompleteTask(task._id!)"
-                class="action-button"
-              >
-                <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
-              </ion-button>
-            </div>
-          </ion-card-content>
-        </ion-card>
-      </div>
-
-      <!-- Estado vacío -->
-      <div class="empty-state" *ngIf="tasks.length === 0">
-        <ion-icon name="calendar-outline"></ion-icon>
-        <p>No tienes tareas registradas</p>
-      </div>
+          <div class="task-actions">
+            <ion-button
+              fill="clear"
+              (click)="uncompleteTask(task._id!)"
+              class="action-button uncomplete-button"
+            >
+              <ion-icon name="refresh-outline"></ion-icon>
+              <span>Reabrir</span>
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
     </div>
   </div>
 
   <!-- Botón flotante para agregar -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="addTask()">
+    <ion-fab-button (click)="addTask()" class="add-task-button">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
@@ -169,92 +205,125 @@
   [breakpoints]="[0, 1.0]"
   [initialBreakpoint]="1.0"
   class="task-modal"
-  (willDismiss)="onWillDismiss($event)"
 >
   <ng-template>
     <ion-header class="ion-no-border">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-button (click)="dismissModal()" class="modal-button">
-            <ion-icon name="close-outline" class="modal-icon"></ion-icon>
+          <ion-button class="modal-close-button" (click)="dismissModal()">
+            <ion-icon name="close-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
-        <ion-title>
-          {{ isEditing ? 'Editar Tarea' : 'Nueva Tarea' }}
-        </ion-title>
+        <ion-title>{{ isEditing ? 'Editar Tarea' : 'Nueva Tarea' }}</ion-title>
         <ion-buttons slot="end">
           <ion-button
-            (click)="saveTask()"
-            class="modal-button save-button"
+            class="save-button"
             [disabled]="!taskForm.valid"
+            (click)="saveTask()"
           >
-            <span class="save-button-text"
-              >{{ isEditing ? 'Actualizar' : 'Crear' }}</span
-            >
+            {{ isEditing ? 'Actualizar' : 'Crear' }}
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
     <ion-content class="modal-content">
-      <form [formGroup]="taskForm">
-        <div class="form-container">
-          <div class="input-group">
-            <ion-item class="custom-input">
-              <ion-label position="floating" class="form-label large-label"
-                >Descripción</ion-label
-              >
-              <ion-input
-                formControlName="description"
-                type="text"
-                class="large-input"
-              ></ion-input>
-            </ion-item>
+      <form [formGroup]="taskForm" class="form-container">
+        <!-- Descripción -->
+        <div class="form-group">
+          <div class="field-label">
+            <ion-icon name="create-outline"></ion-icon>
+            Descripción
+          </div>
+          <ion-item class="custom-input">
+            <ion-input
+              formControlName="description"
+              type="text"
+              placeholder="¿Qué necesitas hacer?"
+            ></ion-input>
+          </ion-item>
+          <div
+            class="error-message"
+            *ngIf="taskForm.get('description')?.invalid && taskForm.get('description')?.touched"
+          >
+            La descripción es requerida
+          </div>
+        </div>
 
-            <ion-item class="custom-input">
-              <ion-select
-                formControlName="subject_id"
-                interface="action-sheet"
-                class="large-input"
-                placeholder="Materia"
+        <!-- Materia -->
+        <div class="form-group">
+          <div class="field-label">
+            <ion-icon name="book-outline"></ion-icon>
+            Materia
+          </div>
+          <ion-item class="custom-input">
+            <ion-select
+              formControlName="subject_id"
+              interface="action-sheet"
+              placeholder="Selecciona una materia"
+            >
+              <ion-select-option
+                *ngFor="let subject of subjects"
+                [value]="subject._id"
               >
-                <ion-select-option
-                  *ngFor="let subject of subjects"
-                  [value]="subject._id"
-                  class="large-option"
-                >
-                  {{ subject.name }}
-                </ion-select-option>
-              </ion-select>
-            </ion-item>
+                {{ subject.name }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+          <div
+            class="error-message"
+            *ngIf="taskForm.get('subject_id')?.invalid && taskForm.get('subject_id')?.touched"
+          >
+            Selecciona una materia
+          </div>
+        </div>
 
-            <ion-item class="custom-input">
-              <ion-label position="floating" class="form-label large-label"
-                >Fecha de entrega</ion-label
-              >
-              <ion-datetime
-                formControlName="due_date"
-                displayFormat="DD/MM/YYYY HH:mm"
-                [min]="minDate"
-                [hourValues]="hourValues"
-                [minuteValues]="minuteValues"
-                locale="es-ES"
-                class="large-input custom-datetime"
-              ></ion-datetime>
-            </ion-item>
+        <!-- Fecha de entrega -->
+        <div class="form-group">
+          <div class="field-label">
+            <ion-icon name="calendar-outline"></ion-icon>
+            Fecha de entrega
+          </div>
+          <ion-item class="custom-input">
+            <ion-datetime
+              formControlName="due_date"
+              [min]="minDate"
+              [hourValues]="hourValues"
+              [minuteValues]="minuteValues"
+              locale="es-ES"
+              presentation="date-time"
+            >
+            </ion-datetime>
+          </ion-item>
+          <div
+            class="error-message"
+            *ngIf="taskForm.get('due_date')?.invalid && taskForm.get('due_date')?.touched"
+          >
+            La fecha de entrega es requerida
+          </div>
+        </div>
 
-            <ion-item class="custom-input">
-              <ion-label position="floating" class="form-label large-label"
-                >Tiempo estimado (minutos)</ion-label
-              >
-              <ion-input
-                formControlName="estimated_time"
-                type="number"
-                min="0"
-                step="15"
-                class="large-input"
-              ></ion-input>
-            </ion-item>
+        <!-- Tiempo estimado -->
+        <div class="form-group">
+          <div class="field-label">
+            <ion-icon name="time-outline"></ion-icon>
+            Tiempo estimado
+          </div>
+          <ion-item class="custom-input">
+            <ion-input
+              formControlName="estimated_time"
+              type="number"
+              min="0"
+              step="15"
+              placeholder="Tiempo en minutos (ej: 30)"
+            >
+            </ion-input>
+          </ion-item>
+          <div
+            class="error-message"
+            *ngIf="taskForm.get('estimated_time')?.invalid && taskForm.get('estimated_time')?.touched"
+          >
+            El tiempo estimado debe ser mayor a 0
           </div>
         </div>
       </form>
