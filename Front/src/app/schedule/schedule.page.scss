@@ -1,9 +1,5 @@
 .schedule-content {
-  --background: linear-gradient(
-    135deg,
-    #f5f7fa 0%,
-    var(--ion-color-primary-tint) 100%
-  );
+  --background: var(--app-background-light);
   --padding-top: 0;
   --padding-start: 0;
   --padding-end: 0;
@@ -16,7 +12,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(30, 136, 229, 0.05)" stroke-width="2"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(var(--ion-color-primary-rgb), 0.05)" stroke-width="2"/></svg>');
     background-size: 300px 300px;
     opacity: 0.5;
     pointer-events: none;
@@ -83,7 +79,7 @@
       }
 
       p {
-        color: #666666;
+        color: var(--app-text-color);
         font-size: 16px;
       }
     }
@@ -96,18 +92,18 @@
         flex: 1;
         display: flex;
         flex-direction: column;
-        background-color: white;
+        background-color: var(--app-card-color);
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        box-shadow: var(--app-shadow-md);
 
         .week-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
           padding: 12px 16px;
-          background-color: #f8f9fa;
-          border-bottom: 1px solid #e0e0e0;
+          background-color: var(--app-card-color);
+          border-bottom: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
 
           .week-nav {
             display: flex;
@@ -117,18 +113,18 @@
               margin: 0 12px;
               font-size: 18px;
               font-weight: 600;
-              color: #333333;
+              color: var(--app-text-color);
             }
           }
         }
 
         .days-header {
           display: flex;
-          border-bottom: 1px solid #e0e0e0;
+          border-bottom: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
 
           .time-column-header {
             min-width: 60px;
-            border-right: 1px solid #e0e0e0;
+            border-right: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
           }
 
           .day-header {
@@ -139,22 +135,22 @@
             .day-name {
               font-size: 14px;
               font-weight: 500;
-              color: #666666;
+              color: var(--app-text-color-medium);
               text-transform: capitalize;
             }
 
             .day-number {
               font-size: 18px;
               font-weight: 600;
-              color: #333333;
+              color: var(--app-text-color);
             }
 
             &.today {
-              background-color: rgba(25, 118, 210, 0.1);
+              background-color: rgba(var(--ion-color-primary-rgb), 0.1);
 
               .day-name,
               .day-number {
-                color: #1976d2;
+                color: var(--ion-color-primary);
                 font-weight: 700;
               }
             }
@@ -171,8 +167,9 @@
             min-width: 60px;
             position: sticky;
             left: 0;
-            background: white;
+            background: var(--app-card-color);
             z-index: 2;
+            border-right: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
 
             .time-slot-label {
               height: 60px;
@@ -180,70 +177,28 @@
               align-items: center;
               justify-content: center;
               font-size: 12px;
-              color: #666666;
-              border-bottom: 1px solid #f0f0f0;
+              color: var(--app-text-color-medium);
+              border-bottom: 1px solid rgba(var(--ion-color-primary-rgb), 0.05);
             }
           }
 
           .calendar-content {
             flex: 1;
             position: relative;
-            min-height: 1440px; // 24 horas * 60px
+            min-height: 960px; // 16 horas (7am-11pm) * 60px
 
             .time-slot-line {
               position: absolute;
               left: 0;
               right: 0;
               height: 1px;
-              background-color: #f0f0f0;
+              background-color: rgba(var(--ion-color-primary-rgb), 0.05);
+            }
 
-              &:nth-child(1) {
-                top: 0px;
-              }
-              &:nth-child(2) {
-                top: 60px;
-              }
-              &:nth-child(3) {
-                top: 120px;
-              }
-              &:nth-child(4) {
-                top: 180px;
-              }
-              &:nth-child(5) {
-                top: 240px;
-              }
-              &:nth-child(6) {
-                top: 300px;
-              }
-              &:nth-child(7) {
-                top: 360px;
-              }
-              &:nth-child(8) {
-                top: 420px;
-              }
-              &:nth-child(9) {
-                top: 480px;
-              }
-              &:nth-child(10) {
-                top: 540px;
-              }
-              &:nth-child(11) {
-                top: 600px;
-              }
-              &:nth-child(12) {
-                top: 660px;
-              }
-              &:nth-child(13) {
-                top: 720px;
-              }
-              &:nth-child(14) {
-                top: 780px;
-              }
-              &:nth-child(15) {
-                top: 840px;
-              }
-              &:nth-child(16) {
-                top: 900px;
+            // Líneas horizontales para cada hora (comenzando desde las 7am)
+            @for $i from 0 through 16 {
+              .time-slot-line:nth-child(#{$i + 1}) {
+                top: #{$i * 60}px;
               }
             }
 
@@ -252,41 +207,42 @@
               top: 0;
               bottom: 0;
               width: 1px;
-              background-color: #e0e0e0;
-              z-index: 0;
+              background-color: rgba(var(--ion-color-primary-rgb), 0.05);
             }
 
             .calendar-event {
               position: absolute;
-              border-radius: 4px;
-              padding: 4px 8px;
+              border-radius: 8px;
+              padding: 8px;
+              box-shadow: var(--app-shadow-sm);
               overflow: hidden;
-              color: white;
-              font-size: 12px;
+              z-index: 3;
               cursor: pointer;
               transition: all 0.2s ease;
-              z-index: 1;
 
               &:hover {
-                filter: brightness(1.1);
-                transform: scale(1.02);
+                transform: translateY(-2px);
+                box-shadow: var(--app-shadow-md);
               }
 
               .event-title {
+                font-size: 14px;
                 font-weight: 500;
-                margin-bottom: 2px;
-                white-space: nowrap;
+                color: #ffffff;
+                margin-bottom: 4px;
                 overflow: hidden;
                 text-overflow: ellipsis;
+                white-space: nowrap;
 
                 &.reminder {
+                  color: #ffffff;
                   font-style: italic;
                 }
               }
 
               .event-time {
-                font-size: 11px;
-                opacity: 0.9;
+                font-size: 12px;
+                color: rgba(255, 255, 255, 0.9);
               }
             }
           }
@@ -536,5 +492,153 @@ ion-select.view-selector {
   &::part(text) {
     color: var(--ion-color-primary);
     font-weight: 500;
+  }
+}
+
+// Estilos para los modales
+ion-modal {
+  --border-radius: 12px;
+  --backdrop-opacity: 0.6;
+
+  ion-header ion-toolbar {
+    --background: var(--app-card-color) !important;
+    --color: var(--ion-color-primary) !important;
+    --border-style: none;
+
+    ion-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--ion-color-primary) !important;
+    }
+
+    ion-button {
+      --color: var(--ion-color-primary);
+    }
+  }
+
+  ion-content {
+    --background: var(--app-background-light);
+
+    h2 {
+      color: var(--app-text-color);
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .event-time {
+      color: var(--app-text-color-medium);
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .event-details {
+      margin-bottom: 24px;
+      
+      p {
+        color: var(--app-text-color);
+        font-size: 16px;
+        line-height: 1.5;
+      }
+    }
+
+    .event-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    // Estilos para formularios
+    form {
+      ion-item {
+        --background: var(--app-card-color);
+        --color: var(--app-text-color);
+        margin-bottom: 16px;
+        border-radius: 8px;
+        --border-color: rgba(var(--ion-color-primary-rgb), 0.1);
+
+        ion-label {
+          color: var(--app-text-color-medium);
+        }
+
+        ion-input, ion-textarea, ion-select, ion-datetime {
+          --color: var(--app-text-color);
+          --placeholder-color: var(--app-text-color-light);
+        }
+      }
+
+      .time-inputs {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+
+        ion-item {
+          flex: 1;
+        }
+      }
+
+      .form-actions {
+        margin-top: 24px;
+      }
+    }
+  }
+}
+
+// Botón flotante para cambiar de vista
+.view-selector-fab {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  z-index: 1000;
+
+  ion-fab-button {
+    --background: var(--ion-color-primary);
+    --background-activated: var(--ion-color-primary-shade);
+    --background-hover: var(--ion-color-primary-tint);
+    --color: white;
+    --box-shadow: var(--app-shadow-md);
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+
+    ion-icon {
+      font-size: 26px;
+    }
+  }
+
+  ion-fab-list {
+    button {
+      --background: var(--app-card-color);
+      --color: var(--ion-color-primary);
+      --box-shadow: var(--app-shadow-sm);
+      width: 48px;
+      height: 48px;
+
+      ion-icon {
+        font-size: 22px;
+      }
+    }
+  }
+}
+
+// Dark mode specific styles
+:host-context(.dark-theme) {
+  .schedule-layout .week-view-container {
+    background-color: var(--app-card-color);
+
+    .week-header {
+      background-color: var(--app-card-color);
+    }
+
+    .calendar-grid .time-column {
+      background: var(--app-card-color);
+    }
   }
 }
