@@ -139,6 +139,22 @@ export class ApiService {
 
   createSubject(subjectData: any): Observable<any> {
     console.log('API createSubject called with:', subjectData);
+    // Transformamos userId a user_id para el backend
+    if (subjectData.userId && !subjectData.user_id) {
+      subjectData.user_id = subjectData.userId;
+      delete subjectData.userId;
+    }
+    
+    // Aseguramos que el user_id esté en el objeto
+    if (!subjectData.user_id) {
+      const token = localStorage.getItem('token');
+      const tokenData = token ? JSON.parse(atob(token.split('.')[1])) : null;
+      if (tokenData && tokenData.id) {
+        subjectData.user_id = tokenData.id;
+      }
+    }
+    
+    console.log('Enviando datos al backend:', subjectData);
     return this.http
       .post(`${this.apiUrl}/subjects`, subjectData, {
         headers: this.getAuthHeaders(),
@@ -150,7 +166,32 @@ export class ApiService {
     subject_id: string,
     subjectData: Partial<Subject>
   ): Observable<any> {
-    return this.http.put(`${this.apiUrl}/subjects/${subject_id}/`, subjectData);
+    console.log('API updateSubject called with:', subject_id, subjectData);
+    
+    // Creamos una copia para no modificar el objeto original
+    const dataToSend: any = {...subjectData};
+    
+    // Transformamos userId a user_id para el backend
+    if (dataToSend.userId && !dataToSend.user_id) {
+      dataToSend.user_id = dataToSend.userId;
+      delete dataToSend.userId;
+    }
+    
+    // Aseguramos que el user_id esté en el objeto
+    if (!dataToSend.user_id) {
+      const token = localStorage.getItem('token');
+      const tokenData = token ? JSON.parse(atob(token.split('.')[1])) : null;
+      if (tokenData && tokenData.id) {
+        dataToSend.user_id = tokenData.id;
+      }
+    }
+    
+    console.log('Enviando datos al backend:', dataToSend);
+    return this.http
+      .put(`${this.apiUrl}/subjects/${subject_id}/`, dataToSend, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(catchError(this.handleError));
   }
 
   deleteSubject(subject_id: string): Observable<any> {

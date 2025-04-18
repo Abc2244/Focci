@@ -5,9 +5,9 @@ export interface ScheduleItem {
 }
 
 export interface Subject {
-  _id: string;
+  _id?: string;
   name: string;
   credits: number;
   schedule: ScheduleItem[];
-  user_id: string;
+  userId: string;
 }

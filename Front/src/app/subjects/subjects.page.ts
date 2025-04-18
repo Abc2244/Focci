@@ -1,14 +1,30 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
-import { AlertController, IonInput, IonModal } from '@ionic/angular';
-import { Subject, ScheduleItem } from '../interfaces/subject.interface';
+import { AlertController, IonInput, IonModal, ToastController } from '@ionic/angular';
+import { ScheduleItem } from '../interfaces/subject.interface';
 import { ToastService } from '../services/toast.service';
 import { ThemeService } from '../services/theme.service';
+import { Observable } from 'rxjs';
+
+// Usamos un nombre diferente para evitar conflicto con la interfaz importada
+export interface SubjectModel {
+  id?: string;
+  name: string;
+  credits: number;
+  schedule: ScheduleItem[];
+  _id?: string; // Mantener compatibilidad con el código existente
+  userId?: string; // Añadimos el userId
+}
+
+interface DayOption {
+  value: string;
+  text: string;
+}
 
 // Definimos un tipo para los días de la semana
-type DayOfWeek =
+export type WeekDay =
   | 'Lunes'
   | 'Martes'
   | 'Miércoles'
@@ -23,18 +39,19 @@ type DayOfWeek =
   styleUrls: ['./subjects.page.scss'],
 })
 export class SubjectsPage implements OnInit {
-  @ViewChild('nameInput') nameInput!: IonInput;
   @ViewChild(IonModal) modal!: IonModal;
+  @ViewChild('nameInput', { static: false }) nameInput?: IonInput;
+  
+  presentingElement: HTMLElement | null = null;
 
-  subjects: Subject[] = [];
-  showModal = false;
-  isEditing = false;
+  subjects: SubjectModel[] = [];
   subjectForm: FormGroup;
+  isModalOpen = false;
+  isEditing = false;
   currentSubjectId: string | null = null;
-  selectedScheduleItems: ScheduleItem[] = [];
+  darkMode = false;
 
-  // Reordenamos los días de la semana para que empiecen en lunes
-  availableDays = [
+  weekDays = [
     { short: 'L', value: 'Lunes' },
     { short: 'M', value: 'Martes' },
     { short: 'X', value: 'Miércoles' },
@@ -44,70 +61,76 @@ export class SubjectsPage implements OnInit {
     { short: 'D', value: 'Domingo' },
   ];
 
+  // Opciones para los días de la semana
+  days: DayOption[] = [
+    { value: 'Lunes', text: 'Lunes' },
+    { value: 'Martes', text: 'Martes' },
+    { value: 'Miércoles', text: 'Miércoles' },
+    { value: 'Jueves', text: 'Jueves' },
+    { value: 'Viernes', text: 'Viernes' },
+    { value: 'Sábado', text: 'Sábado' },
+    { value: 'Domingo', text: 'Domingo' },
+  ];
+
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
     private alertController: AlertController,
     private toastService: ToastService,
     private fb: FormBuilder,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private toastController: ToastController
   ) {
     this.subjectForm = this.fb.group({
       name: ['', Validators.required],
       credits: ['', [Validators.required, Validators.min(1)]],
+      schedule: this.fb.array([])
     });
   }
 
   ngOnInit() {
     this.loadSubjects();
-  }
-
-  ionViewWillEnter() {
-    // Este método se llama cada vez que la página está a punto de ser mostrada
-    this.loadSubjects(); // Recargar las materias
-  }
-
-  // Método para ordenar los horarios por día de la semana
-  sortScheduleByDay(schedule: ScheduleItem[]): ScheduleItem[] {
-    const dayOrder: { [key: string]: number } = {
-      Lunes: 1,
-      Martes: 2,
-      Miércoles: 3,
-      Jueves: 4,
-      Viernes: 5,
-      Sábado: 6,
-      Domingo: 7,
-    };
-
-    return [...schedule].sort((a, b) => {
-      return dayOrder[a.day] - dayOrder[b.day];
+    this.themeService.isDark$.subscribe((isDark: boolean) => {
+      this.darkMode = isDark;
     });
+    
+    this.presentingElement = document.querySelector('.ion-page');
   }
 
   loadSubjects() {
     const userId = this.authService.getCurrentUserId();
     if (userId) {
       this.apiService.getUserSubjects(userId).subscribe({
-        next: (subjects) => {
+        next: (subjects: SubjectModel[]) => {
           this.subjects = subjects;
+          this.isModalOpen = false;
         },
-        error: (error) => {
-          this.toastService.showToast('Error al cargar las materias', 'error');
-          console.error('Error:', error);
+        error: (error: unknown) => {
+          console.error('Error cargando materias:', error);
         },
       });
     }
   }
 
-  addSubject() {
+  openAddSubjectModal() {
     this.isEditing = false;
     this.currentSubjectId = null;
-    this.subjectForm.reset();
-    this.selectedScheduleItems = [];
-    this.showModal = true;
+    this.resetForm();
+    this.isModalOpen = true;
+    
+    // Verificamos si nameInput existe antes de llamar a setFocus
+    setTimeout(() => {
+      if (this.nameInput) {
+        this.nameInput.setFocus();
+      }
+    }, 300);
   }
 
-  editSubject(subject: Subject) {
+  closeModal() {
+    this.isModalOpen = false;
+  }
+
+  editSubject(subject: SubjectModel) {
     this.isEditing = true;
     this.currentSubjectId = subject._id || null;
 
@@ -116,46 +139,45 @@ export class SubjectsPage implements OnInit {
       credits: subject.credits,
     });
 
-    this.selectedScheduleItems = [...subject.schedule];
-    this.showModal = true;
-  }
+    // Limpiar horarios existentes antes de agregar los nuevos
+    while (this.scheduleFormArray.length) {
+      this.scheduleFormArray.removeAt(0);
+    }
 
-  onWillDismiss(event: any) {
-    this.showModal = false;
-    this.subjectForm.reset();
-    this.selectedScheduleItems = [];
-  }
+    // Agregar cada horario al formulario
+    if (subject.schedule && subject.schedule.length > 0) {
+      subject.schedule.forEach(scheduleItem => {
+        this.addScheduleWithValues(scheduleItem);
+      });
+    }
 
-  dismissModal() {
-    this.showModal = false;
-    this.subjectForm.reset();
-    this.selectedScheduleItems = [];
+    this.isModalOpen = true;
+    
+    // Verificamos si nameInput existe antes de llamar a setFocus
+    setTimeout(() => {
+      if (this.nameInput) {
+        this.nameInput.setFocus();
+      }
+    }, 300);
   }
 
   async saveSubject() {
     if (this.subjectForm.valid) {
-      const formData = this.subjectForm.value;
-
       const userId = this.authService.getCurrentUserId();
+      
       if (!userId) {
-        this.toastService.showToast('Error: Usuario no identificado', 'error');
-        return;
-      }
-
-      // Verificar que haya al menos un horario
-      if (this.selectedScheduleItems.length === 0) {
         this.toastService.showToast(
-          'Debes agregar al menos un horario',
-          'warning'
+          'Error: No se pudo obtener el ID del usuario',
+          'error'
         );
         return;
       }
-
-      const subjectData = {
-        user_id: userId,
-        name: formData.name,
-        credits: parseInt(formData.credits), // Asegurarnos de que sea un número
-        schedule: this.selectedScheduleItems,
+      
+      const subjectData: SubjectModel = {
+        name: this.subjectForm.value.name,
+        credits: this.subjectForm.value.credits,
+        schedule: this.subjectForm.value.schedule || [],
+        userId: userId // Corregido a userId para coincidir con la interfaz
       };
 
       try {
@@ -171,26 +193,23 @@ export class SubjectsPage implements OnInit {
           await this.apiService.createSubject(subjectData).toPromise();
           this.toastService.showToast('Materia creada con éxito', 'success');
         }
-
-        this.dismissModal();
-        await this.loadSubjects();
+        this.loadSubjects();
+        this.subjectForm.reset();
+        this.closeModal();
       } catch (error) {
-        this.toastService.showToast('Error al guardar la materia', 'error');
-        console.error('Error:', error);
+        this.toastService.showToast(
+          'Error al guardar la materia. Inténtalo de nuevo.',
+          'error'
+        );
+        console.error('Error saving subject:', error);
       }
-    } else {
-      // Mostrar mensaje si el formulario no es válido
-      this.toastService.showToast(
-        'Por favor complete todos los campos requeridos',
-        'warning'
-      );
     }
   }
 
-  async deleteSubject(subject: Subject) {
+  async deleteSubject(subject: SubjectModel) {
     const alert = await this.alertController.create({
-      header: '¿Eliminar materia?',
-      message: `¿Estás seguro de que deseas eliminar la materia "${subject.name}"?`,
+      header: 'Confirmar eliminación',
+      message: `¿Estás seguro de que quieres eliminar la materia ${subject.name}?`,
       cssClass: 'custom-alert',
       buttons: [
         {
@@ -212,12 +231,12 @@ export class SubjectsPage implements OnInit {
                     'success'
                   );
                 },
-                error: (error) => {
+                error: (error: unknown) => {
                   this.toastService.showToast(
                     'Error al eliminar la materia',
                     'error'
                   );
-                  console.error('Error:', error);
+                  console.error('Error eliminando materia:', error);
                 },
               });
             }
@@ -229,63 +248,67 @@ export class SubjectsPage implements OnInit {
     await alert.present();
   }
 
-  removeScheduleItem(index: number) {
-    this.selectedScheduleItems.splice(index, 1);
+  // Getter para acceder al array de horarios del formulario
+  get scheduleFormArray(): FormArray {
+    return this.subjectForm.get('schedule') as FormArray;
   }
 
-  addScheduleItem() {
-    this.selectedScheduleItems.push({
-      day: this.availableDays[0].value,
-      startTime: '08:00',
-      endTime: '09:00',
+  // Crear formulario de materias
+  createSubjectForm(): FormGroup {
+    return this.fb.group({
+      name: ['', [Validators.required]],
+      credits: ['', [Validators.required, Validators.min(1)]],
+      schedule: this.fb.array([])
     });
   }
 
-  updateScheduleStartTime(index: number, event: any) {
-    if (event && event.detail && event.detail.value) {
-      this.selectedScheduleItems[index].startTime = event.detail.value;
-    }
+  // Añadir un nuevo horario al formulario
+  addSchedule() {
+    const scheduleItem = this.fb.group({
+      day: ['Lunes', Validators.required],
+      startTime: ['08:00', Validators.required],
+      endTime: ['10:00', Validators.required],
+    });
+    this.scheduleFormArray.push(scheduleItem);
   }
 
-  updateScheduleEndTime(index: number, event: any) {
-    if (event && event.detail && event.detail.value) {
-      this.selectedScheduleItems[index].endTime = event.detail.value;
-    }
+  // Añadir un horario con valores predefinidos
+  addScheduleWithValues(schedule: ScheduleItem) {
+    const scheduleGroup = this.fb.group({
+      day: [schedule.day, Validators.required],
+      startTime: [schedule.startTime, Validators.required],
+      endTime: [schedule.endTime, Validators.required]
+    });
+    
+    this.scheduleFormArray.push(scheduleGroup);
   }
 
-  updateScheduleDay(index: number, day: string | null | undefined) {
-    if (day !== null && day !== undefined) {
-      this.selectedScheduleItems[index].day = day;
-      // Ordenar los horarios después de cambiar un día
-      this.selectedScheduleItems = this.sortScheduleByDay(
-        this.selectedScheduleItems
-      );
-    }
+  // Eliminar un horario del formulario
+  removeSchedule(index: number) {
+    this.scheduleFormArray.removeAt(index);
   }
 
-  formatTime(timeString: string): string {
-    if (!timeString) return '';
+  // Resetear formulario
+  resetForm() {
+    this.subjectForm = this.createSubjectForm();
+    // Añadir un horario vacío por defecto
+    this.addSchedule();
+  }
 
-    try {
-      // Si ya está en formato HH:mm, retornarlo formateado
-      if (timeString.includes(':')) {
-        const [hours, minutes] = timeString.split(':');
-        const date = new Date();
-        date.setHours(parseInt(hours), parseInt(minutes));
+  // Obtener nombre del día para mostrar
+  getDayName(day: string): string {
+    return day;
+  }
 
-        // Usar el formato de 12 horas con AM/PM
-        return date
-          .toLocaleTimeString('es-ES', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true,
-          })
-          .replace(/\./g, ''); // Eliminar puntos en "a.m." y "p.m."
-      }
-      return timeString;
-    } catch (e) {
-      console.error('Error formatting time:', e);
-      return timeString;
-    }
+  // Mostrar mensaje toast
+  async presentToast(message: string, color: string = 'primary') {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      color,
+      position: 'bottom'
+    });
+    
+    await toast.present();
   }
 }
