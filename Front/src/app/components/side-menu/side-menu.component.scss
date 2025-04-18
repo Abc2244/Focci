@@ -1,8 +1,8 @@
 // Variables
 :host {
-  --menu-bg: rgba(255, 255, 255, 0.85);
+  --menu-bg: var(--app-card-color);
   --menu-backdrop-filter: blur(10px);
-  --menu-shadow: 0 8px 32px rgba(0, 31, 63, 0.1);
+  --menu-shadow: var(--app-shadow-lg);
   --menu-header-height: 180px;
   --menu-item-radius: 12px;
   --menu-item-active-bg: rgba(var(--ion-color-primary-rgb), 0.15);
@@ -19,7 +19,7 @@ ion-menu.glassmorphism-menu {
   }
 
   &::part(container) {
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
     box-shadow: var(--menu-shadow);
     backdrop-filter: var(--menu-backdrop-filter);
     -webkit-backdrop-filter: var(--menu-backdrop-filter);
@@ -27,11 +27,11 @@ ion-menu.glassmorphism-menu {
 
   ion-toolbar {
     --background: var(--ion-color-primary);
-    --color: white;
+    --color: var(--ion-color-primary-contrast);
   }
 
   ion-content {
-    --background: white;
+    --background: var(--menu-bg);
     --padding-top: 0;
     --padding-bottom: 20px;
 
@@ -52,7 +52,7 @@ ion-menu.glassmorphism-menu {
           width: 60px;
           height: 60px;
           border-radius: 50%;
-          background: rgba(255, 255, 255, 0.2);
+          background: rgba(var(--ion-color-primary-contrast-rgb), 0.2);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -60,21 +60,21 @@ ion-menu.glassmorphism-menu {
 
           ion-icon {
             font-size: 40px;
-            color: white;
+            color: var(--ion-color-primary-contrast);
           }
         }
 
         .user-details {
           h2 {
             margin: 0;
-            color: white;
+            color: var(--ion-color-primary-contrast);
             font-size: 18px;
             font-weight: 600;
           }
 
           p {
             margin: 5px 0 0;
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(var(--ion-color-primary-contrast-rgb), 0.8);
             font-size: 14px;
           }
         }
@@ -92,13 +92,13 @@ ion-menu.glassmorphism-menu {
       --min-height: 56px;
       margin: 0 8px 8px;
       --background: transparent;
-      --background-hover: rgba(var(--ion-color-primary-rgb), 0.08);
+      --background-hover: var(--menu-item-hover-bg);
       --ripple-color: var(--ion-color-primary);
       border-radius: 8px;
-      --color: var(--ion-color-primary);
+      --color: var(--app-text-color);
 
       &.active-item {
-        --background: rgba(var(--ion-color-primary-rgb), 0.12);
+        --background: var(--menu-item-active-bg);
         --color: var(--ion-color-primary);
         font-weight: 600;
 
@@ -116,7 +116,7 @@ ion-menu.glassmorphism-menu {
       ion-label {
         font-size: 16px;
         font-weight: 500;
-        color: var(--ion-color-primary);
+        color: var(--app-text-color);
       }
     }
   }

@@ -1,4 +1,6 @@
 :host {
+  display: block;
+  width: 100%;
   --header-height: 60px;
   --header-padding-top: max(var(--ion-safe-area-top), 24px);
 }
@@ -23,17 +25,87 @@
 // Añadir estilos específicos para el ion-header
 ion-header {
   position: relative !important;
-  background-color: white;
+  background: var(--app-card-color);
   z-index: 1000;
+  box-shadow: var(--app-shadow-sm);
 
   &::after {
     display: none; // Eliminar la línea inferior
   }
 
   ion-toolbar {
-    --background: white;
-    --border-width: 0;
-    box-shadow: none;
+    --background: var(--app-card-color);
+    --color: var(--app-text-color);
+    --border-color: transparent;
+    --padding-start: 16px;
+    --padding-end: 16px;
+
+    .toolbar-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 8px 0;
+
+      .left-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        ion-menu-button {
+          --color: var(--app-text-color);
+          margin: 0;
+          padding: 0;
+        }
+
+        .page-title {
+          font-size: 20px;
+          font-weight: 600;
+          color: var(--app-text-color);
+          margin: 0;
+        }
+      }
+
+      .right-section {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        ion-button {
+          --color: var(--app-text-color-medium);
+          --background: transparent;
+          --background-hover: rgba(var(--ion-color-primary-rgb), 0.1);
+          --background-activated: rgba(var(--ion-color-primary-rgb), 0.2);
+          --padding-start: 8px;
+          --padding-end: 8px;
+          height: 40px;
+
+          &.active {
+            --color: var(--ion-color-primary);
+          }
+
+          ion-icon {
+            font-size: 24px;
+          }
+        }
+
+        .notification-badge {
+          position: absolute;
+          top: -4px;
+          right: -4px;
+          background: var(--ion-color-danger);
+          color: var(--ion-color-danger-contrast);
+          border-radius: 50%;
+          padding: 4px;
+          font-size: 10px;
+          min-width: 18px;
+          height: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+    }
   }
 }
 

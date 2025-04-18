@@ -8,14 +8,14 @@
 
 // Estilos mejorados para la barra de tabs
 ion-tab-bar {
-  --background: white;
+  --background: var(--app-card-color);
   height: calc(var(--tab-height) + var(--ion-safe-area-bottom));
   padding: 0 10px var(--ion-safe-area-bottom);
   border: none;
-  box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--app-shadow-sm);
 
   ion-tab-button {
-    --color: var(--ion-color-medium);
+    --color: var(--app-text-color-medium);
     --color-selected: var(--ion-color-primary);
     --background: transparent;
     position: relative;
@@ -29,6 +29,7 @@ ion-tab-bar {
     span {
       font-size: 12px;
       margin-top: 4px;
+      color: var(--app-text-color-medium);
     }
 
     .tab-indicator {
@@ -47,6 +48,11 @@ ion-tab-bar {
     &.tab-selected {
       ion-icon {
         transform: translateY(-4px) scale(1.2);
+        color: var(--ion-color-primary);
+      }
+
+      span {
+        color: var(--ion-color-primary);
       }
 
       .tab-indicator {
