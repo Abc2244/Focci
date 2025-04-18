@@ -185,7 +185,7 @@ export class TaskPage implements OnInit {
     const alert = await this.alertController.create({
       header: '¿Eliminar tarea?',
       message:
-        '¿Estás seguro de que deseas eliminar esta tarea? Esta acción no se puede deshacer.',
+        '¿Estás seguro de que deseas eliminar esta tarea? También se eliminarán todos los recordatorios asociados. Esta acción no se puede deshacer.',
       buttons: [
         {
           text: 'Cancelar',
@@ -207,11 +207,18 @@ export class TaskPage implements OnInit {
 
   private deleteTask(taskId: string) {
     this.apiService.deleteTask(taskId).subscribe({
-      next: () => {
+      next: (response: any) => {
         this.loadTasks();
-        this.toastService.showToast('Tarea eliminada', 'success');
+        
+        const remindersDeleted = response.details?.reminders_deleted || 0;
+        let message = 'Tarea eliminada';
+        if (remindersDeleted > 0) {
+          message += `. Se eliminaron ${remindersDeleted} recordatorios asociados.`;
+        }
+        
+        this.toastService.showToast(message, 'success');
       },
-      error: (error) => {
+      error: (error: any) => {
         this.toastService.showToast('Error al eliminar la tarea', 'error');
         console.error('Error:', error);
       },

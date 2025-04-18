@@ -209,7 +209,7 @@ export class SubjectsPage implements OnInit {
   async deleteSubject(subject: SubjectModel) {
     const alert = await this.alertController.create({
       header: 'Confirmar eliminación',
-      message: `¿Estás seguro de que quieres eliminar la materia ${subject.name}?`,
+      message: `¿Estás seguro de que quieres eliminar la materia ${subject.name}? También se eliminarán todas las tareas y recordatorios asociados.`,
       cssClass: 'custom-alert',
       backdropDismiss: false,
       mode: 'ios',
@@ -226,12 +226,17 @@ export class SubjectsPage implements OnInit {
           handler: () => {
             if (subject._id) {
               this.apiService.deleteSubject(subject._id).subscribe({
-                next: () => {
+                next: (response: any) => {
                   this.loadSubjects();
-                  this.toastService.showToast(
-                    'Materia eliminada con éxito',
-                    'success'
-                  );
+                  const tasksDeleted = response.details?.tasks_deleted || 0;
+                  const remindersDeleted = response.details?.reminders_deleted || 0;
+                  
+                  let message = `Materia eliminada con éxito`;
+                  if (tasksDeleted > 0 || remindersDeleted > 0) {
+                    message += `. Se eliminaron ${tasksDeleted} tareas y ${remindersDeleted} recordatorios asociados.`;
+                  }
+                  
+                  this.toastService.showToast(message, 'success');
                 },
                 error: (error: unknown) => {
                   this.toastService.showToast(

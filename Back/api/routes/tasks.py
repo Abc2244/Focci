@@ -122,10 +122,22 @@ async def update_task(task_id: str, task: Task):
 
 @router.delete("/tasks/{task_id}/")
 async def delete_task(task_id: str):
-    result = await mongodb.get_collection("tasks").delete_one({"_id": ObjectId(task_id)})
-    if result.deleted_count == 0:
+    # Primero eliminar los recordatorios asociados a la tarea
+    reminder_result = await mongodb.get_collection("reminders").delete_many({"task_id": task_id})
+    reminders_deleted = reminder_result.deleted_count
+    
+    # Luego eliminar la tarea
+    task_result = await mongodb.get_collection("tasks").delete_one({"_id": ObjectId(task_id)})
+    if task_result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
-    return {"message": "Tarea eliminada"}
+    
+    return {
+        "message": "Tarea eliminada con éxito",
+        "details": {
+            "task_deleted": True,
+            "reminders_deleted": reminders_deleted
+        }
+    }
 
 @router.get("/tasks/{task_id}/")
 async def get_task(task_id: str):

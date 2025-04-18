@@ -110,7 +110,10 @@ export class ApiService {
   }
 
   deleteTask(task_id: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/tasks/${task_id}/`);
+    return this.http.delete(`${this.apiUrl}/tasks/${task_id}/`).pipe(
+      tap(response => console.log('Task deletion response:', response)),
+      catchError(this.handleError)
+    );
   }
 
   deleteCompletedTasks(user_id: string): Observable<any> {
@@ -195,7 +198,10 @@ export class ApiService {
   }
 
   deleteSubject(subject_id: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/subjects/${subject_id}/`);
+    return this.http.delete(`${this.apiUrl}/subjects/${subject_id}/`).pipe(
+      tap(response => console.log('Subject deletion response:', response)),
+      catchError(this.handleError)
+    );
   }
 
   // -----------------------------------------

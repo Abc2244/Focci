@@ -35,13 +35,34 @@ async def update_subject(subject_id: str, subject: Subject):
 
 @router.delete("/subjects/{subject_id}/")
 async def delete_subject(subject_id: str):
-    related_tasks = await mongodb.get_collection("tasks").count_documents({"subject_id": subject_id})
-    if related_tasks > 0:
-        raise HTTPException(status_code=400, detail="No puedes eliminar una materia con tareas asociadas")
-    result = await mongodb.get_collection("subjects").delete_one({"_id": ObjectId(subject_id)})
-    if result.deleted_count == 0:
+    # Primero obtener todas las tareas asociadas a la materia
+    tasks = await mongodb.get_collection("tasks").find({"subject_id": subject_id}).to_list(length=1000)
+    task_ids = [str(task["_id"]) for task in tasks]
+    
+    # Eliminar los recordatorios asociados a esas tareas
+    if task_ids:
+        reminder_result = await mongodb.get_collection("reminders").delete_many({"task_id": {"$in": task_ids}})
+        reminders_deleted = reminder_result.deleted_count
+    else:
+        reminders_deleted = 0
+    
+    # Eliminar las tareas asociadas a la materia
+    tasks_result = await mongodb.get_collection("tasks").delete_many({"subject_id": subject_id})
+    tasks_deleted = tasks_result.deleted_count
+    
+    # Finalmente, eliminar la materia
+    subject_result = await mongodb.get_collection("subjects").delete_one({"_id": ObjectId(subject_id)})
+    if subject_result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Materia no encontrada")
-    return {"message": "Materia eliminada"}
+    
+    return {
+        "message": "Materia eliminada con éxito",
+        "details": {
+            "subject_deleted": True,
+            "tasks_deleted": tasks_deleted,
+            "reminders_deleted": reminders_deleted
+        }
+    }
 
 @router.get("/users/{user_id}/subjects/")
 async def get_subjects_by_user(user_id: str):
