@@ -1,9 +1,14 @@
 <ion-content class="reminders-content" fullscreen>
   <div class="reminders-container">
-    <!-- Título de la página -->
-    <div class="page-title">
-      <ion-icon name="notifications-outline" class="title-icon"></ion-icon>
-      <h1>Recordatorios</h1>
+    <!-- Encabezado mejorado -->
+    <div class="page-header">
+      <div class="page-title">
+        <ion-icon name="notifications-outline" class="title-icon"></ion-icon>
+        <h1>Mis Recordatorios</h1>
+      </div>
+      <p class="title-subtitle">
+        Gestiona tus recordatorios y notificaciones de tareas pendientes.
+      </p>
     </div>
 
     <!-- Shimmer loading effect -->
@@ -15,15 +20,21 @@
     <div class="reminder-list" *ngIf="!isLoading && reminders.length > 0">
       <!-- Recordatorios Pendientes -->
       <ion-card class="reminder-card" *ngFor="let reminder of pendingReminders">
+        <div class="reminder-card-top-decoration"></div>
         <ion-card-header>
           <div class="card-header-content">
-            <ion-icon name="alarm-outline" class="reminder-icon"></ion-icon>
+            <div class="reminder-icon-container">
+              <ion-icon name="alarm-outline" class="reminder-icon"></ion-icon>
+            </div>
             <div class="card-title-container">
               <ion-card-title
                 >{{ getTaskName(reminder.task_id) }}</ion-card-title
               >
-              <ion-card-subtitle>
-                <ion-icon name="calendar-outline" class="date-icon"></ion-icon>
+              <ion-card-subtitle class="date-badge">
+                <ion-icon
+                  name="calendar-outline"
+                  class="subtitle-icon"
+                ></ion-icon>
                 {{ reminder.reminder_date | date:'MMM d, y, h:mm a' }}
               </ion-card-subtitle>
             </div>
@@ -31,7 +42,7 @@
         </ion-card-header>
 
         <ion-card-content>
-          <!-- Mostrar el mensaje del recordatorio si existe -->
+          <!-- Mensaje del recordatorio -->
           <div
             class="reminder-message"
             *ngIf="reminder.message && reminder.message.trim() !== ''"
@@ -39,6 +50,7 @@
             <p>{{ reminder.message }}</p>
           </div>
 
+          <!-- Chips de información -->
           <div class="reminder-info">
             <ion-chip
               class="priority-chip"
@@ -67,212 +79,129 @@
             </ion-chip>
           </div>
 
+          <!-- Acciones -->
           <div class="reminder-actions">
             <ion-button
               fill="clear"
               (click)="completeReminder(reminder._id)"
-              class="action-button"
+              class="action-button complete-button"
             >
-              <ion-icon
-                name="checkmark-circle-outline"
-                slot="icon-only"
-              ></ion-icon>
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              Completar
             </ion-button>
             <ion-button
               fill="clear"
               (click)="editReminder(reminder)"
-              class="action-button"
+              class="action-button edit-button"
             >
-              <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+              <ion-icon name="create-outline"></ion-icon>
+              Editar
             </ion-button>
             <ion-button
               fill="clear"
               (click)="deleteReminder(reminder._id)"
-              class="action-button"
+              class="action-button delete-button"
             >
-              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+              <ion-icon name="trash-outline"></ion-icon>
+              Eliminar
             </ion-button>
           </div>
         </ion-card-content>
       </ion-card>
 
-      <!-- Divider for Completed Reminders -->
+      <!-- Sección de Completados -->
       <div class="section-divider" *ngIf="completedReminders.length > 0">
         <div class="divider-line"></div>
         <div class="divider-text">Recordatorios Completados</div>
         <div class="divider-line"></div>
       </div>
 
-      <!-- Completed Reminders Section -->
-      <div
-        class="completed-reminders-section"
-        *ngIf="completedReminders.length > 0"
+      <!-- Lista de Completados -->
+      <ion-card
+        class="reminder-card completed"
+        *ngFor="let reminder of completedReminders"
       >
-        <ion-card
-          class="reminder-card completed"
-          *ngFor="let reminder of completedReminders"
-        >
-          <ion-card-header>
-            <div class="card-header-content">
+        <div class="reminder-card-top-decoration"></div>
+        <ion-card-header>
+          <div class="card-header-content">
+            <div class="reminder-icon-container">
               <ion-icon
                 name="checkmark-circle"
                 class="reminder-icon completed-icon"
               ></ion-icon>
-              <div class="card-title-container">
-                <ion-card-title
-                  >{{ getTaskName(reminder.task_id) }}</ion-card-title
-                >
-                <ion-card-subtitle>
-                  <ion-icon
-                    name="calendar-outline"
-                    class="date-icon"
-                  ></ion-icon>
-                  {{ reminder.completed_date | date:'MMM d, y, h:mm a' }}
-                </ion-card-subtitle>
-              </div>
             </div>
-          </ion-card-header>
-
-          <ion-card-content>
-            <!-- Mostrar el mensaje del recordatorio si existe -->
-            <div
-              class="reminder-message"
-              *ngIf="reminder.message && reminder.message.trim() !== ''"
-            >
-              <p>{{ reminder.message }}</p>
-            </div>
-
-            <div class="reminder-info">
-              <ion-chip color="success">
-                <ion-icon name="checkmark-done-outline"></ion-icon>
-                Completado: {{ reminder.completed_date | date:'MMM d, y, h:mm a'
-                }}
-              </ion-chip>
-            </div>
-
-            <div class="reminder-actions">
-              <ion-button
-                fill="clear"
-                (click)="reactivateReminder(reminder._id)"
-                class="action-button"
+            <div class="card-title-container">
+              <ion-card-title
+                >{{ getTaskName(reminder.task_id) }}</ion-card-title
               >
-                <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
-              </ion-button>
+              <ion-card-subtitle class="date-badge">
+                <ion-icon
+                  name="calendar-outline"
+                  class="subtitle-icon"
+                ></ion-icon>
+                {{ reminder.completed_date | date:'MMM d, y, h:mm a' }}
+              </ion-card-subtitle>
             </div>
-          </ion-card-content>
-        </ion-card>
-      </div>
+          </div>
+        </ion-card-header>
 
-      <!-- Cancelados Section -->
-      <div class="section-divider" *ngIf="canceledReminders.length > 0">
-        <div class="divider-line"></div>
-        <div class="divider-text">Recordatorios Cancelados</div>
-        <div class="divider-line"></div>
-      </div>
+        <ion-card-content>
+          <div
+            class="reminder-message"
+            *ngIf="reminder.message && reminder.message.trim() !== ''"
+          >
+            <p>{{ reminder.message }}</p>
+          </div>
 
-      <div
-        class="canceled-reminders-section"
-        *ngIf="canceledReminders.length > 0"
-      >
-        <ion-card
-          class="reminder-card canceled"
-          *ngFor="let reminder of canceledReminders"
-        >
-          <ion-card-header>
-            <div class="card-header-content">
-              <ion-icon
-                name="close-circle"
-                class="reminder-icon canceled-icon"
-              ></ion-icon>
-              <div class="card-title-container">
-                <ion-card-title
-                  >{{ getTaskName(reminder.task_id) }}</ion-card-title
-                >
-                <ion-card-subtitle>
-                  <ion-icon
-                    name="calendar-outline"
-                    class="date-icon"
-                  ></ion-icon>
-                  {{ reminder.reminder_date | date:'MMM d, y, h:mm a' }}
-                </ion-card-subtitle>
-              </div>
-            </div>
-          </ion-card-header>
-
-          <ion-card-content>
-            <!-- Mostrar el mensaje del recordatorio si existe -->
-            <div
-              class="reminder-message"
-              *ngIf="reminder.message && reminder.message.trim() !== ''"
-            >
-              <p>{{ reminder.message }}</p>
-            </div>
-
-            <div class="reminder-info">
-              <ion-chip color="medium">
-                <ion-icon name="ban-outline"></ion-icon>
-                <span>Cancelado</span>
-              </ion-chip>
-            </div>
-
-            <div class="reminder-actions">
-              <ion-button
-                fill="clear"
-                (click)="reactivateReminder(reminder._id)"
-                class="action-button"
+          <div class="reminder-info">
+            <ion-chip color="success">
+              <ion-icon name="checkmark-done-outline"></ion-icon>
+              <span
+                >Completado: {{ reminder.completed_date | date:'MMM d, y, h:mm
+                a' }}</span
               >
-                <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
-              </ion-button>
-            </div>
-          </ion-card-content>
-        </ion-card>
-      </div>
+            </ion-chip>
+          </div>
+
+          <div class="reminder-actions">
+            <ion-button
+              fill="clear"
+              (click)="reactivateReminder(reminder._id)"
+              class="action-button reactivate-button"
+            >
+              <ion-icon name="refresh-outline"></ion-icon>
+              Reactivar
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
     </div>
 
     <!-- Estado vacío -->
     <div class="empty-state" *ngIf="!isLoading && reminders.length === 0">
-      <div class="empty-state-content">
-        <ion-icon
-          name="notifications-off-outline"
-          class="empty-icon"
-        ></ion-icon>
-        <h2>No hay recordatorios</h2>
-        <p>
-          Aún no has creado ningún recordatorio. ¡Comienza creando uno nuevo!
-        </p>
-        <ion-button
-          expand="block"
-          (click)="openAddReminderModal()"
-          class="add-button"
-        >
-          <ion-icon name="add-outline" slot="start"></ion-icon>
-          Crear recordatorio
-        </ion-button>
-      </div>
-    </div>
-
-    <!-- Añade esto temporalmente para debug -->
-    <div *ngIf="isLoading">Cargando recordatorios...</div>
-    <div *ngIf="!isLoading && reminders.length === 0">No hay recordatorios</div>
-    <div *ngIf="!isLoading && reminders.length > 0">
-      Recordatorios totales: {{reminders.length}} Pendientes:
-      {{pendingReminders.length}} Completados: {{completedReminders.length}}
-      Cancelados: {{canceledReminders.length}}
+      <ion-icon name="notifications-off-outline" class="empty-icon"></ion-icon>
+      <h2>No hay recordatorios</h2>
+      <p>Aún no has creado ningún recordatorio. ¡Comienza creando uno nuevo!</p>
+      <ion-button
+        expand="block"
+        (click)="openAddReminderModal()"
+        class="empty-state-button"
+      >
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Crear recordatorio
+      </ion-button>
     </div>
   </div>
 
-  <!-- Botón flotante para agregar -->
+  <!-- Botón flotante -->
   <ion-fab
     vertical="bottom"
     horizontal="end"
     slot="fixed"
     *ngIf="reminders.length > 0"
+    class="fab-fixed"
   >
-    <ion-fab-button
-      class="custom-fab"
-      (click)="openAddReminderModal()"
-      color="primary"
-    >
+    <ion-fab-button class="custom-fab" (click)="openAddReminderModal()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
@@ -290,114 +219,115 @@
     <ion-header class="ion-no-border">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-button (click)="dismissModal()" color="primary">
-            <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+          <ion-button class="modal-close-button" (click)="dismissModal()">
+            <ion-icon name="close-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-title>{{ isEditing ? 'Editar' : 'Nuevo' }} Recordatorio</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="saveReminder()" color="primary" [strong]="true">
-            <span>{{ isEditing ? 'Actualizar' : 'Crear' }}</span>
+          <ion-button
+            class="save-button"
+            [disabled]="!reminderForm.valid"
+            (click)="saveReminder()"
+          >
+            {{ isEditing ? 'Actualizar' : 'Crear' }}
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
     <ion-content class="modal-content">
-      <form [formGroup]="reminderForm">
-        <div class="form-container">
-          <div class="input-group">
-            <ion-item class="custom-input">
-              <ion-label position="floating" class="form-label"
-                >Tarea</ion-label
-              >
-              <ion-select formControlName="task_id" interface="action-sheet">
-                <ion-select-option
-                  *ngFor="let task of tasks"
-                  [value]="task._id"
-                >
-                  {{ task.description }}
-                </ion-select-option>
-              </ion-select>
-            </ion-item>
+      <div class="modal-intro" *ngIf="!isEditing">
+        <ion-icon name="notifications-outline" color="primary"></ion-icon>
+        <p>
+          Configura un nuevo recordatorio para mantener el seguimiento de tus
+          tareas importantes.
+        </p>
+      </div>
 
-            <ion-item class="custom-input">
-              <ion-label position="floating" class="form-label"
-                >Mensaje</ion-label
-              ><br>
-              <ion-textarea
-                formControlName="message"
-                placeholder="Escribe un mensaje para este recordatorio"
-                rows="3"
-              ></ion-textarea>
-            </ion-item>
-
-            <ion-item class="custom-input datetime-input">
-              <ion-label position="floating" class="form-label"
-                >Fecha de Recordatorio</ion-label
-              >
-              <ion-datetime
-                formControlName="reminder_date"
-                displayFormat="DD/MM/YYYY HH:mm"
-                presentation="date-time"
-                locale="es-ES"
-                class="custom-datetime"
-              ></ion-datetime>
-            </ion-item>
-
-            <ion-item class="custom-input">
-              <ion-label position="floating" class="form-label"
-                >Prioridad</ion-label
-              >
-              <ion-select formControlName="priority" interface="action-sheet">
-                <ion-select-option value="1">Baja</ion-select-option>
-                <ion-select-option value="2">Media-Baja</ion-select-option>
-                <ion-select-option value="3">Media</ion-select-option>
-                <ion-select-option value="4">Media-Alta</ion-select-option>
-                <ion-select-option value="5">Alta</ion-select-option>
-              </ion-select>
-            </ion-item>
-
-            <ion-item class="custom-input">
-              <ion-label position="floating" class="form-label"
-                >Estado</ion-label
-              >
-              <ion-select formControlName="status" interface="action-sheet">
-                <ion-select-option value="pendiente"
-                  >Pendiente</ion-select-option
-                >
-                <ion-select-option value="completado"
-                  >Completado</ion-select-option
-                >
-                <ion-select-option value="cancelado"
-                  >Cancelado</ion-select-option
-                >
-              </ion-select>
-            </ion-item>
-
-            <ion-item class="custom-input">
-              <ion-label position="floating" class="form-label"
-                >Nivel de Insistencia</ion-label
-              >
-              <ion-select
-                formControlName="insistence_level"
-                interface="action-sheet"
-              >
-                <ion-select-option value="0">Muy Baja</ion-select-option>
-                <ion-select-option value="1">Baja</ion-select-option>
-                <ion-select-option value="2">Baja-Media</ion-select-option>
-                <ion-select-option value="3">Media-Baja</ion-select-option>
-                <ion-select-option value="4">Media</ion-select-option>
-                <ion-select-option value="5">Media-Alta</ion-select-option>
-                <ion-select-option value="6">Alta-Media</ion-select-option>
-                <ion-select-option value="7">Alta</ion-select-option>
-                <ion-select-option value="8">Muy Alta</ion-select-option>
-                <ion-select-option value="9">Crítica</ion-select-option>
-                <ion-select-option value="10">Urgente</ion-select-option>
-              </ion-select>
-            </ion-item>
-          </div>
+      <form [formGroup]="reminderForm" class="form-container">
+        <!-- Selector de tarea -->
+        <div class="field-label">
+          <ion-icon name="list-outline"></ion-icon>
+          Tarea asociada
         </div>
+        <ion-item class="custom-input">
+          <ion-select
+            formControlName="task_id"
+            interface="action-sheet"
+            placeholder="Selecciona una tarea"
+          >
+            <ion-select-option *ngFor="let task of tasks" [value]="task._id">
+              {{ task.description }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Mensaje -->
+        <div class="field-label">
+          <ion-icon name="chatbox-outline"></ion-icon>
+          Mensaje del recordatorio
+        </div>
+        <ion-item class="custom-input">
+          <ion-textarea
+            formControlName="message"
+            placeholder="Escribe un mensaje para este recordatorio"
+            rows="3"
+          ></ion-textarea>
+        </ion-item>
+
+        <!-- Fecha y hora -->
+        <div class="field-label">
+          <ion-icon name="calendar-outline"></ion-icon>
+          Fecha y hora
+        </div>
+        <ion-item class="custom-input datetime-input">
+          <ion-datetime
+            formControlName="reminder_date"
+            presentation="date-time"
+            [min]="minDate"
+            locale="es-ES"
+          ></ion-datetime>
+        </ion-item>
+
+        <!-- Prioridad -->
+        <div class="field-label">
+          <ion-icon name="flag-outline"></ion-icon>
+          Nivel de prioridad
+        </div>
+        <ion-item class="custom-input">
+          <ion-select formControlName="priority" interface="action-sheet">
+            <ion-select-option value="1">Baja</ion-select-option>
+            <ion-select-option value="2">Media-Baja</ion-select-option>
+            <ion-select-option value="3">Media</ion-select-option>
+            <ion-select-option value="4">Media-Alta</ion-select-option>
+            <ion-select-option value="5">Alta</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Nivel de insistencia -->
+        <div class="field-label">
+          <ion-icon name="repeat-outline"></ion-icon>
+          Nivel de insistencia
+        </div>
+        <ion-item class="custom-input">
+          <ion-select
+            formControlName="insistence_level"
+            interface="action-sheet"
+          >
+            <ion-select-option value="0">Muy Baja</ion-select-option>
+            <ion-select-option value="1">Baja</ion-select-option>
+            <ion-select-option value="2">Baja-Media</ion-select-option>
+            <ion-select-option value="3">Media-Baja</ion-select-option>
+            <ion-select-option value="4">Media</ion-select-option>
+            <ion-select-option value="5">Media-Alta</ion-select-option>
+            <ion-select-option value="6">Alta-Media</ion-select-option>
+            <ion-select-option value="7">Alta</ion-select-option>
+            <ion-select-option value="8">Muy Alta</ion-select-option>
+            <ion-select-option value="9">Crítica</ion-select-option>
+            <ion-select-option value="10">Urgente</ion-select-option>
+          </ion-select>
+        </ion-item>
       </form>
     </ion-content>
   </ng-template>

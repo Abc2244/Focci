@@ -6,8 +6,8 @@ import { RemindersPage } from './reminders.page';
 const routes: Routes = [
   {
     path: '',
-    component: RemindersPage
-  }
+    component: RemindersPage,
+  },
 ];
 
 @NgModule({

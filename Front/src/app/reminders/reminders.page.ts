@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
-import { ToastController } from '@ionic/angular';
+import { AlertController, IonModal, ToastController } from '@ionic/angular';
 import { ToastService } from '../services/toast.service';
 import { NotificationsService } from '../services/notifications.service';
 import { LocalNotifications } from '@capacitor/local-notifications';
@@ -13,6 +13,9 @@ import { LocalNotifications } from '@capacitor/local-notifications';
   styleUrls: ['./reminders.page.scss'],
 })
 export class RemindersPage implements OnInit {
+  @ViewChild(IonModal) modal!: IonModal;
+  presentingElement: HTMLElement | null = null;
+
   reminders: any[] = [];
   pendingReminders: any[] = [];
   completedReminders: any[] = [];
@@ -21,7 +24,7 @@ export class RemindersPage implements OnInit {
   showModal = false;
   isEditing = false;
   isLoading = true;
-  reminderForm: FormGroup;
+  reminderForm: FormGroup = this.initForm();
   currentReminderId: string | null = null;
   minDate: string = new Date().toISOString();
 
@@ -31,31 +34,39 @@ export class RemindersPage implements OnInit {
     private fb: FormBuilder,
     private toastController: ToastController,
     private toastService: ToastService,
-    private notificationsService: NotificationsService
-  ) {
-    this.reminderForm = this.fb.group({
-      reminder_date: ['', Validators.required],
-      priority: [3, Validators.required],
-      task_id: ['', Validators.required],
-      message: ['', Validators.required],
-      status: ['pendiente', Validators.required],
-      insistence_level: [
-        1,
-        [Validators.required, Validators.min(0), Validators.max(10)],
-      ],
-    });
-  }
+    private notificationsService: NotificationsService,
+    private alertController: AlertController
+  ) {}
 
   ngOnInit() {
     this.loadReminders();
     this.loadTasks();
     this.requestNotificationPermissions();
     this.scheduleAllPendingReminders();
+    this.presentingElement = document.querySelector('.ion-page');
   }
 
   ionViewWillEnter() {
     this.loadReminders();
     this.loadTasks();
+  }
+
+  // Inicializar el formulario
+  private initForm(): FormGroup {
+    return this.fb.group({
+      reminder_date: ['', Validators.required],
+      priority: [
+        '3',
+        [Validators.required, Validators.min(1), Validators.max(5)],
+      ],
+      task_id: ['', Validators.required],
+      message: ['', Validators.required],
+      status: ['pendiente', Validators.required],
+      insistence_level: [
+        '1',
+        [Validators.required, Validators.min(0), Validators.max(10)],
+      ],
+    });
   }
 
   // Método para cerrar el modal
@@ -65,11 +76,11 @@ export class RemindersPage implements OnInit {
     this.currentReminderId = null;
     this.reminderForm.reset({
       reminder_date: '',
-      priority: 3,
+      priority: '3',
       task_id: '',
       message: '',
       status: 'pendiente',
-      insistence_level: 1,
+      insistence_level: '1',
     });
   }
 
@@ -169,11 +180,11 @@ export class RemindersPage implements OnInit {
     this.currentReminderId = null;
     this.reminderForm.reset({
       reminder_date: new Date().toISOString(),
-      priority: 3,
+      priority: '3',
       task_id: '',
       message: '',
       status: 'pendiente',
-      insistence_level: 1,
+      insistence_level: '1',
     });
     this.showModal = true;
   }
@@ -182,14 +193,19 @@ export class RemindersPage implements OnInit {
   editReminder(reminder: any): void {
     this.isEditing = true;
     this.currentReminderId = reminder._id;
-    this.reminderForm.setValue({
+
+    // Convertir los valores numéricos a string para el formulario
+    const formValues = {
       reminder_date: reminder.reminder_date,
-      priority: Number(reminder.priority),
+      priority: reminder.priority.toString(),
       task_id: reminder.task_id,
       message: reminder.message,
       status: reminder.status,
-      insistence_level: Number(reminder.insistence_level),
-    });
+      insistence_level: reminder.insistence_level.toString(),
+    };
+
+    console.log('Setting form values:', formValues);
+    this.reminderForm.patchValue(formValues);
     this.showModal = true;
   }
 
@@ -264,7 +280,8 @@ export class RemindersPage implements OnInit {
     );
   }
 
-  saveReminder() {
+  // Método para guardar el recordatorio
+  async saveReminder() {
     if (this.reminderForm.invalid) {
       console.log('Form invalid:', this.reminderForm.errors);
       return;
@@ -277,8 +294,13 @@ export class RemindersPage implements OnInit {
         return;
       }
 
-      // Obtener los valores del formulario
-      const formData = { ...this.reminderForm.value };
+      // Obtener los valores del formulario y convertir los valores numéricos
+      const formData = {
+        ...this.reminderForm.value,
+        priority: parseInt(this.reminderForm.value.priority),
+        insistence_level: parseInt(this.reminderForm.value.insistence_level),
+        user_id: userId,
+      };
 
       // Asegurarse de que la fecha sea un string ISO
       if (
@@ -288,75 +310,18 @@ export class RemindersPage implements OnInit {
         formData.reminder_date = formData.reminder_date.toISOString();
       }
 
-      // Convertir valores numéricos
-      formData.priority = Number(formData.priority);
-      formData.insistence_level = Number(formData.insistence_level);
-
-      // Añadir el ID de usuario
-      formData.user_id = userId;
-
-      // Añadir el nombre de la tarea para referencia
-      formData.taskName = this.getTaskName(formData.task_id);
-
-      // Añadir un ID temporal para la notificación si es nuevo
-      if (!this.isEditing) {
-        formData._id = `temp_${Date.now()}`;
-      } else {
-        formData._id = this.currentReminderId;
-      }
-
-      console.log('Saving reminder with formatted data:', formData);
-
       if (this.isEditing && this.currentReminderId) {
-        this.apiService
+        await this.apiService
           .updateReminder(this.currentReminderId, formData)
-          .subscribe(
-            async (response: any) => {
-              console.log('Reminder updated:', response);
-              this.toastService.showToast(
-                'Recordatorio actualizado',
-                'success'
-              );
-              this.loadReminders();
-              this.dismissModal();
-
-              // Actualizar la notificación
-              await this.notificationsService.cancelNotification(
-                this.currentReminderId!
-              );
-              await this.notificationsService.scheduleNotification({
-                ...formData,
-                _id: this.currentReminderId,
-              });
-            },
-            (error: any) => {
-              console.error('Error updating reminder:', error);
-              this.toastService.showToast(
-                'Error al actualizar recordatorio',
-                'error'
-              );
-            }
-          );
+          .toPromise();
+        this.toastService.showToast('Recordatorio actualizado', 'success');
       } else {
-        this.apiService.createReminder(formData).subscribe(
-          async (response: any) => {
-            console.log('Reminder created:', response);
-            this.toastService.showToast('Recordatorio creado', 'success');
-            this.loadReminders();
-            this.dismissModal();
-
-            // Programar la notificación para el nuevo recordatorio
-            await this.notificationsService.scheduleNotification({
-              ...formData,
-              _id: response.reminder_id,
-            });
-          },
-          (error: any) => {
-            console.error('Error creating reminder:', error);
-            this.toastService.showToast('Error al crear recordatorio', 'error');
-          }
-        );
+        await this.apiService.createReminder(formData).toPromise();
+        this.toastService.showToast('Recordatorio creado', 'success');
       }
+
+      this.loadReminders();
+      this.dismissModal();
     } catch (error) {
       console.error('Error in saveReminder:', error);
       this.toastService.showToast('Error al guardar recordatorio', 'error');
@@ -447,11 +412,11 @@ export class RemindersPage implements OnInit {
     this.showModal = false;
     this.reminderForm.reset({
       reminder_date: new Date().toISOString(),
-      priority: 3,
+      priority: '3',
       task_id: '',
       message: '',
       status: 'pendiente',
-      insistence_level: 1,
+      insistence_level: '1',
     });
     this.currentReminderId = null;
     this.isEditing = false;

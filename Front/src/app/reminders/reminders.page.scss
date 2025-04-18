@@ -13,6 +13,15 @@ $priority-high: #f44336; // Rojo para prioridad alta
 // Color para tareas
 $task-color: #673ab7; // Púrpura para tareas
 
+// Variables
+$card-border-radius: 16px;
+$card-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+$primary-gradient: linear-gradient(
+  135deg,
+  var(--ion-color-primary) 0%,
+  var(--ion-color-primary-tint) 100%
+);
+
 .reminders-content {
   --background: linear-gradient(
     135deg,
@@ -36,34 +45,99 @@ $task-color: #673ab7; // Púrpura para tareas
   }
 
   .reminders-container {
+    padding: 1rem;
     max-width: 1200px;
     margin: 0 auto;
     position: relative;
     z-index: 1;
-    padding-top: 1rem;
 
-    .page-title {
+    @media (max-width: 576px) {
+      padding: 0.75rem;
+    }
+
+    .page-header {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 1rem;
       background: var(--app-card-color);
-      padding: 1rem;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      padding: 1.5rem;
+      border-radius: $card-border-radius;
+      box-shadow: $card-shadow;
       margin-bottom: 1.5rem;
       text-align: center;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
 
-      h1 {
-        color: var(--ion-color-primary);
-        margin: 0;
-        font-size: 1.5rem;
-        font-weight: 600;
+      @media (max-width: 576px) {
+        padding: 1.25rem 1rem;
+        border-radius: $card-border-radius - 4px;
       }
 
-      .title-icon {
-        font-size: 2rem;
-        color: var(--ion-color-primary);
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 6px;
+        background: $primary-gradient;
+      }
+
+      .page-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+        width: 100%;
+        padding: 0 0.5rem;
+
+        @media (max-width: 576px) {
+          gap: 0.75rem;
+          margin-bottom: 0.5rem;
+          padding: 0 0.25rem;
+        }
+
+        h1 {
+          color: var(--ion-color-primary);
+          margin: 0;
+          font-size: 1.8rem;
+          font-weight: 700;
+          text-align: center;
+          line-height: 1.2;
+
+          @media (max-width: 576px) {
+            font-size: 1.5rem;
+          }
+        }
+
+        .title-icon {
+          font-size: 2.2rem;
+          color: var(--ion-color-primary);
+          flex-shrink: 0;
+
+          @media (max-width: 576px) {
+            font-size: 1.8rem;
+          }
+        }
+      }
+
+      .title-subtitle {
+        color: var(--app-text-color-medium);
+        margin: 0;
+        font-size: 1rem;
+        max-width: 600px;
+        text-align: center;
+        width: 100%;
+        padding: 0 0.5rem;
+        line-height: 1.4;
+
+        @media (max-width: 576px) {
+          font-size: 0.9rem;
+          padding: 0 0.75rem;
+        }
       }
     }
 
@@ -102,34 +176,54 @@ $task-color: #673ab7; // Púrpura para tareas
   // Estilos para las tarjetas de recordatorios
   .reminder-card {
     background: var(--app-card-color);
-    border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    border-radius: $card-border-radius;
+    box-shadow: $card-shadow;
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
-    margin-bottom: 1rem;
+    border: none;
+    position: relative;
 
     &:hover {
       transform: translateY(-5px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
     }
 
     &.completed {
       opacity: 0.8;
     }
 
+    .reminder-card-top-decoration {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: $primary-gradient;
+      z-index: 1;
+    }
+
     .card-header-content {
       display: flex;
       align-items: center;
       gap: 1rem;
-      padding: 1rem;
+      padding: 1.2rem;
 
-      .reminder-icon {
-        font-size: 2rem;
-        color: var(--ion-color-primary);
+      .reminder-icon-container {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: rgba(var(--ion-color-primary-rgb), 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-        &.completed-icon {
-          color: var(--ion-color-success);
+        .reminder-icon {
+          font-size: 26px;
+          color: var(--ion-color-primary);
+
+          &.completed-icon {
+            color: var(--ion-color-success);
+          }
         }
       }
 
@@ -137,35 +231,38 @@ $task-color: #673ab7; // Púrpura para tareas
         flex: 1;
 
         ion-card-title {
-          color: var(--ion-color-primary);
+          color: var(--app-text-color);
+          font-size: 1.3rem;
           font-weight: 600;
-          font-size: 1.1rem;
-          margin: 0;
+          margin-bottom: 4px;
         }
 
         ion-card-subtitle {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
-          color: var(--ion-color-medium);
-          margin-top: 0.25rem;
+          gap: 6px;
 
-          .date-icon {
-            font-size: 1rem;
-            color: var(--ion-color-medium);
+          &.date-badge {
+            color: var(--app-text-color-medium);
+            font-size: 0.9rem;
+
+            .subtitle-icon {
+              font-size: 16px;
+              color: var(--ion-color-primary);
+            }
           }
         }
       }
     }
 
     ion-card-content {
-      padding: 12px 16px;
+      padding: 0 1.2rem 1.2rem;
 
       .reminder-message {
         background: rgba(var(--ion-color-primary-rgb), 0.05);
         border-radius: 8px;
         padding: 1rem;
-        margin: 0 1rem 1rem;
+        margin-bottom: 1rem;
 
         p {
           margin: 0;
@@ -178,55 +275,41 @@ $task-color: #673ab7; // Púrpura para tareas
       .reminder-info {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.5rem;
-        margin: 0 1rem 1rem;
+        gap: 8px;
+        margin-bottom: 1rem;
 
         ion-chip {
           margin: 0;
           height: 24px;
+          padding: 5px 10px;
+          border-radius: 8px;
           font-size: 0.8rem;
-          padding: 0 0.75rem;
 
           .chip-icon {
             margin-right: 4px;
-            font-size: 1rem;
+            font-size: 16px;
           }
 
           &.priority-chip {
             &.priority-1 {
               --background: rgba(var(--ion-color-success-rgb), 0.1);
               --color: var(--ion-color-success);
-              .chip-icon {
-                color: var(--ion-color-success);
-              }
             }
             &.priority-2 {
               --background: rgba(var(--ion-color-warning-rgb), 0.1);
               --color: var(--ion-color-warning);
-              .chip-icon {
-                color: var(--ion-color-warning);
-              }
             }
             &.priority-3 {
               --background: rgba(var(--ion-color-primary-rgb), 0.1);
               --color: var(--ion-color-primary);
-              .chip-icon {
-                color: var(--ion-color-primary);
-              }
             }
             &.priority-4 {
               --background: rgba(var(--ion-color-tertiary-rgb), 0.1);
               --color: var(--ion-color-tertiary);
-              .chip-icon {
-                color: var(--ion-color-tertiary);
-              }
             }
             &.priority-5 {
               --background: rgba(var(--ion-color-danger-rgb), 0.1);
               --color: var(--ion-color-danger);
-              .chip-icon {
-                color: var(--ion-color-danger);
-              }
             }
           }
 
@@ -234,16 +317,10 @@ $task-color: #673ab7; // Púrpura para tareas
             &.status-pendiente {
               --background: rgba(var(--ion-color-warning-rgb), 0.1);
               --color: var(--ion-color-warning);
-              .chip-icon {
-                color: var(--ion-color-warning);
-              }
             }
             &.status-completado {
               --background: rgba(var(--ion-color-success-rgb), 0.1);
               --color: var(--ion-color-success);
-              .chip-icon {
-                color: var(--ion-color-success);
-              }
             }
           }
 
@@ -251,23 +328,14 @@ $task-color: #673ab7; // Púrpura para tareas
             &.insistence-low {
               --background: rgba(var(--ion-color-success-rgb), 0.1);
               --color: var(--ion-color-success);
-              .chip-icon {
-                color: var(--ion-color-success);
-              }
             }
             &.insistence-medium {
               --background: rgba(var(--ion-color-warning-rgb), 0.1);
               --color: var(--ion-color-warning);
-              .chip-icon {
-                color: var(--ion-color-warning);
-              }
             }
             &.insistence-high {
               --background: rgba(var(--ion-color-danger-rgb), 0.1);
               --color: var(--ion-color-danger);
-              .chip-icon {
-                color: var(--ion-color-danger);
-              }
             }
           }
         }
@@ -276,14 +344,41 @@ $task-color: #673ab7; // Púrpura para tareas
       .reminder-actions {
         display: flex;
         justify-content: flex-end;
-        gap: 0.5rem;
-        padding: 0 1rem 1rem;
+        gap: 8px;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
 
         .action-button {
-          --color: var(--ion-color-primary);
-          margin: 0;
+          --padding-start: 10px;
+          --padding-end: 10px;
+          --border-radius: 8px;
           height: 36px;
-          width: 36px;
+          font-size: 13px;
+
+          &.complete-button {
+            --color: var(--ion-color-success);
+            --background-hover: rgba(var(--ion-color-success-rgb), 0.08);
+          }
+
+          &.edit-button {
+            --color: var(--ion-color-primary);
+            --background-hover: rgba(var(--ion-color-primary-rgb), 0.08);
+          }
+
+          &.delete-button {
+            --color: var(--ion-color-danger);
+            --background-hover: rgba(var(--ion-color-danger-rgb), 0.08);
+          }
+
+          &.reactivate-button {
+            --color: var(--ion-color-warning);
+            --background-hover: rgba(var(--ion-color-warning-rgb), 0.08);
+          }
+
+          ion-icon {
+            font-size: 16px;
+            margin-right: 6px;
+          }
         }
       }
     }
@@ -311,15 +406,15 @@ $task-color: #673ab7; // Púrpura para tareas
 
   // Estado vacío
   .empty-state {
+    background: var(--app-card-color);
+    border-radius: $card-border-radius;
+    padding: 2.5rem 2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 3rem 1rem;
     text-align: center;
-    background: var(--app-card-color);
-    border-radius: 16px;
-    border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
+    box-shadow: $card-shadow;
     margin: 2rem auto;
     max-width: 500px;
 
@@ -327,83 +422,149 @@ $task-color: #673ab7; // Púrpura para tareas
       font-size: 4rem;
       color: var(--ion-color-primary);
       margin-bottom: 1rem;
+      opacity: 0.7;
     }
 
     h2 {
-      color: var(--ion-color-primary);
-      font-size: 1.5rem;
+      color: var(--app-text-color);
+      font-size: 1.3rem;
+      font-weight: 600;
       margin-bottom: 0.5rem;
     }
 
     p {
-      color: var(--ion-color-medium);
-      font-size: 1rem;
-      margin: 0;
+      color: var(--app-text-color-medium);
+      margin-bottom: 1.5rem;
+      max-width: 300px;
+    }
+
+    .empty-state-button {
+      --border-radius: 10px;
+      max-width: 250px;
     }
   }
 }
 
 // Estilos para el modal
 .reminder-modal {
-  --height: 100%;
+  --height: 90%;
   --width: 100%;
+  --max-width: 800px;
+  --border-radius: 16px 16px 0 0;
+  --box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.1);
 
   ion-header {
     ion-toolbar {
-      --background: var(--app-card-color);
-      --color: var(--ion-color-primary);
+      --background: var(--ion-color-primary);
+      --color: white;
+      --border-width: 0;
 
       ion-title {
         font-size: 1.2rem;
         font-weight: 600;
+        color: white;
+      }
+
+      .modal-close-button {
+        margin-left: 8px;
+        --padding-start: 8px;
+        --padding-end: 8px;
+        height: 36px;
+        width: 36px;
+        --border-radius: 50%;
+        --background: rgba(255, 255, 255, 0.2);
+        --color: white;
       }
 
       .save-button {
-        --color: var(--ion-color-primary);
+        --color: white;
+        --background: rgba(255, 255, 255, 0.2);
+        --padding-start: 12px;
+        --padding-end: 12px;
+        --border-radius: 8px;
+        margin-right: 8px;
         font-weight: 600;
+
+        &[disabled] {
+          opacity: 0.5;
+        }
       }
     }
   }
 
   .modal-content {
     --background: var(--app-background-light);
+    --padding-bottom: 16px;
+
+    .modal-intro {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 12px;
+      text-align: center;
+      background: rgba(var(--ion-color-primary-rgb), 0.05);
+      border-bottom: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
+      margin-bottom: 16px;
+
+      ion-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+
+      p {
+        color: var(--app-text-color-medium);
+        font-size: 15px;
+        line-height: 1.4;
+        margin: 0;
+        max-width: 320px;
+      }
+    }
 
     .form-container {
-      padding: 1rem;
+      padding: 16px;
 
-      ion-item {
-        --background: transparent;
-        margin-bottom: 1rem;
+      .field-label {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--app-text-color-medium);
+        margin-bottom: 8px;
+        margin-left: 4px;
 
-        &.custom-input {
-          background: var(--app-card-color);
-          border-radius: 12px;
-          --padding-start: 1rem;
-          --padding-end: 1rem;
-          --inner-padding-end: 0;
-          margin-bottom: 1rem;
-          --min-height: 56px;
+        ion-icon {
+          font-size: 18px;
+          margin-right: 8px;
+          color: var(--ion-color-primary);
+        }
+      }
 
-          ion-textarea {
-            margin: 0.5rem 0;
-            --padding-top: 0.5rem;
-            --padding-bottom: 0.5rem;
-            --placeholder-color: var(--ion-color-medium);
-            font-size: 1rem;
-          }
+      .custom-input {
+        --background: var(--app-card-color);
+        --border-radius: 12px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        border: 1px solid rgba(var(--ion-color-medium-rgb), 0.2);
+        --highlight-color-focused: var(--ion-color-primary);
 
+        ion-select,
+        ion-textarea,
+        ion-datetime {
+          --color: var(--app-text-color);
+          --placeholder-color: var(--app-text-color-medium);
+          --placeholder-opacity: 0.7;
+          font-size: 15px;
+          --padding-start: 16px;
+          --padding-end: 16px;
+          --padding-top: 12px;
+          --padding-bottom: 12px;
+        }
+
+        &.datetime-input {
           ion-datetime {
-            margin: 0;
             background: var(--app-card-color);
             border-radius: 12px;
-            padding: 1rem;
-            font-size: 1rem;
-          }
-
-          ion-select {
-            font-size: 1rem;
-            --placeholder-color: var(--ion-color-medium);
-            min-height: 40px;
+            padding: 0;
           }
         }
       }
@@ -494,143 +655,98 @@ $task-color: #673ab7; // Púrpura para tareas
 }
 
 // Estilos para el botón flotante
+.fab-fixed {
+  position: fixed !important;
+  right: 16px !important;
+  bottom: 16px !important;
+  z-index: 1000 !important;
+}
+
 ion-fab {
-  margin-bottom: 20px;
-  margin-right: 20px;
+  ion-fab-button.custom-fab {
+    --background: var(--ion-color-primary);
+    --background-activated: var(--ion-color-primary-shade);
+    --background-hover: var(--ion-color-primary-tint);
+    position: relative;
+    overflow: hidden;
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.4);
 
-  ion-fab-button {
-    --box-shadow: 0 4px 10px rgba(var(--ion-color-primary-rgb), 0.3);
+    &::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(30deg);
+      animation: shimmer 3s infinite;
+      z-index: 1;
+      pointer-events: none;
+      border-radius: 50%;
+    }
 
-    &::part(native) {
-      background: var(--ion-color-primary);
-
-      ion-icon {
-        font-size: 24px;
-        color: white;
-      }
+    ion-icon {
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      position: relative;
+      z-index: 2;
     }
   }
 }
 
-// Ajustes para el empty state
-.empty-state {
-  .empty-state-content {
-    padding: 2rem;
-
-    .add-button {
-      margin-top: 1.5rem;
-      --background: var(--ion-color-primary);
-      --color: white;
-      --border-radius: 8px;
-      --padding-start: 1.5rem;
-      --padding-end: 1.5rem;
-      height: 44px;
-      font-weight: 500;
-
-      ion-icon {
-        margin-right: 8px;
-      }
-    }
-  }
-}
-
-// Estilos para el action-sheet
-::ng-deep .action-sheet-group {
-  background: var(--app-card-color) !important;
-  border-radius: 16px 16px 0 0;
-  overflow: hidden;
-
-  .action-sheet-title {
-    color: var(--ion-color-primary) !important;
-    font-size: 1rem !important;
-    font-weight: 600 !important;
-    padding: 16px !important;
-  }
-
-  .action-sheet-button {
-    color: var(--app-text-color) !important;
-    font-size: 1rem !important;
-    min-height: 48px !important;
-    padding: 0 16px !important;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-
-    &.action-sheet-selected {
-      color: var(--ion-color-primary) !important;
-      background: rgba(var(--ion-color-primary-rgb), 0.1) !important;
-      font-weight: 500;
-
-      &::before {
-        content: "";
-        width: 3px;
-        height: 100%;
-        background: var(--ion-color-primary);
-        position: absolute;
-        left: 0;
-        top: 0;
-      }
-    }
+// Dark mode adjustments
+:host-context(.dark-theme) {
+  .reminder-card {
+    background: var(--app-card-color);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 
     &:hover {
-      background: rgba(var(--ion-color-primary-rgb), 0.05) !important;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
     }
   }
 
-  .action-sheet-button.action-sheet-cancel {
-    color: var(--ion-color-medium) !important;
-    font-weight: 500 !important;
-    border-top: 1px solid rgba(var(--ion-color-medium-rgb), 0.1) !important;
-  }
-}
-
-::ng-deep ion-select::part(icon) {
-  color: var(--ion-color-primary) !important;
-  opacity: 1 !important;
-}
-
-/* Estilos específicos para los ion-select */
-.custom-input {
-  ion-select {
-    background: transparent;
-    min-height: 40px;
-    max-width: 100%;
-    width: 100%;
-    padding: 8px 0;
-
-    &::part(text) {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-size: 1rem;
-      color: var(--app-text-color);
-    }
-
-    &::part(icon) {
-      color: var(--ion-color-primary);
-      opacity: 1;
-      margin-right: 4px;
-    }
-
-    &::part(placeholder) {
-      color: var(--ion-color-medium);
-      opacity: 0.8;
-    }
+  .empty-state {
+    background: var(--app-card-color);
   }
 
-  ion-label {
-    &.form-label {
-      font-size: 1rem;
-      font-weight: 500;
-      color: var(--ion-color-primary);
-      margin-bottom: 8px;
-    }
-  }
+  ion-modal.reminder-modal {
+    ion-header ion-toolbar {
+      --background: var(--ion-color-primary);
 
-  &.select-input {
-    --min-height: 56px;
-    --padding-start: 16px;
-    --padding-end: 16px;
-    --inner-padding-end: 8px;
+      ion-title,
+      .modal-close-button,
+      .save-button {
+        --color: var(--ion-text-color, #ffffff);
+        color: var(--ion-text-color, #ffffff);
+      }
+    }
+
+    .modal-content {
+      --background: var(--app-background-dark, #121212);
+
+      .custom-input {
+        --background: var(--app-card-color);
+
+        ion-select,
+        ion-textarea,
+        ion-datetime {
+          --color: var(--app-text-color);
+        }
+      }
+
+      .field-label {
+        color: var(--app-text-color-medium);
+      }
+    }
   }
 }

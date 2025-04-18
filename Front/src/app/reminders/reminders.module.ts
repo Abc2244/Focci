@@ -1,13 +1,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
 import { IonicModule } from '@ionic/angular';
-
 import { RemindersPageRoutingModule } from './reminders-routing.module';
-
 import { RemindersPage } from './reminders.page';
+import { SharedModule } from '../shared/shared.module';
 import { NotificationsService } from '../services/notifications.service';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -15,6 +14,7 @@ import { NotificationsService } from '../services/notifications.service';
     ReactiveFormsModule,
     IonicModule,
     RemindersPageRoutingModule,
+    SharedModule,
   ],
   declarations: [RemindersPage],
   providers: [NotificationsService],
