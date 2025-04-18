@@ -130,6 +130,7 @@ export class ProfilePage implements OnInit {
   }
 
   changeTheme(theme: ColorTheme) {
+    console.log('Cambiando tema a:', theme);
     if (theme === 'custom') {
       // No aplicamos el tema inmediatamente para permitir la selección del color
       this.themeService.applyTheme(theme);
@@ -140,6 +141,7 @@ export class ProfilePage implements OnInit {
   }
 
   applyCustomColor() {
+    console.log('Aplicando color personalizado:', this.customColorInput);
     document.documentElement.style.setProperty('--custom-primary-color', this.customColorInput);
     this.themeService.updateCustomColors(this.customColorInput);
     this.themeService.applyTheme('custom');
@@ -147,11 +149,13 @@ export class ProfilePage implements OnInit {
   }
 
   openThemeSelector() {
+    console.log('Abriendo modal de selección de tema');
     this.showThemeSelectorModal = true;
   }
 
   getThemeName() {
     const currentTheme = this.themeService.getCurrentTheme();
+    console.log('Tema actual:', currentTheme);
     const themeMap: { [key: string]: string } = {
       blue: 'Azul',
       green: 'Verde',

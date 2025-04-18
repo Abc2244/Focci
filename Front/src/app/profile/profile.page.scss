@@ -461,28 +461,33 @@ ion-card-content ion-list ion-item ion-label p {
   --color: var(--app-text-color) !important;
 }
 
-// Estilos para el selector de tema
-.theme-selector-container {
+// Restauramos los estilos originales para el modal de tema
+.profile-modal ion-content.modal-content .theme-selector-container {
   padding: 1rem;
 
   ion-list {
-    background: transparent;
+    background: transparent !important;
     padding: 0;
 
     ion-item {
-      --background: var(--app-card-color);
-      --background-activated: var(--app-card-color);
+      --background: var(--app-card-color) !important;
+      --background-activated: var(--app-card-color) !important;
+      --background-focused: var(--app-card-color) !important;
+      --background-hover: var(--app-card-color) !important;
       margin-bottom: 0.5rem;
       border-radius: 8px;
-      --color: var(--app-text-color);
+      --color: var(--app-text-color) !important;
+      --border-width: 0 !important;
+      --inner-border-width: 0 !important;
+      --highlight-height: 0;
 
       &.selected-theme {
-        --background: rgba(var(--ion-color-primary-rgb), 0.1);
-        --color: var(--app-text-color);
+        --background: rgba(var(--ion-color-primary-rgb), 0.1) !important;
+        --color: var(--app-text-color) !important;
         font-weight: 600;
 
         ion-icon {
-          color: var(--ion-color-primary);
+          color: var(--ion-color-primary) !important;
         }
       }
 
@@ -548,4 +553,20 @@ ion-item.custom-input {
   --border-style: none !important;
   --border: none !important;
   --highlight-height: 0;
+}
+
+// Estilos adicionales para modo oscuro en el selector de tema
+:host-context(.dark-theme) {
+  .theme-selector-container ion-item {
+    --background: var(--app-card-color);
+    --color: var(--app-text-color);
+  }
+  
+  .custom-color-container {
+    background: var(--app-card-color);
+    
+    ion-item {
+      --background: var(--app-card-color);
+    }
+  }
 }
