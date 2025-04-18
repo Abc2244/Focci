@@ -221,8 +221,20 @@
               color: white;
               font-size: 0.85rem;
               box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+              padding: 6px 8px;
+              border-radius: 6px;
+              color: white;
+              font-size: 0.85rem;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
               transition: all 0.2s ease;
               cursor: pointer;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              opacity: 0.95;
+              max-height: calc(100% - 4px); /* Asegurar que no se salga por abajo */
+              max-width: calc(100% - 2px); /* Asegurar que no se salga por la derecha */
+              word-break: break-word;
+                            cursor: pointer;
               overflow: hidden;
               text-overflow: ellipsis;
               opacity: 0.95;
@@ -235,18 +247,27 @@
                 transform: scale(1.02);
                 z-index: 10 !important;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                opacity: 1;
+                transform: scale(1.02);
+                z-index: 10 !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
               }
 
               .event-title {
                 font-weight: 600;
+                font-weight: 600;
                 margin-bottom: 4px;
+                white-space: nowrap;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 font-size: 0.8rem;
+                font-size: 0.8rem;
               }
 
               .event-time {
+                font-size: 0.75rem;
+                opacity: 0.85;
                 font-size: 0.75rem;
                 opacity: 0.85;
               }
@@ -348,6 +369,60 @@
     }
   }
 
+  .event-type-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    gap: 8px;
+    
+    ion-icon {
+      font-size: 18px;
+    }
+    
+    &.event-type-subject {
+      background-color: rgba(25, 118, 210, 0.1);
+      color: #1976d2;
+    }
+    
+    &.event-type-task {
+      background-color: rgba(245, 124, 0, 0.1);
+      color: #f57c00;
+    }
+    
+    &.event-type-reminder {
+      background-color: rgba(156, 39, 176, 0.1);
+      color: #9c27b0;
+    }
+    
+    &.event-type-custom {
+      background-color: rgba(var(--ion-color-primary-rgb), 0.1);
+      color: var(--ion-color-primary);
+    }
+  }
+  
+  .event-details, .event-location {
+    margin-bottom: 20px;
+    
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--app-text-color);
+      margin-bottom: 8px;
+    }
+    
+    p {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      
+      ion-icon {
+        margin-top: 3px;
+        color: var(--ion-color-primary);
+      }
   .event-type-badge {
     display: inline-flex;
     align-items: center;
@@ -525,22 +600,39 @@ ion-select.view-selector {
     border-radius: 16px;
   }
   
+// Estilos del modal
+.calendar-modal {
+  --height: 90vh;
+  --width: 90%;
+  --max-width: 500px;
+  --border-radius: 16px;
+  
+  &::part(content) {
+    border-radius: 16px;
+  }
+  
   ion-header ion-toolbar {
+    --background: var(--ion-color-primary);
+    --color: white;
+    
     --background: var(--ion-color-primary);
     --color: white;
     
     ion-title {
       color: white;
+      color: white;
       font-weight: 600;
     }
     
+    
     ion-button {
+      --color: white;
       --color: white;
     }
   }
   
+  
   ion-content {
-<<<<<<< Updated upstream
     --background: var(--app-background-light);
 
     h2 {
@@ -590,24 +682,6 @@ ion-select.view-selector {
         ion-datetime {
           --color: var(--app-text-color);
           --placeholder-color: var(--app-text-color-light);
-=======
-    --background: var(--ion-color-light);
-    
-    .modal-content {
-      padding: 20px;
-      
-      .event-type-badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 6px 12px;
-        border-radius: 20px;
-        margin-bottom: 16px;
-        background: rgba(var(--ion-color-primary-rgb), 0.1);
-        color: var(--ion-color-primary);
-        
-        ion-icon {
-          margin-right: 8px;
->>>>>>> Stashed changes
         }
       }
       
@@ -619,6 +693,7 @@ ion-select.view-selector {
       
       .event-time-display {
         display: flex;
+        align-items: flex-start;
         align-items: flex-start;
         gap: 12px;
         margin-bottom: 24px;
@@ -633,7 +708,85 @@ ion-select.view-selector {
         background: rgba(var(--ion-color-light-rgb), 0.6);
         border-radius: 12px;
         padding: 16px;
+        margin-bottom: 24px;
+        
+        ion-icon {
+          color: var(--ion-color-primary);
+          margin-top: 4px;
+        }
+      }
+      
+      .event-section {
+        background: rgba(var(--ion-color-light-rgb), 0.6);
+        border-radius: 12px;
+        padding: 16px;
         margin-bottom: 16px;
+        border-left: 4px solid var(--ion-color-primary);
+        
+        h3 {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 8px;
+          
+          ion-icon {
+            color: var(--ion-color-primary);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Estilos para los botones flotantes
+.fab-controls {
+  z-index: 1000;
+  
+  ion-fab-button {
+    --box-shadow: none;
+    overflow: hidden;
+    position: relative;
+    
+    &.main-fab {
+      --background: var(--ion-color-primary);
+      --color: white;
+    }
+    
+    &.active {
+      --background: var(--ion-color-primary-shade);
+    }
+    
+    // Efecto shimmer mejorado
+    &.shimmer-button {
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0; // Ajusta al tamaño exacto del botón
+        border-radius: 50%; // Mantiene el efecto circular
+        background: conic-gradient(
+          from 0deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.2) 25%,
+          rgba(255, 255, 255, 0.4) 50%,
+          rgba(255, 255, 255, 0.2) 75%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        animation: shimmer 3s infinite linear;
+        mask-image: radial-gradient(circle closest-side, white 100%, transparent);
+        -webkit-mask-image: radial-gradient(circle closest-side, white 100%, transparent);
+      }
+    }
+  }
+  
+  ion-fab-list {
+    button {
+      margin: 8px 0;
+      --background: var(--ion-color-light);
+      --color: var(--ion-color-primary);
+      
+      &:hover {
+        --background: var(--ion-color-primary-tint);
+        --color: white;
         border-left: 4px solid var(--ion-color-primary);
         
         h3 {
@@ -714,6 +867,15 @@ ion-select.view-selector {
   }
 }
 
+@keyframes shimmer {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 // Botón flotante para cambiar de vista
 .view-selector-fab {
   position: fixed;
@@ -773,61 +935,3 @@ ion-select.view-selector {
     }
   }
 }
-<<<<<<< Updated upstream
-=======
-
-// Event type badges
-.event-type-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 1rem;
-  border-radius: 2rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  
-  ion-icon {
-    font-size: 1.1rem;
-  }
-  
-  &.event-type-subject {
-    background-color: rgba(var(--ion-color-primary-rgb), 0.15);
-    color: var(--ion-color-primary);
-  }
-  
-  &.event-type-task {
-    background-color: rgba(var(--ion-color-warning-rgb), 0.15);
-    color: var(--ion-color-warning-shade);
-  }
-  
-  &.event-type-reminder {
-    background-color: rgba(var(--ion-color-tertiary-rgb), 0.15);
-    color: var(--ion-color-tertiary);
-  }
-  
-  &.event-type-custom {
-    background-color: rgba(var(--ion-color-success-rgb), 0.15);
-    color: var(--ion-color-success);
-  }
-}
-
-.event-details, .event-location {
-  padding: 0;
-  
-  h3 {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    
-    ion-icon {
-      font-size: 18px;
-    }
-  }
-  
-  p {
-    padding-left: 2px;
-    white-space: pre-line;
-  }
-}
->>>>>>> Stashed changes
