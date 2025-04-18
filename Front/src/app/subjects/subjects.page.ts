@@ -211,6 +211,8 @@ export class SubjectsPage implements OnInit {
       header: 'Confirmar eliminación',
       message: `¿Estás seguro de que quieres eliminar la materia ${subject.name}?`,
       cssClass: 'custom-alert',
+      backdropDismiss: false,
+      mode: 'ios',
       buttons: [
         {
           text: 'Cancelar',

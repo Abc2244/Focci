@@ -277,46 +277,53 @@ ion-select {
 
 // Estilos para los alerts personalizados
 .custom-alert {
-  --background: var(--app-background-light);
+  --background: var(--app-card-color) !important;
+  --backdrop-opacity: 0.6 !important;
 
   .alert-wrapper {
-    background: var(--app-gradient-light);
-    border-radius: var(--app-border-radius-lg);
-    box-shadow: var(--app-shadow-lg);
+    background: var(--app-card-color) !important;
+    border-radius: var(--app-border-radius-lg) !important;
+    box-shadow: var(--app-shadow-lg) !important;
+    max-width: 320px !important;
   }
 
   .alert-head {
-    text-align: center;
-    color: var(--ion-color-primary);
+    text-align: center !important;
+    color: var(--app-text-color) !important;
 
     .alert-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-    }
-  }
-
-  .alert-input-group {
-    padding: var(--app-spacing-md);
-
-    .alert-input {
-      border: 1px solid var(--app-color-medium);
-      border-radius: var(--app-border-radius-md);
-      margin: var(--app-spacing-xs) 0;
-      --padding-start: var(--app-spacing-md);
-      background: var(--app-color-white);
+      font-size: 1.3rem !important;
+      font-weight: 600 !important;
+      color: var(--app-text-color) !important;
     }
   }
 
   .alert-message {
-    color: var(--app-text-color);
+    color: var(--app-text-color) !important;
+    text-align: center !important;
+    padding: 16px !important;
   }
 
   .alert-button-group {
-    .alert-button {
-      color: var(--ion-color-primary);
+    padding: 8px !important;
+    display: flex !important;
+    flex-direction: column !important;
 
+    button {
+      margin: 4px 0 !important;
+      border-radius: 8px !important;
+      color: var(--ion-color-primary) !important;
+      
       &.delete-button {
-        color: var(--ion-color-primary) !important;
+        background-color: var(--ion-color-primary) !important;
+        color: var(--ion-color-primary-contrast) !important;
+        font-weight: 600 !important;
+      }
+      
+      &.cancel-button {
+        background-color: var(--app-background-light) !important;
+        color: var(--app-text-color) !important;
+        border: 1px solid rgba(var(--ion-color-medium-rgb), 0.2) !important;
       }
     }
   }
@@ -627,6 +634,9 @@ ion-select {
   position: relative;
   min-height: 40px;
   padding: 8px 0;
+  --highlight-color-focused: var(--ion-color-primary);
+  --highlight-color-valid: var(--ion-color-primary);
+  --highlight-color-invalid: var(--ion-color-primary);
 
   &::part(icon) {
     position: absolute;
@@ -656,6 +666,13 @@ ion-select {
   }
 }
 
+/* Estilos para los inputs de tiempo */
+ion-input[type="time"] {
+  --highlight-color-focused: var(--ion-color-primary);
+  --highlight-color-valid: var(--ion-color-primary);
+  --highlight-color-invalid: var(--ion-color-primary);
+}
+
 /* Estilos para los ion-item que contienen ion-select */
 ion-item.custom-input {
   --padding-start: 0;
@@ -666,5 +683,104 @@ ion-item.custom-input {
 
   &::part(native) {
     padding: 0;
+  }
+}
+
+/* Estilos para las listas de opciones en ion-select */
+ion-select-popover {
+  --background: var(--app-card-color) !important;
+  --width: 300px;
+  --max-width: 90%;
+  
+  ion-list {
+    background: var(--app-card-color) !important;
+  }
+  
+  ion-item {
+    --background: var(--app-card-color) !important;
+    --color: var(--app-text-color) !important;
+    --border-color: rgba(var(--ion-color-medium-rgb), 0.2) !important;
+    
+    &.item-radio-checked {
+      --background: rgba(var(--ion-color-primary-rgb), 0.1) !important;
+      --color: var(--ion-color-primary) !important;
+    }
+  }
+  
+  ion-radio {
+    --color: var(--ion-color-medium);
+    --color-checked: var(--ion-color-primary);
+  }
+}
+
+/* Estilos para el popover y actionsheet */
+ion-popover, ion-action-sheet {
+  --background: var(--app-card-color) !important;
+  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  
+  ion-list {
+    background: var(--app-card-color) !important;
+  }
+  
+  ion-item {
+    --background: var(--app-card-color) !important;
+    --color: var(--app-text-color) !important;
+  }
+}
+
+/* Estilos globales para modales y selectores */
+ion-modal ion-toolbar {
+  --background: var(--ion-color-primary) !important;
+  --color: var(--ion-color-primary-contrast) !important;
+}
+
+ion-modal ion-title,
+ion-modal ion-button,
+ion-modal .modal-close-button,
+ion-modal .save-button {
+  color: var(--ion-color-primary-contrast) !important;
+}
+
+ion-modal ion-button ion-icon {
+  color: var(--ion-color-primary-contrast) !important;
+}
+
+/* Corrige los fondos oscuros en selectores */
+ion-action-sheet.action-sheet-translucent .action-sheet-group {
+  background: var(--app-card-color) !important;
+}
+
+ion-select-popover ion-list {
+  background: var(--app-card-color) !important;
+}
+
+ion-popover ion-content {
+  --background: var(--app-card-color) !important;
+}
+
+.popover-content {
+  background: var(--app-card-color) !important;
+}
+
+/* Fix para popover con fondo oscuro */
+.popover-arrow::after {
+  background: var(--app-card-color) !important;
+}
+
+.select-interface-option {
+  background: var(--app-card-color) !important;
+  color: var(--app-text-color) !important;
+}
+
+/* Corrige los componentes dinámicos */
+.ion-select-popover .ion-page {
+  background: var(--app-card-color) !important;
+}
+
+ion-alert.custom-alert {
+  --backdrop-opacity: 0.7;
+  
+  .alert-wrapper {
+    background: var(--app-card-color) !important;
   }
 }

@@ -108,6 +108,9 @@ export class ThemeService {
     this._colorTheme.next(theme);
     localStorage.setItem('app-color-theme', theme);
 
+    // Actualizar elementos de UI específicos con el contraste correcto
+    this.updateUIElementsContrast();
+
     // Disparar evento personalizado para actualizar el calendario
     document.dispatchEvent(new CustomEvent('themeChanged'));
   }
@@ -123,15 +126,43 @@ export class ThemeService {
     // Mantener el atributo data-theme para compatibilidad
     if (isDark) {
       document.documentElement.setAttribute('data-theme', 'dark');
+      document.body.classList.add('dark-theme');
     } else {
       document.documentElement.removeAttribute('data-theme');
+      document.body.classList.remove('dark-theme');
     }
 
     this._isDark.next(isDark);
     localStorage.setItem('app-is-dark', isDark.toString());
 
+    // Actualizar elementos de UI específicos con el contraste correcto
+    this.updateUIElementsContrast();
+
     // Disparar evento personalizado para actualizar el calendario
     document.dispatchEvent(new CustomEvent('themeChanged'));
+  }
+
+  // Método para actualizar el contraste de elementos específicos de la UI
+  private updateUIElementsContrast() {
+    const contrastColor = getComputedStyle(document.documentElement).getPropertyValue('--ion-color-primary-contrast').trim();
+    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--ion-color-primary').trim();
+    
+    // Aplicar a los elementos de modal y popover
+    document.documentElement.style.setProperty('--modal-text-color', contrastColor);
+    document.documentElement.style.setProperty('--modal-bg-color', primaryColor);
+    
+    // Forzar actualización de estilos en componentes dinámicos
+    setTimeout(() => {
+      document.querySelectorAll('ion-modal ion-toolbar').forEach(element => {
+        const toolbar = element as HTMLElement;
+        toolbar.style.setProperty('--color', contrastColor);
+      });
+      
+      document.querySelectorAll('ion-modal ion-title, ion-modal .modal-close-button, ion-modal .save-button').forEach(element => {
+        const el = element as HTMLElement;
+        el.style.color = contrastColor;
+      });
+    }, 50);
   }
 
   // Método para actualizar colores personalizados
