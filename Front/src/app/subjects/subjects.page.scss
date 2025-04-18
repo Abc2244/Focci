@@ -549,7 +549,7 @@ ion-fab {
             --placeholder-color: var(--app-text-color-medium);
             --placeholder-opacity: 0.7;
             border-radius: 8px;
-            background: rgba(var(--ion-color-light-rgb), 0.5);
+            background: var(--app-card-color);
             font-size: 14px;
             border: 1px solid rgba(var(--ion-color-medium-rgb), 0.2);
           }
@@ -562,7 +562,7 @@ ion-fab {
           
           .time-field {
             .time-input {
-              --background: rgba(var(--ion-color-light-rgb), 0.5);
+              --background: var(--app-card-color);
               --border-radius: 8px;
               --padding-start: 16px;
               --padding-end: 16px;

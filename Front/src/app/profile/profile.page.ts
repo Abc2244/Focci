@@ -154,7 +154,6 @@ export class ProfilePage implements OnInit {
 
   getThemeName() {
     const currentTheme = this.themeService.getCurrentTheme();
-    console.log('Tema actual:', currentTheme);
     const themeMap: { [key: string]: string } = {
       blue: 'Azul',
       green: 'Verde',
