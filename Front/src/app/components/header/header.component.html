@@ -2,24 +2,14 @@
   <ion-toolbar>
     <div class="toolbar-content">
       <div class="left-section">
-        <ion-menu-button class="animated-menu-button">
-          <div class="menu-icon">
-            <span></span>
-            <span></span>
-            <span></span>
+        <ion-menu-button class="modern-menu-button">
+          <div class="menu-button-content">
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
           </div>
         </ion-menu-button>
         <h1 class="page-title" *ngIf="pageTitle">{{ pageTitle }}</h1>
-      </div>
-
-      <div class="right-section">
-        <ion-button fill="clear" class="action-button">
-          <ion-icon name="search-outline"></ion-icon>
-        </ion-button>
-        <ion-button fill="clear" class="action-button notification-button">
-          <ion-icon name="notifications-outline"></ion-icon>
-          <span class="notification-badge">2</span>
-        </ion-button>
       </div>
     </div>
   </ion-toolbar>

@@ -20,8 +20,8 @@
           <div class="status-dot"></div>
         </div>
         <div class="user-details">
-          <h2>Estudiante</h2>
-          <p>Organiza tu tiempo</p>
+          <h2>{{ userProfile.username || "Usuario" }}</h2>
+          <p>{{ userProfile.email || "correo@ejemplo.com" }}</p>
         </div>
       </div>
     </div>
