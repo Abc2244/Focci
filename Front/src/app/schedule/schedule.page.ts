@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IonModal } from '@ionic/angular';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
@@ -11,8 +10,6 @@ import {
   addDays,
   startOfWeek,
   endOfWeek,
-  isSameDay,
-  parseISO,
   isToday,
   addWeeks,
   subWeeks,
@@ -21,9 +18,9 @@ import {
   setHours,
   setMinutes,
   getDay,
+  parseISO,
 } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Router } from '@angular/router';
 
 interface DayHeader {
   name: string;
@@ -54,54 +51,43 @@ export interface CalendarEvent {
   styleUrls: ['./schedule.page.scss'],
 })
 export class SchedulePage implements OnInit {
-  @ViewChild(IonModal) modal!: IonModal;
-  @ViewChild('addEventModal') addEventModal!: IonModal;
+  @ViewChild('eventModal') eventModal!: IonModal;
+  presentingElement: Element | null = null;
 
   subjects: Subject[] = [];
   tasks: Task[] = [];
   reminders: any[] = [];
   events: CalendarEvent[] = [];
+  selectedEvent: CalendarEvent | null = null;
   isLoading = true;
   currentDate = new Date();
   daysOfWeek: DayHeader[] = [];
-  eventForm: FormGroup;
-  selectedEvent: CalendarEvent | null = null;
-  isEditMode = false;
-  eventColors = [
-    { name: 'Azul', value: '#1976d2' },
-    { name: 'Naranja', value: '#f57c00' },
-    // Agrega más colores si es necesario
-  ];
-  timeSlots = Array.from({ length: 17 }, (_, i) => i + 7); // Comienza desde las 7am hasta las 23 (7am-11pm)
   currentWeekLabel: string = '';
   currentView = 'schedule'; // 'calendar', 'schedule', 'week'
+  timeSlots = Array.from({ length: 17 }, (_, i) => i + 7); // 7am to 11pm
 
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
-    private toastService: ToastService,
-    private fb: FormBuilder,
-    private router: Router
-  ) {
-    this.eventForm = this.fb.group({
-      title: ['', Validators.required],
-      description: [''],
-      startDate: ['', Validators.required],
-      startTime: ['', Validators.required],
-      endTime: ['', Validators.required],
-      color: ['#1976d2'],
-    });
-  }
+    private toastService: ToastService
+  ) {}
 
   ngOnInit() {
     this.loadData();
     this.updateDaysOfWeek();
     this.updateCurrentWeekLabel();
+    this.presentingElement = document.querySelector('.ion-page');
   }
 
   ionViewWillEnter() {
-    // Este método se llama cada vez que la página está a punto de ser mostrada
-    this.loadData(); // Recargar los datos
+    this.loadData();
+    this.presentingElement = document.querySelector('.ion-page');
+  }
+
+  ionViewDidEnter() {
+    setTimeout(() => {
+      this.presentingElement = document.querySelector('.ion-page');
+    }, 100);
   }
 
   loadData() {
@@ -109,7 +95,6 @@ export class SchedulePage implements OnInit {
     if (userId) {
       this.isLoading = true;
 
-      // Usar Promise.all para manejar todas las peticiones en paralelo
       Promise.all([
         this.apiService.getUserSubjects(userId).toPromise(),
         this.apiService.getUserTasks(userId).toPromise(),
@@ -119,8 +104,6 @@ export class SchedulePage implements OnInit {
           this.subjects = subjects || [];
           this.tasks = tasks || [];
           this.reminders = reminders || [];
-
-          // Actualizar todos los eventos una vez que tengamos los datos
           this.updateEventsForCurrentWeek();
           this.isLoading = false;
         })
@@ -136,8 +119,6 @@ export class SchedulePage implements OnInit {
   }
 
   processSubjectsToEvents() {
-    this.events = []; // Limpiar eventos existentes
-
     if (this.subjects && this.subjects.length > 0) {
       this.subjects.forEach((subject) => {
         if (subject.schedule && subject.schedule.length > 0) {
@@ -154,8 +135,7 @@ export class SchedulePage implements OnInit {
 
             const day = dayMap[scheduleItem.day];
             if (day !== undefined) {
-              const [startHour, startMinute] =
-                scheduleItem.startTime.split(':');
+              const [startHour, startMinute] = scheduleItem.startTime.split(':');
               const [endHour, endMinute] = scheduleItem.endTime.split(':');
 
               const currentWeekDay = this.daysOfWeek[day].fullDate;
@@ -243,7 +223,7 @@ export class SchedulePage implements OnInit {
   }
 
   updateEventsForCurrentWeek() {
-    this.events = []; // Limpiar eventos existentes
+    this.events = [];
     this.processSubjectsToEvents();
     this.processTasksToEvents();
     this.processRemindersToEvents();
@@ -261,8 +241,6 @@ export class SchedulePage implements OnInit {
         fullDate: date,
       };
     });
-
-    // En lugar de llamar a loadData(), llamamos a procesar los eventos existentes
     this.updateEventsForCurrentWeek();
   }
 
@@ -278,21 +256,21 @@ export class SchedulePage implements OnInit {
     this.currentDate = subWeeks(this.currentDate, 1);
     this.updateDaysOfWeek();
     this.updateCurrentWeekLabel();
-    this.loadData(); // Llamar a loadData solo una vez al cambiar de semana
+    this.loadData();
   }
 
   nextWeek() {
     this.currentDate = addWeeks(this.currentDate, 1);
     this.updateDaysOfWeek();
     this.updateCurrentWeekLabel();
-    this.loadData(); // Llamar a loadData solo una vez al cambiar de semana
+    this.loadData();
   }
 
   goToToday() {
     this.currentDate = new Date();
     this.updateDaysOfWeek();
     this.updateCurrentWeekLabel();
-    this.loadData(); // Llamar a loadData solo una vez al ir a hoy
+    this.loadData();
   }
 
   formatHour(hour: number): string {
@@ -307,154 +285,60 @@ export class SchedulePage implements OnInit {
     const endHour = getHours(event.endTime);
     const endMinute = getMinutes(event.endTime);
 
-    // Ajustar la hora de inicio para el desplazamiento relativo a las 7am
-    const hourOffset = startHour - 7; // Restamos 7 porque ahora la hora de inicio es 7am
+    const hourOffset = startHour - 7;
     const minuteOffset = startMinute / 60;
-    const top = (hourOffset + minuteOffset) * 60;
+    const top = Math.max(0, (hourOffset + minuteOffset) * 60);
 
-    // Calcular la duración en horas
-    const durationHours = (endHour - startHour) + ((endMinute - startMinute) / 60);
-    const height = durationHours * 60;
+    let durationHours = (endHour - startHour) + ((endMinute - startMinute) / 60);
+    durationHours = Math.max(durationHours, 0.5);
+    
+    const height = Math.min(durationHours * 60, 960 - top);
 
-    // Posición del día (0-6) y ancho (considerando 7 días)
-    const dayWidth = 100 / 7;
-    const left = event.day * dayWidth;
+    const dayWidth = (100 / 7) - 2;
+    const left = event.day * (100 / 7) + 1;
     const width = dayWidth;
 
     return {
       top: `${top}px`,
-      height: `${height}px`,
+      height: `${Math.max(height, 30)}px`,
       left: `${left}%`,
       width: `${width}%`,
       backgroundColor: event.color,
+      zIndex: event.type === 'subject' ? 2 : 3,
     };
-  }
-
-  onEventClick(event: CalendarEvent) {
-    this.selectedEvent = event;
-    this.modal.present();
-  }
-
-  openAddEventModal() {
-    this.isEditMode = false;
-    this.eventForm.reset();
-    this.modal.present();
-  }
-
-  closeEventModal() {
-    this.modal.dismiss();
-  }
-
-  closeAddEventModal() {
-    this.modal.dismiss();
-  }
-
-  onSubmitEvent() {
-    if (this.eventForm.valid) {
-      const formValue = this.eventForm.value;
-      const newEvent: CalendarEvent = {
-        id: this.isEditMode ? this.selectedEvent!.id : new Date().toISOString(),
-        title: formValue.title,
-        startTime: new Date(formValue.startDate + 'T' + formValue.startTime),
-        endTime: new Date(formValue.startDate + 'T' + formValue.endTime),
-        day: getDay(new Date(formValue.startDate)),
-        description: formValue.description,
-        color: formValue.color,
-        type: 'custom',
-      };
-
-      if (this.isEditMode) {
-        const index = this.events.findIndex(
-          (e) => e.id === this.selectedEvent!.id
-        );
-        this.events[index] = newEvent;
-      } else {
-        this.events.push(newEvent);
-      }
-
-      this.closeAddEventModal();
-      this.updateEventsForCurrentWeek();
-    }
-  }
-
-  editEvent() {
-    if (this.selectedEvent) {
-      this.isEditMode = true;
-      this.eventForm.patchValue({
-        title: this.selectedEvent.title,
-        startDate: format(this.selectedEvent.startTime, 'yyyy-MM-dd'),
-        startTime: format(this.selectedEvent.startTime, 'HH:mm'),
-        endTime: format(this.selectedEvent.endTime, 'HH:mm'),
-        description: this.selectedEvent.description,
-        color: this.selectedEvent.color,
-      });
-      this.modal.present();
-    }
-  }
-
-  deleteEvent() {
-    if (this.selectedEvent) {
-      this.events = this.events.filter((e) => e.id !== this.selectedEvent!.id);
-      this.closeEventModal();
-      this.updateEventsForCurrentWeek();
-    }
-  }
-
-  // Nuevos métodos para filtrar eventos del día
-  getDayTasks() {
-    const today = new Date();
-    return this.tasks.filter((task) => {
-      const taskDate = new Date(task.due_date);
-      return (
-        taskDate.getDate() === today.getDate() &&
-        taskDate.getMonth() === today.getMonth() &&
-        taskDate.getFullYear() === today.getFullYear()
-      );
-    });
-  }
-
-  getDayReminders() {
-    const today = new Date();
-    return this.reminders.filter((reminder) => {
-      const reminderDate = new Date(reminder.reminder_date);
-      return (
-        reminderDate.getDate() === today.getDate() &&
-        reminderDate.getMonth() === today.getMonth() &&
-        reminderDate.getFullYear() === today.getFullYear()
-      );
-    });
-  }
-
-  // Formatear hora
-  formatTime(timeString: string): string {
-    if (timeString && timeString.includes('T')) {
-      try {
-        const date = new Date(timeString);
-        return date.toLocaleTimeString('es-ES', {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: true,
-        });
-      } catch (e) {
-        return timeString;
-      }
-    }
-    return timeString;
-  }
-
-  // Obtener nombre de materia
-  getSubjectName(subjectId: string): string {
-    const subject = this.subjects.find((s) => s._id === subjectId);
-    return subject ? subject.name : 'Sin materia';
-  }
-
-  // Obtener nombre de tarea
-  getTaskName(taskId: string): string {
-    const task = this.tasks.find((t) => t._id === taskId);
-    return task ? task.description : 'Sin tarea';
   }
 
   changeView(view: string) {
     this.currentView = view;
+  }
+
+  onEventClick(event: CalendarEvent) {
+    this.selectedEvent = event;
+    this.eventModal.present();
+  }
+
+  closeEventModal() {
+    this.eventModal.dismiss();
+    this.selectedEvent = null;
+  }
+
+  getEventTypeIcon(type: string): string {
+    const icons: { [key: string]: string } = {
+      subject: 'school',
+      task: 'checkbox',
+      reminder: 'alarm',
+      custom: 'calendar',
+    };
+    return icons[type] || 'calendar';
+  }
+
+  getEventTypeLabel(type: string): string {
+    const labels: { [key: string]: string } = {
+      subject: 'Materia',
+      task: 'Tarea',
+      reminder: 'Recordatorio',
+      custom: 'Evento',
+    };
+    return labels[type] || 'Evento';
   }
 }
