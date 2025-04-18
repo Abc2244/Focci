@@ -247,30 +247,60 @@ export class SmartPage implements OnInit {
 
             // Verificar si este horario está ocupado en el calendario
             const isOccupied = schedule.some((item) => {
-              const itemStart = new Date(item.startTime);
-              const itemEnd = new Date(item.endTime);
+              // Convertir las horas de string a Date
+              const itemStartTime = new Date(item.startTime);
+              const itemEndTime = new Date(item.endTime);
 
-              // Verificar si es el mismo día
-              const isSameDay =
-                startTime.getDate() === itemStart.getDate() &&
-                startTime.getMonth() === itemStart.getMonth() &&
-                startTime.getFullYear() === itemStart.getFullYear();
+              // Verificar si es el mismo día de la semana
+              const dayNames = [
+                'sunday',
+                'monday',
+                'tuesday',
+                'wednesday',
+                'thursday',
+                'friday',
+                'saturday',
+              ];
+              const startDayName = dayNames[startTime.getDay()];
 
-              if (!isSameDay) return false;
+              // Solo considerar eventos del mismo día de la semana
+              if (item.day.toLowerCase() !== startDayName) return false;
+
+              // Comparar solo las horas y minutos para detectar conflictos
+              const startTimeHours = startTime.getHours();
+              const startTimeMinutes = startTime.getMinutes();
+              const endTimeHours = endTime.getHours();
+              const endTimeMinutes = endTime.getMinutes();
+
+              const itemStartHours = itemStartTime.getHours();
+              const itemStartMinutes = itemStartTime.getMinutes();
+              const itemEndHours = itemEndTime.getHours();
+              const itemEndMinutes = itemEndTime.getMinutes();
 
               // Verificar superposición de horarios
               const overlap =
-                (startTime >= itemStart && startTime < itemEnd) ||
-                (endTime > itemStart && endTime <= itemEnd) ||
-                (startTime <= itemStart && endTime >= itemEnd);
+                ((startTimeHours > itemStartHours ||
+                  (startTimeHours === itemStartHours &&
+                    startTimeMinutes >= itemStartMinutes)) &&
+                  (startTimeHours < itemEndHours ||
+                    (startTimeHours === itemEndHours &&
+                      startTimeMinutes < itemEndMinutes))) ||
+                ((endTimeHours > itemStartHours ||
+                  (endTimeHours === itemStartHours &&
+                    endTimeMinutes > itemStartMinutes)) &&
+                  (endTimeHours < itemEndHours ||
+                    (endTimeHours === itemEndHours &&
+                      endTimeMinutes <= itemEndMinutes))) ||
+                (startTimeHours <= itemStartHours &&
+                  endTimeHours >= itemEndHours);
 
               if (overlap) {
                 console.log('⚠️ Conflicto con evento:', item.title);
                 console.log(
                   '   Evento:',
-                  itemStart.toLocaleString(),
+                  `${itemStartHours}:${itemStartMinutes}`,
                   '-',
-                  itemEnd.toLocaleString()
+                  `${itemEndHours}:${itemEndMinutes}`
                 );
               }
 
@@ -443,12 +473,25 @@ export class SmartPage implements OnInit {
       // Marcar el plan como aceptado
       this.currentReminderPlan.accepted = true;
 
+      // Asegurarse de que los recordatorios tengan fechas reales basadas en la fecha límite
+      if (this.selectedTask && this.currentReminderPlan.reminders) {
+        const dueDate = new Date(this.selectedTask.due_date);
+
+        // Convertir cada recordatorio a una fecha real
+        this.currentReminderPlan.reminders.forEach((reminder) => {
+          if (reminder.time) {
+            // Convertir tiempo relativo a fecha real
+            const date = this.calculateRelativeDate(dueDate, reminder.time);
+            if (date) {
+              reminder.date = date.toISOString();
+            }
+          }
+        });
+      }
+
       // Usar el servicio para crear los recordatorios
       this.smartAssistant
-        .createRemindersFromPlan(
-          this.currentReminderPlan,
-          userId // Ahora pasamos userId que sabemos que es string
-        )
+        .createRemindersFromPlan(this.currentReminderPlan, userId)
         .subscribe(
           (responses) => {
             console.log('Recordatorios creados:', responses);

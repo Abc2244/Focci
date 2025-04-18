@@ -74,11 +74,19 @@ async def get_free_slots(user_id: str, date: Optional[str] = None):
     try:
         # Determinar el día
         if date:
-            target_date = datetime.fromisoformat(date)
-            day_name = target_date.strftime("%A").lower()
+            try:
+                # Intentar parsearlo como ISO 8601 (YYYY-MM-DD o fecha completa con hora)
+                target_date = datetime.fromisoformat(date.replace('Z', '+00:00'))
+            except ValueError:
+                # Si falla, intentar otro formato común
+                try:
+                    target_date = datetime.strptime(date, "%Y-%m-%d")
+                except ValueError:
+                    raise HTTPException(status_code=400, detail=f"Formato de fecha inválido: {date}")
         else:
             target_date = datetime.now()
-            day_name = target_date.strftime("%A").lower()
+            
+        day_name = target_date.strftime("%A").lower()
         
         # Obtener todos los elementos del horario para ese día
         items = await mongodb.get_collection("schedule").find({
@@ -89,19 +97,30 @@ async def get_free_slots(user_id: str, date: Optional[str] = None):
         # Convertir a formato de hora
         busy_slots = []
         for item in items:
-            start_time = datetime.strptime(item["startTime"], "%H:%M").time()
-            end_time = datetime.strptime(item["endTime"], "%H:%M").time()
-            
-            # Crear objetos datetime completos para el día objetivo
-            start_dt = datetime.combine(target_date.date(), start_time)
-            end_dt = datetime.combine(target_date.date(), end_time)
-            
-            busy_slots.append({
-                "start": start_dt.isoformat(),
-                "end": end_dt.isoformat(),
-                "title": item["title"],
-                "type": item["type"]
-            })
+            try:
+                # Intentar primero parsear como ISO 8601
+                if isinstance(item["startTime"], str) and "T" in item["startTime"]:
+                    start_time = datetime.fromisoformat(item["startTime"].replace('Z', '+00:00')).time()
+                    end_time = datetime.fromisoformat(item["endTime"].replace('Z', '+00:00')).time()
+                else:
+                    # Intentar formato HH:MM
+                    start_time = datetime.strptime(item["startTime"], "%H:%M").time()
+                    end_time = datetime.strptime(item["endTime"], "%H:%M").time()
+                
+                # Crear objetos datetime completos para el día objetivo
+                start_dt = datetime.combine(target_date.date(), start_time)
+                end_dt = datetime.combine(target_date.date(), end_time)
+                
+                busy_slots.append({
+                    "start": start_dt.isoformat(),
+                    "end": end_dt.isoformat(),
+                    "title": item["title"],
+                    "type": item["type"]
+                })
+            except Exception as e:
+                # Registrar error, pero continuar con los otros slots
+                print(f"Error procesando slot {item['_id']}: {str(e)}")
+                continue
         
         # Ordenar por hora de inicio
         busy_slots.sort(key=lambda x: x["start"])

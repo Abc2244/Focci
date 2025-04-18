@@ -192,39 +192,53 @@ export class SmartAssistantService {
 
     // Crear un array de observables para cada recordatorio
     const reminderObservables = plan.reminders.map((reminder) => {
-      // Verificar si reminder.time existe
-      if (!reminder.time) {
-        console.warn('Recordatorio sin tiempo definido, omitiendo');
-        return of(null);
+      // Si el recordatorio ya tiene una fecha calculada, usarla
+      if (reminder.date) {
+        const reminderData = {
+          user_id: userId,
+          task_id: plan.taskId,
+          reminder_date: reminder.date,
+          message: reminder.description,
+          priority: plan.taskPriority || 3,
+          status: 'pendiente',
+          insistence_level: plan.insistenceLevel || 1,
+        };
+        return this.apiService.createReminder(reminderData);
       }
 
-      let reminderDate = new Date();
-      const timeStr = reminder.time;
+      // Si no tiene fecha pero tiene tiempo relativo, calcularlo
+      else if (reminder.time) {
+        let reminderDate = new Date();
+        const timeStr = reminder.time;
 
-      if (timeStr.includes('semana')) {
-        const weeks = parseInt(timeStr.split(' ')[0]);
-        reminderDate.setDate(reminderDate.getDate() + weeks * 7);
-      } else if (timeStr.includes('día')) {
-        const days = parseInt(timeStr.split(' ')[0]);
-        reminderDate.setDate(reminderDate.getDate() + days);
-      } else if (timeStr.includes('hora')) {
-        const hours = parseInt(timeStr.split(' ')[0]);
-        reminderDate.setHours(reminderDate.getHours() + hours);
+        if (timeStr.includes('semana')) {
+          const weeks = parseInt(timeStr.split(' ')[0]);
+          reminderDate.setDate(reminderDate.getDate() + weeks * 7);
+        } else if (timeStr.includes('día')) {
+          const days = parseInt(timeStr.split(' ')[0]);
+          reminderDate.setDate(reminderDate.getDate() + days);
+        } else if (timeStr.includes('hora')) {
+          const hours = parseInt(timeStr.split(' ')[0]);
+          reminderDate.setHours(reminderDate.getHours() + hours);
+        }
+
+        // Crear el recordatorio
+        const reminderData = {
+          user_id: userId,
+          task_id: plan.taskId,
+          reminder_date: reminderDate.toISOString(),
+          message: reminder.description,
+          priority: plan.taskPriority || 3,
+          status: 'pendiente',
+          insistence_level: plan.insistenceLevel || 1,
+        };
+
+        return this.apiService.createReminder(reminderData);
       }
 
-      // Crear el recordatorio
-      const reminderData = {
-        user_id: userId,
-        task_id: plan.taskId,
-        reminder_date: reminderDate.toISOString(),
-        message: reminder.description,
-        priority: plan.taskPriority || 3,
-        status: 'pendiente',
-        insistence_level: plan.insistenceLevel || 1,
-      };
-
-      // Usar el ApiService para crear el recordatorio
-      return this.apiService.createReminder(reminderData);
+      // Si no tiene ni fecha ni tiempo, omitir
+      console.warn('Recordatorio sin tiempo definido, omitiendo');
+      return of(null);
     });
 
     // Filtrar los nulos y combinar todos los observables
@@ -261,6 +275,20 @@ export class SmartAssistantService {
     taskPriority: number = 3,
     insistenceLevel: number = 1
   ): ReminderPlan {
+    // Verificar que la tarea tenga una fecha de vencimiento
+    if (!task.due_date) {
+      console.warn('La tarea no tiene fecha de vencimiento definida');
+      return {
+        taskId: task._id || '',
+        accepted: false,
+        taskPriority,
+        insistenceLevel,
+        reminders: [],
+      };
+    }
+
+    const dueDate = new Date(task.due_date);
+
     // Generar plan de recordatorios
     const reminderPlan: ReminderPlan = {
       taskId: task._id || '',
@@ -278,16 +306,19 @@ export class SmartAssistantService {
           time: '1 semana antes',
           description: `Recuerda que tienes que completar: ${task.description}`,
           level: 3,
+          date: this.calculateRelativeDateString(dueDate, -7),
         },
         {
           time: '3 días antes',
           description: `No olvides tu tarea: ${task.description}`,
           level: 4,
+          date: this.calculateRelativeDateString(dueDate, -3),
         },
         {
           time: '1 día antes',
           description: `¡Mañana vence tu tarea: ${task.description}!`,
           level: 5,
+          date: this.calculateRelativeDateString(dueDate, -1),
         },
       ];
     } else if (taskPriority >= 3 || insistenceLevel >= 2) {
@@ -297,11 +328,13 @@ export class SmartAssistantService {
           time: '3 días antes',
           description: `Recuerda tu tarea: ${task.description}`,
           level: 3,
+          date: this.calculateRelativeDateString(dueDate, -3),
         },
         {
           time: '1 día antes',
           description: `Mañana vence tu tarea: ${task.description}`,
           level: 4,
+          date: this.calculateRelativeDateString(dueDate, -1),
         },
       ];
     } else {
@@ -311,10 +344,23 @@ export class SmartAssistantService {
           time: '1 día antes',
           description: `Mañana vence tu tarea: ${task.description}`,
           level: 3,
+          date: this.calculateRelativeDateString(dueDate, -1),
         },
       ];
     }
 
     return reminderPlan;
+  }
+
+  // Método auxiliar para calcular fechas relativas a una fecha base
+  private calculateRelativeDateString(
+    baseDate: Date,
+    daysOffset: number
+  ): string | null {
+    if (!baseDate) return null;
+
+    const result = new Date(baseDate);
+    result.setDate(result.getDate() + daysOffset);
+    return result.toISOString();
   }
 }
