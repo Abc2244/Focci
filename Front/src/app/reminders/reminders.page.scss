@@ -452,17 +452,18 @@ $primary-gradient: linear-gradient(
   --max-width: 800px;
   --border-radius: 16px 16px 0 0;
   --box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.1);
+  --background: var(--app-card-color);
 
   ion-header {
     ion-toolbar {
-      --background: var(--ion-color-primary);
-      --color: white;
+      --background: var(--app-card-color);
+      --color: var(--ion-color-primary);
       --border-width: 0;
 
       ion-title {
         font-size: 1.2rem;
         font-weight: 600;
-        color: white;
+        color: var(--ion-color-primary);
       }
 
       .modal-close-button {
@@ -472,13 +473,17 @@ $primary-gradient: linear-gradient(
         height: 36px;
         width: 36px;
         --border-radius: 50%;
-        --background: rgba(255, 255, 255, 0.2);
-        --color: white;
+        --background: rgba(var(--ion-color-primary-rgb), 0.1);
+        --color: var(--ion-color-primary);
+        
+        ion-icon {
+          color: var(--ion-color-primary);
+        }
       }
 
       .save-button {
-        --color: white;
-        --background: rgba(255, 255, 255, 0.2);
+        --color: var(--ion-color-primary);
+        --background: rgba(var(--ion-color-primary-rgb), 0.1);
         --padding-start: 12px;
         --padding-end: 12px;
         --border-radius: 8px;
@@ -719,33 +724,22 @@ ion-fab {
     background: var(--app-card-color);
   }
 
-  ion-modal.reminder-modal {
+  .reminder-modal {
+    --background: var(--app-card-color);
+    
     ion-header ion-toolbar {
-      --background: var(--ion-color-primary);
-
-      ion-title,
-      .modal-close-button,
-      .save-button {
-        --color: var(--ion-text-color, #ffffff);
-        color: var(--ion-text-color, #ffffff);
+      --background: var(--app-card-color);
+      
+      ion-title {
+        color: var(--ion-color-primary);
       }
-    }
-
-    .modal-content {
-      --background: var(--app-background-dark, #121212);
-
-      .custom-input {
-        --background: var(--app-card-color);
-
-        ion-select,
-        ion-textarea,
-        ion-datetime {
-          --color: var(--app-text-color);
+      
+      .modal-close-button, .save-button {
+        color: var(--ion-color-primary);
+        
+        ion-icon {
+          color: var(--ion-color-primary);
         }
-      }
-
-      .field-label {
-        color: var(--app-text-color-medium);
       }
     }
   }

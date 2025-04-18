@@ -369,12 +369,13 @@ ion-fab {
   
   ion-header {
     ion-toolbar {
-      --background: var(--ion-color-primary) !important;
+      --background: var(--app-card-color) !important;
+      --border-style: none;
       
       ion-title {
         font-size: 1.2rem;
         font-weight: 600;
-        color: var(--ion-color-primary-contrast) !important;
+        color: var(--ion-color-primary) !important;
       }
       
       .modal-close-button {
@@ -384,17 +385,17 @@ ion-fab {
         height: 36px;
         width: 36px;
         --border-radius: 50%;
-        --background: rgba(255, 255, 255, 0.2);
-        color: var(--ion-color-primary-contrast) !important;
+        --background: rgba(var(--ion-color-primary-rgb), 0.1);
+        color: var(--ion-color-primary) !important;
         
         ion-icon {
-          color: var(--ion-color-primary-contrast) !important;
+          color: var(--ion-color-primary) !important;
         }
       }
       
       .save-button {
-        color: var(--ion-color-primary-contrast) !important;
-        --background: rgba(255, 255, 255, 0.2);
+        color: var(--ion-color-primary) !important;
+        --background: rgba(var(--ion-color-primary-rgb), 0.1);
         --padding-start: 12px;
         --padding-end: 12px;
         --border-radius: 8px;
@@ -664,17 +665,17 @@ ion-alert {
     --background: var(--app-card-color);
     
     ion-header ion-toolbar {
-      --background: var(--ion-color-primary) !important;
+      --background: var(--app-card-color) !important;
       
       ion-title {
-        color: var(--ion-color-primary-contrast) !important;
+        color: var(--ion-color-primary) !important;
       }
       
       .modal-close-button, .save-button {
-        color: var(--ion-color-primary-contrast) !important;
+        color: var(--ion-color-primary) !important;
         
         ion-icon {
-          color: var(--ion-color-primary-contrast) !important;
+          color: var(--ion-color-primary) !important;
         }
       }
     }

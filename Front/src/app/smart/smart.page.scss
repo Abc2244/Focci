@@ -556,27 +556,24 @@
 
 // Estilos para el modal de detalles
 .task-details-modal {
-  --background: linear-gradient(
-    135deg,
-    #f5f7fa 0%,
-    rgba(var(--ion-color-primary-rgb), 0.1) 100%
-  );
+  --background: var(--app-background-light);
 
   ion-header ion-toolbar {
-    --color: white;
+    --background: var(--app-card-color);
+    --color: var(--ion-color-primary);
 
     ion-title {
-      color: white;
+      color: var(--ion-color-primary);
       font-weight: 600;
+    }
+    
+    ion-button {
+      --color: var(--ion-color-primary);
     }
   }
 
   .task-details-content {
-    --background: linear-gradient(
-      135deg,
-      #f5f7fa 0%,
-      rgba(var(--ion-color-primary-rgb), 0.1) 100%
-    );
+    --background: var(--app-background-light);
 
     .task-title {
       font-size: 22px;
@@ -624,27 +621,24 @@
 
 // Estilos para el modal de plan de recordatorios
 .reminder-plan-modal {
-  --background: linear-gradient(
-    135deg,
-    #f5f7fa 0%,
-    rgba(var(--ion-color-primary-rgb), 0.1) 100%
-  );
+  --background: var(--app-background-light);
 
   ion-header ion-toolbar {
-    --color: white;
+    --background: var(--app-card-color);
+    --color: var(--ion-color-primary);
 
     ion-title {
-      color: white;
+      color: var(--ion-color-primary);
       font-weight: 600;
+    }
+    
+    ion-button {
+      --color: var(--ion-color-primary);
     }
   }
 
   .reminder-plan-content {
-    --background: linear-gradient(
-      135deg,
-      #f5f7fa 0%,
-      rgba(var(--ion-color-primary-rgb), 0.1) 100%
-    );
+    --background: var(--app-background-light);
 
     .plan-title {
       font-size: 22px;

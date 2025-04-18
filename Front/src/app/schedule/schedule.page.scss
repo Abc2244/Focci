@@ -416,21 +416,21 @@
 
 // Asegurarse de que los textos sean visibles
 ion-item {
-  --color: #333333;
+  --color: var(--app-text-color);
 
   ion-label {
-    color: #333333 !important;
+    color: var(--app-text-color) !important;
   }
 
   ion-input,
   ion-textarea,
   ion-select {
-    --color: #333333;
+    --color: var(--app-text-color);
   }
 }
 
 ion-datetime {
-  color: #333333;
+  color: var(--app-text-color);
 }
 
 ion-button {
@@ -439,20 +439,33 @@ ion-button {
 
 // Corregir problemas de visualización en la parte superior izquierda
 ion-header ion-toolbar {
-  --background: white;
-  --color: #333333;
+  --background: var(--app-card-color);
+  --color: var(--ion-color-primary);
 }
 
 ion-title {
-  color: #333333;
+  color: var(--ion-color-primary);
 }
 
-// Asegurar que los modales tengan fondo blanco
+// Asegurar que los modales tengan fondo apropiado para el tema
 ion-modal {
-  --background: white;
+  --background: var(--app-card-color);
 
   ion-content {
-    --background: white;
+    --background: var(--app-background-light);
+  }
+  
+  ion-header ion-toolbar {
+    --background: var(--app-card-color);
+    --color: var(--ion-color-primary);
+    
+    ion-title {
+      color: var(--ion-color-primary);
+    }
+    
+    ion-button {
+      --color: var(--ion-color-primary);
+    }
   }
 }
 

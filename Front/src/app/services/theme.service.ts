@@ -151,18 +151,7 @@ export class ThemeService {
     document.documentElement.style.setProperty('--modal-text-color', contrastColor);
     document.documentElement.style.setProperty('--modal-bg-color', primaryColor);
     
-    // Forzar actualización de estilos en componentes dinámicos
-    setTimeout(() => {
-      document.querySelectorAll('ion-modal ion-toolbar').forEach(element => {
-        const toolbar = element as HTMLElement;
-        toolbar.style.setProperty('--color', contrastColor);
-      });
-      
-      document.querySelectorAll('ion-modal ion-title, ion-modal .modal-close-button, ion-modal .save-button').forEach(element => {
-        const el = element as HTMLElement;
-        el.style.color = contrastColor;
-      });
-    }, 50);
+    // Ya no actualizamos los estilos de los modales aquí, se manejan en los CSS de cada componente
   }
 
   // Método para actualizar colores personalizados
