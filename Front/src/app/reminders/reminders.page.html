@@ -220,15 +220,16 @@
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-button class="modal-close-button" (click)="dismissModal()">
-            <ion-icon name="close-outline"></ion-icon>
+            <ion-icon name="close-outline" color="primary"></ion-icon>
           </ion-button>
         </ion-buttons>
-        <ion-title>{{ isEditing ? 'Editar' : 'Nuevo' }} Recordatorio</ion-title>
+        <ion-title color="primary">{{ isEditing ? 'Editar' : 'Nuevo' }} Recordatorio</ion-title>
         <ion-buttons slot="end">
           <ion-button
             class="save-button"
             [disabled]="!reminderForm.valid"
             (click)="saveReminder()"
+            color="primary"
           >
             {{ isEditing ? 'Actualizar' : 'Crear' }}
           </ion-button>

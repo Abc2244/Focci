@@ -349,49 +349,62 @@
   }
 }
 
-// Estilos para el modal
+// Estilos para el modal de tareas
 .task-modal {
   --height: 90%;
   --width: 100%;
   --max-width: 800px;
   --border-radius: 16px 16px 0 0;
   --box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.1);
+  --background: var(--app-card-color);
 
   ion-header {
     ion-toolbar {
-      --background: var(--ion-color-primary);
-      --color: white;
-      --border-width: 0;
-
+      --background: var(--app-card-color) !important;
+      --border-style: none;
+      
       ion-title {
         font-size: 1.2rem;
         font-weight: 600;
-        color: white;
+        color: var(--ion-color-primary) !important;
       }
-
+      
       ion-buttons {
-        .modal-close-button {
-          margin-left: 8px;
-          --padding-start: 8px;
-          --padding-end: 8px;
-          height: 36px;
-          width: 36px;
-          --border-radius: 50%;
-          --background: rgba(255, 255, 255, 0.2);
-          --color: white;
+        &[slot="start"] {
+          margin-left: 4px;
+          
+          .modal-close-button {
+            --padding-start: 8px;
+            --padding-end: 8px;
+            height: 36px;
+            width: 36px;
+            --border-radius: 50%;
+            --background: rgba(var(--ion-color-primary-rgb), 0.1);
+            --color: var(--ion-color-primary);
+            
+            ion-icon {
+              color: var(--ion-color-primary);
+              font-size: 22px;
+            }
+          }
         }
-
-        .save-button {
-          --color: white;
-          --background: rgba(255, 255, 255, 0.2);
-          --padding-start: 12px;
-          --padding-end: 12px;
-          --border-radius: 8px;
-          margin-right: 8px;
-          font-weight: 600;
-
-          &[disabled] {
-            opacity: 0.5;
+        
+        &[slot="end"] {
+          margin-right: 4px;
+          
+          .save-button {
+            --color: var(--ion-color-primary);
+            --background: rgba(var(--ion-color-primary-rgb), 0.1);
+            --padding-start: 16px;
+            --padding-end: 16px;
+            --border-radius: 8px;
+            height: 36px;
+            font-weight: 600;
+            font-size: 14px;
+            
+            &[disabled] {
+              opacity: 0.5;
+            }
           }
         }
       }
@@ -405,69 +418,52 @@
     .form-container {
       padding: 16px;
 
-      .field-label {
-        display: flex;
-        align-items: center;
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--ion-color-primary);
-        margin-bottom: 8px;
-        margin-left: 4px;
-
-        ion-icon {
-          font-size: 18px;
-          margin-right: 8px;
-          color: var(--ion-color-primary);
-        }
-      }
-
       .form-group {
-        margin-bottom: 24px;
+        margin-bottom: 16px;
+        
+        .field-label {
+          display: flex;
+          align-items: center;
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--app-text-color-medium);
+          margin-bottom: 8px;
+          margin-left: 4px;
+          
+          ion-icon {
+            font-size: 18px;
+            margin-right: 8px;
+            color: var(--ion-color-primary);
+          }
+        }
 
         .custom-input {
           --background: var(--app-card-color);
           --border-radius: 12px;
-          --padding-start: 16px;
-          --padding-end: 16px;
-          --padding-top: 12px;
-          --padding-bottom: 12px;
-          --highlight-color-focused: var(--ion-color-primary);
-          margin: 0;
+          margin-bottom: 8px;
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
           border: 1px solid rgba(var(--ion-color-medium-rgb), 0.2);
-
-          &::part(native) {
-            padding: 0;
-          }
-
-          ion-input,
-          ion-select,
-          ion-textarea {
-            --padding-start: 0;
-            --padding-end: 0;
-            --padding-top: 0;
-            --padding-bottom: 0;
-            font-size: 15px;
-            color: var(--app-text-color);
+          --highlight-color-focused: var(--ion-color-primary);
+          
+          ion-select, 
+          ion-input, 
+          ion-datetime {
+            --color: var(--app-text-color);
             --placeholder-color: var(--app-text-color-medium);
             --placeholder-opacity: 0.7;
-            min-height: 24px;
-          }
-
-          ion-textarea {
-            min-height: 80px;
-          }
-
-          ion-select {
-            width: 100%;
-            max-width: 100%;
+            font-size: 15px;
+            --padding-start: 16px;
+            --padding-end: 16px;
+            --padding-top: 12px;
+            --padding-bottom: 12px;
           }
         }
 
         .error-message {
           color: var(--ion-color-danger);
-          font-size: 0.85rem;
-          margin: 0.25rem 0 0 1rem;
+          font-size: 12px;
+          margin-top: 4px;
+          margin-left: 8px;
         }
       }
     }
@@ -487,84 +483,39 @@
   }
 }
 
-// Estilos para el datetime (copiados de reminders)
+// Estilos para datetime
 ::ng-deep ion-datetime {
   --background: var(--app-card-color) !important;
   --ion-color-primary: var(--ion-color-primary) !important;
   --ion-text-color: var(--app-text-color) !important;
   --ion-toolbar-background: var(--app-card-color) !important;
   --ion-toolbar-color: var(--ion-color-primary) !important;
-  --wheel-highlight-background: rgba(
-    var(--ion-color-primary-rgb),
-    0.2
-  ) !important;
-  --wheel-fade-background-rgb: var(--app-card-color-rgb) !important;
   border-radius: 16px;
-  margin: 0;
-  padding: 20px;
-
-  .datetime-header {
-    background: var(--app-card-color);
-    color: var(--ion-color-primary);
-    padding: 20px;
+  
+  .datetime-header, ion-buttons {
+    color: var(--ion-color-primary) !important;
   }
+}
 
-  .datetime-calendar {
-    padding: 20px;
-    background: var(--app-card-color);
-  }
-
-  .calendar-action-buttons {
-    ion-button {
-      --color: var(--ion-color-primary);
-      font-weight: 500;
-    }
-  }
-
-  .calendar-days {
-    color: var(--app-text-color);
-  }
-
-  .calendar-day {
-    color: var(--app-text-color);
-
-    &.calendar-day-active {
-      color: var(--ion-color-primary);
-      font-weight: bold;
-    }
-
-    &.calendar-day-today {
-      border-color: var(--ion-color-primary);
-    }
-  }
-
-  .datetime-time {
-    padding: 20px;
-    background: var(--app-card-color);
-
-    .time-header {
-      color: var(--ion-color-primary);
-      font-weight: 500;
-    }
-
-    .time-body {
-      color: var(--app-text-color);
-    }
-  }
-
-  ion-buttons[slot="buttons"] {
-    padding: 10px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    background: var(--app-card-color);
-
-    ion-button {
-      margin: 0;
-      --padding-start: 15px;
-      --padding-end: 15px;
-      height: 36px;
-      font-weight: 500;
+// Dark mode adjustments
+:host-context(.dark-theme) {
+  .task-modal {
+    --background: var(--app-card-color);
+    
+    ion-header ion-toolbar {
+      --background: var(--app-card-color) !important;
+      
+      ion-title {
+        color: var(--ion-color-primary) !important;
+      }
+      
+      .modal-close-button, .save-button {
+        color: var(--ion-color-primary) !important;
+        
+        ion-icon {
+          color: var(--ion-color-primary) !important;
+        }
+      }
     }
   }
 }
