@@ -224,25 +224,33 @@
   class="profile-modal"
 >
   <ng-template>
-    <ion-header class="ion-no-border">
+    <ion-header class="ion-no-border modal-header">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-button (click)="cancelEditProfile()">
-            <ion-icon name="close-outline"></ion-icon>
+          <ion-button (click)="cancelEditProfile()" class="modal-close-button">
+            <ion-icon name="close-outline" color="primary"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-title>Editar Perfil</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="saveProfile()" [strong]="true" color="primary">
+          <ion-button (click)="saveProfile()" [strong]="true" color="primary" class="modal-save-button">
+            <ion-icon name="checkmark-outline" slot="start"></ion-icon>
             Guardar
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content class="modal-content">
+      <div class="modal-intro">
+        <ion-icon name="person-circle" color="primary"></ion-icon>
+        <p>Actualiza tu información personal</p>
+      </div>
       <form [formGroup]="profileForm">
         <div class="form-container">
-          <div class="field-label">Nombre de Usuario</div>
+          <div class="field-label">
+            <ion-icon name="person-outline" color="medium"></ion-icon>
+            Nombre de Usuario
+          </div>
           <ion-item class="custom-input">
             <ion-input
               formControlName="username"
@@ -252,7 +260,10 @@
             ></ion-input>
           </ion-item>
 
-          <div class="field-label">Email</div>
+          <div class="field-label">
+            <ion-icon name="mail-outline" color="medium"></ion-icon>
+            Email
+          </div>
           <ion-item class="custom-input">
             <ion-input
               formControlName="email"
@@ -275,11 +286,11 @@
   class="profile-modal"
 >
   <ng-template>
-    <ion-header class="ion-no-border">
+    <ion-header class="ion-no-border modal-header">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-button (click)="cancelChangePassword()">
-            <ion-icon name="close-outline"></ion-icon>
+          <ion-button (click)="cancelChangePassword()" class="modal-close-button">
+            <ion-icon name="close-outline" color="primary"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-title>Cambiar Contraseña</ion-title>
@@ -288,16 +299,25 @@
             (click)="changePassword()"
             [strong]="true"
             color="primary"
+            class="modal-save-button"
           >
+            <ion-icon name="checkmark-outline" slot="start"></ion-icon>
             Guardar
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content class="modal-content">
+      <div class="modal-intro">
+        <ion-icon name="lock-closed" color="primary"></ion-icon>
+        <p>Para tu seguridad, elige una contraseña fuerte</p>
+      </div>
       <form [formGroup]="passwordForm">
         <div class="form-container">
-          <div class="field-label">Contraseña Actual</div>
+          <div class="field-label">
+            <ion-icon name="key-outline" color="medium"></ion-icon>
+            Contraseña Actual
+          </div>
           <ion-item class="custom-input">
             <ion-input
               formControlName="old_password"
@@ -306,7 +326,10 @@
             ></ion-input>
           </ion-item>
 
-          <div class="field-label">Nueva Contraseña</div>
+          <div class="field-label">
+            <ion-icon name="shield-outline" color="medium"></ion-icon>
+            Nueva Contraseña
+          </div>
           <ion-item class="custom-input">
             <ion-input
               formControlName="new_password"
@@ -315,7 +338,10 @@
             ></ion-input>
           </ion-item>
 
-          <div class="field-label">Confirmar Contraseña</div>
+          <div class="field-label">
+            <ion-icon name="shield-checkmark-outline" color="medium"></ion-icon>
+            Confirmar Contraseña
+          </div>
           <ion-item class="custom-input">
             <ion-input
               formControlName="confirm_password"
@@ -328,7 +354,13 @@
             *ngIf="passwordForm.hasError('mismatch') && passwordForm.get('confirm_password')?.touched"
             class="error-message"
           >
+            <ion-icon name="alert-circle-outline" color="danger"></ion-icon>
             Las contraseñas no coinciden
+          </div>
+          
+          <div class="password-tips">
+            <ion-icon name="information-circle-outline" color="medium"></ion-icon>
+            <span>Usa al menos 6 caracteres incluyendo letras y números</span>
           </div>
         </div>
       </form>
@@ -343,11 +375,11 @@
   class="profile-modal"
 >
   <ng-template>
-    <ion-header class="ion-no-border">
+    <ion-header class="ion-no-border modal-header">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-button (click)="showThemeSelectorModal = false">
-            <ion-icon name="close-outline"></ion-icon>
+          <ion-button (click)="showThemeSelectorModal = false" class="modal-close-button">
+            <ion-icon name="close-outline" color="primary"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-title>Seleccionar Tema</ion-title>
