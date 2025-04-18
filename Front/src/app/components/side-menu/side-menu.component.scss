@@ -1,17 +1,18 @@
 // Variables
 :host {
   --menu-bg: var(--app-card-color);
-  --menu-backdrop-filter: blur(10px);
-  --menu-shadow: var(--app-shadow-lg);
-  --menu-header-height: 180px;
+  --menu-width: 280px;
+  --menu-padding: 16px;
+  --avatar-size: 56px;
+  --icon-container-size: 36px;
+  --menu-item-height: 50px;
   --menu-item-radius: 12px;
-  --menu-item-active-bg: rgba(var(--ion-color-primary-rgb), 0.15);
-  --menu-item-hover-bg: rgba(var(--ion-color-primary-rgb), 0.08);
+  --status-dot-size: 12px;
 }
 
 // Estilos para el menú lateral con glassmorphism
 ion-menu.glassmorphism-menu {
-  --width: 280px;
+  --width: var(--menu-width);
   --background: var(--menu-bg);
 
   &::part(backdrop) {
@@ -20,103 +21,234 @@ ion-menu.glassmorphism-menu {
 
   &::part(container) {
     border-right: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
-    box-shadow: var(--menu-shadow);
-    backdrop-filter: var(--menu-backdrop-filter);
-    -webkit-backdrop-filter: var(--menu-backdrop-filter);
-  }
-
-  ion-toolbar {
-    --background: var(--ion-color-primary);
-    --color: var(--ion-color-primary-contrast);
+    background: var(--menu-bg);
   }
 
   ion-content {
     --background: var(--menu-bg);
     --padding-top: 0;
-    --padding-bottom: 20px;
+    --padding-bottom: var(--menu-padding);
 
     .menu-header {
-      padding: 20px 16px;
-      background: linear-gradient(
-        135deg,
-        var(--ion-color-primary) 0%,
-        var(--ion-color-primary-shade) 100%
-      );
-      margin-bottom: 20px;
+      padding: var(--menu-padding);
+      margin-bottom: 24px;
 
       .user-info {
         display: flex;
         align-items: center;
+        gap: 16px;
 
-        .avatar {
-          width: 60px;
-          height: 60px;
-          border-radius: 50%;
-          background: rgba(var(--ion-color-primary-contrast-rgb), 0.2);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-right: 15px;
+        .avatar-container {
+          position: relative;
 
-          ion-icon {
-            font-size: 40px;
-            color: var(--ion-color-primary-contrast);
+          .avatar {
+            width: var(--avatar-size);
+            height: var(--avatar-size);
+            border-radius: 16px;
+            background: rgba(var(--ion-color-primary-rgb), 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+
+            &:hover {
+              transform: scale(1.05);
+            }
+
+            ion-icon {
+              font-size: 24px;
+              color: var(--ion-color-primary);
+            }
+          }
+
+          .status-dot {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: var(--status-dot-size);
+            height: var(--status-dot-size);
+            border-radius: 50%;
+            background: var(--ion-color-success);
+            border: 2px solid var(--menu-bg);
           }
         }
 
         .user-details {
           h2 {
             margin: 0;
-            color: var(--ion-color-primary-contrast);
+            color: var(--ion-color-primary);
             font-size: 18px;
             font-weight: 600;
           }
 
           p {
-            margin: 5px 0 0;
-            color: rgba(var(--ion-color-primary-contrast-rgb), 0.8);
+            margin: 4px 0 0;
+            color: var(--ion-color-primary);
             font-size: 14px;
+            opacity: 0.8;
           }
         }
       }
     }
-  }
 
-  .menu-items {
-    padding: 0;
-    background: transparent;
+    .menu-sections {
+      padding: 0 var(--menu-padding);
 
-    ion-item {
-      --padding-start: 16px;
-      --padding-end: 16px;
-      --min-height: 56px;
-      margin: 0 8px 8px;
-      --background: transparent;
-      --background-hover: var(--menu-item-hover-bg);
-      --ripple-color: var(--ion-color-primary);
-      border-radius: 8px;
-      --color: var(--app-text-color);
+      .section-title {
+        color: var(--app-text-color-medium);
+        font-size: 12px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+        padding-left: 8px;
+      }
 
-      &.active-item {
-        --background: var(--menu-item-active-bg);
-        --color: var(--ion-color-primary);
-        font-weight: 600;
+      .menu-items {
+        background: transparent;
+        padding: 0;
 
-        ion-icon {
-          color: var(--ion-color-primary);
+        ion-item {
+          --background: transparent;
+          --background-hover: transparent;
+          --min-height: var(--menu-item-height);
+          --padding-start: 8px;
+          --padding-end: 8px;
+          --inner-padding-end: 8px;
+          margin-bottom: 8px;
+          border-radius: var(--menu-item-radius);
+          transition: all 0.3s ease;
+
+          .item-content {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 12px;
+
+            .icon-container {
+              width: var(--icon-container-size);
+              height: var(--icon-container-size);
+              border-radius: 10px;
+              background: transparent;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              transition: all 0.3s ease;
+
+              ion-icon {
+                font-size: 20px;
+                color: var(--app-text-color-medium);
+                transition: all 0.3s ease;
+              }
+            }
+
+            ion-label {
+              color: var(--app-text-color);
+              font-size: 15px;
+              font-weight: 500;
+              transition: all 0.3s ease;
+            }
+          }
+
+          .hover-indicator {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%) scaleY(0);
+            width: 4px;
+            height: 20px;
+            background: var(--ion-color-primary);
+            border-radius: 0 4px 4px 0;
+            transition: transform 0.3s ease;
+          }
+
+          &:hover {
+            background: rgba(var(--ion-color-primary-rgb), 0.08);
+
+            .icon-container {
+              background: rgba(var(--ion-color-primary-rgb), 0.15);
+
+              ion-icon {
+                color: var(--ion-color-primary);
+              }
+            }
+          }
+
+          &.active-item {
+            background: rgba(var(--ion-color-primary-rgb), 0.15);
+
+            .hover-indicator {
+              transform: translateY(-50%) scaleY(1);
+            }
+
+            .icon-container {
+              background: var(--ion-color-primary);
+
+              ion-icon {
+                color: white;
+              }
+            }
+
+            ion-label {
+              color: var(--ion-color-primary);
+              font-weight: 600;
+            }
+          }
         }
       }
+    }
 
-      ion-icon {
-        font-size: 22px;
-        margin-right: 16px;
-        color: var(--ion-color-primary);
-      }
+    .menu-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: var(--menu-width);
+      padding: var(--menu-padding);
+      background: var(--menu-bg);
+      border-top: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
 
-      ion-label {
-        font-size: 16px;
-        font-weight: 500;
-        color: var(--app-text-color);
+      .logout-button {
+        --background: transparent;
+        --background-hover: rgba(var(--ion-color-danger-rgb), 0.08);
+        --min-height: var(--menu-item-height);
+        --padding-start: 8px;
+        --padding-end: 8px;
+        border-radius: var(--menu-item-radius);
+
+        .item-content {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          gap: 12px;
+
+          .icon-container {
+            width: var(--icon-container-size);
+            height: var(--icon-container-size);
+            border-radius: 10px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+
+            ion-icon {
+              font-size: 20px;
+              color: var(--ion-color-danger);
+            }
+          }
+
+          ion-label {
+            color: var(--ion-color-danger);
+            font-size: 15px;
+            font-weight: 500;
+          }
+        }
+
+        &:hover {
+          .icon-container {
+            background: rgba(var(--ion-color-danger-rgb), 0.15);
+          }
+        }
       }
     }
   }
