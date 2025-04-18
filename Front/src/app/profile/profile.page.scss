@@ -108,6 +108,24 @@ $profile-text-light: var(--app-text-color-light);
       font-size: 1rem;
       color: var(--app-text-color-medium);
     }
+    
+    .edit-profile-button {
+      margin-top: 1.5rem;
+      --border-radius: 10px;
+      width: 80%;
+      max-width: 240px;
+      font-weight: 500;
+      --border-color: rgba(var(--ion-color-primary-rgb), 0.5);
+      transition: all 0.2s ease;
+      
+      &:hover {
+        --background: rgba(var(--ion-color-primary-rgb), 0.1);
+      }
+      
+      ion-icon {
+        margin-right: 8px;
+      }
+    }
   }
 
   // Secciones del perfil
@@ -465,6 +483,27 @@ ion-card-content ion-list ion-item ion-label p {
 .profile-modal ion-content.modal-content .theme-selector-container {
   padding: 1rem;
 
+  .theme-intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 1rem 1.5rem;
+    text-align: center;
+
+    ion-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    p {
+      color: var(--app-text-color-medium);
+      font-size: 15px;
+      line-height: 1.4;
+      margin: 0;
+      max-width: 280px;
+    }
+  }
+
   ion-list {
     background: transparent !important;
     padding: 0;
@@ -557,6 +596,12 @@ ion-item.custom-input {
 
 // Estilos adicionales para modo oscuro en el selector de tema
 :host-context(.dark-theme) {
+  .theme-selector-container .theme-intro {
+    p {
+      color: var(--app-text-color-medium);
+    }
+  }
+  
   .theme-selector-container ion-item {
     --background: var(--app-card-color);
     --color: var(--app-text-color);

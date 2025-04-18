@@ -19,8 +19,7 @@ export class ProfilePage implements OnInit {
 
   settings: any = {
     notifications: true,
-    darkMode: false,
-    language: 'es',
+    darkMode: false
   };
 
   lastSync: Date = new Date();
@@ -164,22 +163,6 @@ export class ProfilePage implements OnInit {
       custom: 'Personalizado',
     };
     return themeMap[currentTheme] || 'Azul';
-  }
-
-  openLanguageSelector() {
-    // Implementar selector de idioma
-    this.presentToast('Función no implementada', 'warning');
-  }
-
-  getLanguageName() {
-    const languages = {
-      es: 'Español',
-      en: 'English',
-      fr: 'Français',
-    };
-    return (
-      languages[this.settings.language as keyof typeof languages] || 'Español'
-    );
   }
 
   syncData() {
