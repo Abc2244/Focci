@@ -9,7 +9,7 @@ import { filter } from 'rxjs/operators';
   styleUrls: ['tabs.page.scss'],
 })
 export class TabsPage implements OnInit {
-  activeTab: string = 'week';
+  activeTab: string = 'schedule';
   pageTitle: string = ''; // Título vacío
 
   // Mapeo de rutas a títulos con índice de tipo string

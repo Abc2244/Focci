@@ -754,3 +754,17 @@ ion-fab {
     }
   }
 }
+
+// Estilos para el action sheet
+::ng-deep .action-sheet-group {
+  background: var(--app-card-color) !important;
+
+  .action-sheet-button {
+    color: var(--app-text-color) !important;
+
+    &.action-sheet-selected {
+      color: var(--ion-color-primary) !important;
+      background: rgba(var(--ion-color-primary-rgb), 0.1) !important;
+    }
+  }
+}
