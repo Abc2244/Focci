@@ -221,7 +221,7 @@ export class ApiService {
 
   updateUserProfile(userId: string, profileData: any): Observable<any> {
     return this.http
-      .put(`${this.apiUrl}/users/${userId}`, profileData, {
+      .put(`${this.apiUrl}/users/${userId}/`, profileData, {
         headers: this.getAuthHeaders(),
       })
       .pipe(catchError(this.handleError));

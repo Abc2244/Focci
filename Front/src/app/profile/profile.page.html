@@ -7,9 +7,6 @@
         <div class="user-avatar">
           <ion-icon name="person" class="avatar-icon"></ion-icon>
         </div>
-        <div class="edit-avatar-button">
-          <ion-icon name="camera"></ion-icon>
-        </div>
       </div>
       <h1 class="user-name">{{ userProfile.username || 'Usuario' }}</h1>
       <p class="user-email">{{ userProfile.email || 'correo@ejemplo.com' }}</p>
@@ -245,10 +242,8 @@
     <ion-content class="modal-content">
       <form [formGroup]="profileForm">
         <div class="form-container">
+          <div class="field-label">Nombre de Usuario</div>
           <ion-item class="custom-input">
-            <ion-label position="floating" color="medium"
-              >Nombre de Usuario</ion-label
-            >
             <ion-input
               formControlName="username"
               type="text"
@@ -257,8 +252,8 @@
             ></ion-input>
           </ion-item>
 
+          <div class="field-label">Email</div>
           <ion-item class="custom-input">
-            <ion-label position="floating" color="medium">Email</ion-label>
             <ion-input
               formControlName="email"
               type="email"
@@ -302,10 +297,8 @@
     <ion-content class="modal-content">
       <form [formGroup]="passwordForm">
         <div class="form-container">
+          <div class="field-label">Contraseña Actual</div>
           <ion-item class="custom-input">
-            <ion-label position="floating" color="medium"
-              >Contraseña Actual</ion-label
-            >
             <ion-input
               formControlName="old_password"
               type="password"
@@ -313,10 +306,8 @@
             ></ion-input>
           </ion-item>
 
+          <div class="field-label">Nueva Contraseña</div>
           <ion-item class="custom-input">
-            <ion-label position="floating" color="medium"
-              >Nueva Contraseña</ion-label
-            >
             <ion-input
               formControlName="new_password"
               type="password"
@@ -324,10 +315,8 @@
             ></ion-input>
           </ion-item>
 
+          <div class="field-label">Confirmar Contraseña</div>
           <ion-item class="custom-input">
-            <ion-label position="floating" color="medium"
-              >Confirmar Contraseña</ion-label
-            >
             <ion-input
               formControlName="confirm_password"
               type="password"

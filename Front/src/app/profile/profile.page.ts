@@ -54,10 +54,7 @@ export class ProfilePage implements OnInit {
   ) {
     this.profileForm = this.fb.group({
       username: ['', Validators.required],
-      firstName: [''],
-      lastName: [''],
       email: ['', [Validators.required, Validators.email]],
-      phone: [''],
     });
 
     this.passwordForm = this.fb.group({
@@ -65,12 +62,6 @@ export class ProfilePage implements OnInit {
       new_password: ['', [Validators.required, Validators.minLength(6)]],
       confirm_password: ['', Validators.required],
     });
-  }
-
-  passwordMatchValidator(g: FormGroup) {
-    return g.get('new_password')?.value === g.get('confirm_password')?.value
-      ? null
-      : { mismatch: true };
   }
 
   ngOnInit() {
@@ -83,6 +74,23 @@ export class ProfilePage implements OnInit {
       this.customColorInput = savedColor;
       document.documentElement.style.setProperty('--custom-primary-color', savedColor);
     }
+    
+    // Actualizamos la validación comparando los valores directamente
+    this.passwordForm.valueChanges.subscribe(() => {
+      const newPassword = this.passwordForm.get('new_password')?.value;
+      const confirmPassword = this.passwordForm.get('confirm_password')?.value;
+      
+      if (newPassword && confirmPassword && newPassword !== confirmPassword) {
+        this.passwordForm.setErrors({ mismatch: true });
+      } else {
+        // Solo eliminamos el error de mismatch si existe
+        const currentErrors = this.passwordForm.errors;
+        if (currentErrors && currentErrors['mismatch']) {
+          delete currentErrors['mismatch'];
+          this.passwordForm.setErrors(Object.keys(currentErrors).length ? currentErrors : null);
+        }
+      }
+    });
   }
 
   loadUserProfile() {
@@ -217,7 +225,15 @@ export class ProfilePage implements OnInit {
     if (this.profileForm.valid) {
       const userId = this.authService.getCurrentUserId();
       if (userId) {
-        const profileData = this.profileForm.value;
+        // Solo enviamos los campos que el backend espera según el modelo User en el backend
+        const profileData = {
+          username: this.profileForm.value.username,
+          email: this.profileForm.value.email,
+          password: this.userProfile.password // Mantenemos la contraseña actual
+        };
+        
+        console.log('Enviando datos de perfil:', profileData);
+        
         this.apiService.updateUserProfile(userId, profileData).subscribe(
           (response: any) => {
             this.userProfile = { ...this.userProfile, ...profileData };
@@ -226,18 +242,28 @@ export class ProfilePage implements OnInit {
           },
           (error: any) => {
             console.error('Error updating profile:', error);
-            this.presentToast('Error al actualizar el perfil', 'danger');
+            this.presentToast('Error al actualizar el perfil: ' + (error.message || 'Error desconocido'), 'danger');
           }
         );
       }
     } else {
-      this.presentToast('Por favor, complete los campos requeridos', 'warning');
+      if (!this.profileForm.get('username')?.valid) {
+        this.presentToast('Por favor, ingrese un nombre de usuario', 'warning');
+      } else if (!this.profileForm.get('email')?.valid) {
+        this.presentToast('Por favor, ingrese un email válido', 'warning');
+      } else {
+        this.presentToast('Por favor, complete los campos requeridos', 'warning');
+      }
     }
   }
 
   changePassword() {
     if (this.passwordForm.valid) {
-      if (this.passwordForm.hasError('mismatch')) {
+      // Verificamos manualmente si las contraseñas coinciden
+      const newPassword = this.passwordForm.get('new_password')?.value;
+      const confirmPassword = this.passwordForm.get('confirm_password')?.value;
+      
+      if (newPassword !== confirmPassword) {
         this.presentToast('Las contraseñas no coinciden', 'warning');
         return;
       }
@@ -248,6 +274,8 @@ export class ProfilePage implements OnInit {
           old_password: this.passwordForm.value.old_password,
           new_password: this.passwordForm.value.new_password,
         };
+        
+        console.log('Enviando datos de contraseña:', passwordData);
 
         this.apiService.updatePassword(userId, passwordData).subscribe(
           (response: any) => {
@@ -256,15 +284,25 @@ export class ProfilePage implements OnInit {
               'Contraseña actualizada correctamente',
               'success'
             );
+            this.passwordForm.reset();
           },
           (error: any) => {
             console.error('Error updating password:', error);
-            this.presentToast('Error al actualizar la contraseña', 'danger');
+            this.presentToast('Error al actualizar la contraseña: ' + (error.message || 'Verifique su contraseña actual'), 'danger');
           }
         );
       }
     } else {
-      this.presentToast('Por favor, complete los campos requeridos', 'warning');
+      // Mostrar mensajes específicos para cada campo
+      if (!this.passwordForm.get('old_password')?.valid) {
+        this.presentToast('Por favor, ingrese su contraseña actual', 'warning');
+      } else if (!this.passwordForm.get('new_password')?.valid) {
+        this.presentToast('La nueva contraseña debe tener al menos 6 caracteres', 'warning');
+      } else if (!this.passwordForm.get('confirm_password')?.valid) {
+        this.presentToast('Por favor, confirme su nueva contraseña', 'warning');
+      } else {
+        this.presentToast('Por favor, complete todos los campos requeridos', 'warning');
+      }
     }
   }
 
