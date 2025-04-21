@@ -61,16 +61,36 @@
             </div>
 
             <div class="available-slots" *ngIf="plan.availableSlots.length > 0">
-              <h4>Horarios Recomendados</h4>
-              <ion-chip
-                *ngFor="let slot of plan.availableSlots"
-                (click)="scheduleStudySession(plan, slot)"
-                [class.selected]="plan.selectedSlot === slot"
-              >
-                <ion-icon name="calendar-outline"></ion-icon>
-                {{ formatDate(slot.start) }} - {{ formatTimeRange(slot.start,
-                slot.end) }}
-              </ion-chip>
+              <h4>
+                <ion-icon name="time-outline"></ion-icon>
+                Horarios Recomendados
+              </h4>
+              <div class="slots-container">
+                <ion-chip
+                  *ngFor="let slot of plan.availableSlots"
+                  (click)="scheduleStudySession(plan, slot)"
+                  [class.selected]="plan.selectedSlot === slot"
+                  [class.has-reminder]="hasReminderInTimeSlot(plan, slot)"
+                >
+                  <ion-icon name="calendar-outline"></ion-icon>
+                  <ion-label>
+                    {{ formatDate(slot.start) }} - {{ formatTimeRange(slot.start, slot.end) }}
+                    <span class="duration">{{ getDurationInMinutes(slot) }} min</span>
+                  </ion-label>
+                  <ion-icon 
+                    name="notifications" 
+                    *ngIf="hasReminderInTimeSlot(plan, slot)"
+                    class="reminder-icon"
+                  ></ion-icon>
+                </ion-chip>
+              </div>
+
+              <div class="slot-actions" *ngIf="plan.selectedSlot">
+                <ion-button expand="block" color="primary" (click)="confirmScheduleWithReminders(plan)">
+                  <ion-icon name="calendar-outline" slot="start"></ion-icon>
+                  Programar con recordatorios
+                </ion-button>
+              </div>
             </div>
 
             <div class="plan-actions">

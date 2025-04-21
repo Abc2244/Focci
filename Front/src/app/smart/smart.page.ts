@@ -32,6 +32,7 @@ interface TimeSlot {
   start: Date;
   end: Date;
   isFree: boolean;
+  duration?: number;
 }
 
 interface TaskWithSlots {
@@ -651,5 +652,75 @@ export class SmartPage implements OnInit {
 
     // Retornar el formato: "Lun 15 May"
     return `${capitalizedDayName} ${day} ${month}`;
+  }
+
+  // Método para verificar si hay un recordatorio en un slot de tiempo específico
+  hasReminderInTimeSlot(plan: TaskWithSlots, slot: TimeSlot): boolean {
+    if (!plan.reminderPlan || !plan.reminderPlan.reminders) return false;
+
+    return plan.reminderPlan.reminders.some(reminder => {
+      if (!reminder.date) return false;
+      
+      const reminderDate = new Date(reminder.date);
+      const slotStart = new Date(slot.start);
+      const slotEnd = new Date(slot.end);
+      
+      return reminderDate >= slotStart && reminderDate <= slotEnd;
+    });
+  }
+
+  // Método para calcular la duración en minutos de un slot
+  getDurationInMinutes(slot: TimeSlot): number {
+    const start = new Date(slot.start);
+    const end = new Date(slot.end);
+    const diffMs = end.getTime() - start.getTime();
+    return Math.round(diffMs / (1000 * 60));
+  }
+
+  // Método para confirmar la programación con recordatorios
+  async confirmScheduleWithReminders(plan: TaskWithSlots) {
+    if (!plan.selectedSlot || !this.userId || !plan.task._id) return;
+
+    try {
+      // Primero programar la sesión de estudio
+      await this.scheduleStudySession(plan, plan.selectedSlot);
+
+      // Generar recordatorios para la sesión
+      const sessionStart = new Date(plan.selectedSlot.start);
+      const reminderTimes = [
+        { minutes: 30, level: 3 },
+        { minutes: 15, level: 4 },
+        { minutes: 5, level: 5 }
+      ];
+
+      for (const { minutes, level } of reminderTimes) {
+        const reminderTime = new Date(sessionStart.getTime() - minutes * 60000);
+        const notificationData = {
+          title: `Recordatorio de sesión de estudio`,
+          body: `Tu sesión de estudio "${plan.task.description}" comienza en ${minutes} minutos`,
+          scheduledTime: reminderTime.toISOString(),
+          _id: `study_session_${plan.task._id}_${minutes}_${Date.now()}`,
+          task_id: plan.task._id,
+          reminder_date: reminderTime.toISOString(),
+          priority: level
+        };
+
+        await this.notificationsService.scheduleNotification(notificationData);
+      }
+
+      this.toastService.showToast(
+        'Sesión programada con recordatorios',
+        'success'
+      );
+
+      // Recargar los datos
+      await this.loadData();
+    } catch (error) {
+      console.error('Error al programar sesión con recordatorios:', error);
+      this.toastService.showToast(
+        'Error al programar la sesión con recordatorios',
+        'error'
+      );
+    }
   }
 }

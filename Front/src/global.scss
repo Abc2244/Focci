@@ -58,7 +58,7 @@
 
   // Colores base - Tema claro
   --app-background-light: #f5f7fa;
-  --app-background-dark: #e0e0e0;
+  --app-background-dark: #ffffff;
   --app-card-color: #ffffff;
   --app-card-color-rgb: 255, 255, 255;
   --app-text-color: #333333;
@@ -140,6 +140,43 @@
   --glass-bg: rgba(255, 255, 255, 0.85);
   --glass-blur: blur(10px);
   --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+// Tema oscuro
+:root[data-theme="dark"] {
+  --app-background-light: #121212;
+  --app-background-dark: #1e1e1e;
+  --app-card-color: #2d2d2d;
+  --app-card-color-rgb: 45, 45, 45;
+  --app-text-color: #ffffff;
+  --app-text-color-medium: #b0b0b0;
+  --app-text-color-light: #808080;
+  --app-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --app-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.3);
+  --app-shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.4);
+
+  ion-content {
+    --background: var(--app-background-light);
+  }
+
+  ion-item {
+    --background: var(--app-card-color);
+    --color: var(--app-text-color);
+  }
+
+  .login-content,
+  .register-content {
+    --background: var(--app-background-light);
+
+    .login-card,
+    .register-card {
+      background: var(--app-card-color);
+    }
+
+    .custom-input {
+      background: var(--app-background-dark);
+    }
+  }
 }
 
 // Estilos base

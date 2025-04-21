@@ -521,28 +521,77 @@
         }
 
         .available-slots {
-          background-color: rgba(var(--ion-color-tertiary-rgb), 0.1);
-          border-radius: 10px;
-          padding: 12px;
-          margin-bottom: 16px;
+          margin-top: 1rem;
+          padding: 1rem;
+          background: rgba(var(--ion-color-primary-rgb), 0.05);
+          border-radius: 12px;
 
           h4 {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--ion-color-tertiary);
-            margin-top: 0;
-            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--ion-color-primary);
+            margin: 0 0 1rem;
+            font-size: 1rem;
+
+            ion-icon {
+              font-size: 1.2rem;
+            }
           }
 
-          ion-chip {
-            --background: rgba(var(--ion-color-tertiary-rgb), 0.2);
-            --color: var(--ion-color-tertiary-shade);
-            margin-bottom: 8px;
-            font-weight: 500;
+          .slots-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
 
-            &.selected {
-              --background: var(--ion-color-tertiary);
-              --color: white;
+            ion-chip {
+              --background: var(--app-card-color);
+              --color: var(--app-text-color);
+              border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
+              transition: all 0.2s ease;
+              cursor: pointer;
+
+              &.selected {
+                --background: rgba(var(--ion-color-primary-rgb), 0.1);
+                --color: var(--ion-color-primary);
+                border-color: var(--ion-color-primary);
+              }
+
+              &.has-reminder {
+                --background: rgba(var(--ion-color-warning-rgb), 0.1);
+                border-color: var(--ion-color-warning);
+
+                .reminder-icon {
+                  color: var(--ion-color-warning);
+                }
+              }
+
+              ion-label {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+
+                .duration {
+                  font-size: 0.8rem;
+                  opacity: 0.7;
+                }
+              }
+
+              &:hover {
+                --background: rgba(var(--ion-color-primary-rgb), 0.15);
+                transform: translateY(-1px);
+              }
+            }
+          }
+
+          .slot-actions {
+            margin-top: 1rem;
+
+            ion-button {
+              margin: 0;
+              --border-radius: 8px;
+              height: 40px;
             }
           }
         }
@@ -833,6 +882,70 @@
     .insistence-badge {
       background-color: rgba(var(--ion-color-tertiary-rgb), 0.1);
       color: var(--ion-color-tertiary);
+    }
+  }
+}
+
+// Estilos para el modal de confirmación
+.confirmation-modal {
+  --height: auto;
+  --width: 90%;
+  --max-width: 400px;
+  --border-radius: 16px;
+
+  ion-content {
+    --padding-top: 1rem;
+    --padding-bottom: 1rem;
+    --padding-start: 1rem;
+    --padding-end: 1rem;
+  }
+
+  .modal-content {
+    text-align: center;
+
+    ion-icon {
+      font-size: 3rem;
+      color: var(--ion-color-primary);
+      margin-bottom: 1rem;
+    }
+
+    h2 {
+      color: var(--ion-color-primary);
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: var(--app-text-color-medium);
+      margin-bottom: 1.5rem;
+    }
+
+    .reminder-options {
+      margin: 1rem 0;
+      text-align: left;
+
+      ion-item {
+        --padding-start: 0;
+        --inner-padding-end: 0;
+        --background: transparent;
+
+        ion-label {
+          color: var(--app-text-color);
+        }
+      }
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+
+      ion-button {
+        flex: 1;
+        margin: 0;
+        height: 40px;
+        --border-radius: 8px;
+      }
     }
   }
 }
