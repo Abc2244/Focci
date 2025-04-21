@@ -8,6 +8,9 @@ export type ToastType = 'success' | 'error' | 'warning' | 'info';
   providedIn: 'root',
 })
 export class ToastService {
+  private activeToasts: Map<string, HTMLIonToastElement> = new Map();
+  private toastDebounceTime = 3000; // 3 segundos
+
   constructor(
     private toastController: ToastController,
     private themeService: ThemeService
@@ -24,6 +27,14 @@ export class ToastService {
     type: ToastType = 'info',
     duration: number = 3000
   ) {
+    // Crear una clave única para el mensaje y tipo
+    const toastKey = `${type}-${message}`;
+
+    // Si ya existe un toast activo con el mismo mensaje y tipo, no mostrar otro
+    if (this.activeToasts.has(toastKey)) {
+      return;
+    }
+
     const isDark = this.themeService.isDarkMode();
     
     const toastConfig = {
@@ -51,7 +62,34 @@ export class ToastService {
       ]
     });
 
+    // Guardar referencia al toast activo
+    this.activeToasts.set(toastKey, toast);
+
+    // Eliminar la referencia cuando el toast se cierre
+    toast.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.activeToasts.delete(toastKey);
+      }, this.toastDebounceTime);
+    });
+
     await toast.present();
     return toast;
+  }
+
+  /**
+   * Muestra un mensaje de error de carga genérico
+   * @param entity Nombre de la entidad que falló al cargar
+   */
+  async showLoadError(entity: string) {
+    const message = `No se pudieron cargar ${entity.toLowerCase()}. Por favor, intenta más tarde.`;
+    await this.showToast(message, 'error');
+  }
+
+  /**
+   * Muestra un mensaje de error de conexión
+   */
+  async showConnectionError() {
+    const message = 'Error de conexión. Verifica tu conexión a internet.';
+    await this.showToast(message, 'error');
   }
 }

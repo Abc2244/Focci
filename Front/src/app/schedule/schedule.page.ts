@@ -63,7 +63,7 @@ export class SchedulePage implements OnInit {
   currentDate = new Date();
   daysOfWeek: DayHeader[] = [];
   currentWeekLabel: string = '';
-  currentView = 'schedule'; // 'calendar', 'schedule', 'week'
+  currentView = 'calendar'; // Cambiado de 'schedule' a 'calendar'
   timeSlots = Array.from({ length: 17 }, (_, i) => i + 7); // 7am to 11pm
 
   constructor(
@@ -82,6 +82,7 @@ export class SchedulePage implements OnInit {
   ionViewWillEnter() {
     this.loadData();
     this.presentingElement = document.querySelector('.ion-page');
+    this.currentView = 'calendar'; // Asegurar que la vista sea calendar al entrar
   }
 
   ionViewDidEnter() {

@@ -768,3 +768,29 @@ ion-fab {
     }
   }
 }
+
+.reminder-item {
+  &.auto-completed {
+    opacity: 0.7;
+    background-color: var(--ion-color-light);
+    
+    .reminder-title {
+      text-decoration: line-through;
+      color: var(--ion-color-medium);
+    }
+    
+    .reminder-date {
+      color: var(--ion-color-medium);
+      font-style: italic;
+    }
+    
+    .reminder-actions {
+      .action-button {
+        &.edit-button,
+        &.delete-button {
+          --color: var(--ion-color-medium);
+        }
+      }
+    }
+  }
+}

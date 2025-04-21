@@ -9,6 +9,23 @@
       <p class="title-subtitle">Gestiona tus materias y horarios académicos.</p>
     </div>
     
+    <!-- Estado de carga -->
+    <div *ngIf="isLoading" class="ion-text-center ion-padding">
+      <ion-spinner></ion-spinner>
+      <p>Cargando materias...</p>
+    </div>
+
+    <!-- Estado vacío -->
+    <div *ngIf="!isLoading && subjects.length === 0" class="ion-text-center ion-padding empty-state">
+      <ion-icon name="school-outline" size="large"></ion-icon>
+      <h3>¡Comienza tu semestre!</h3>
+      <p>Aún no tienes materias registradas. Añade tu primera materia para comenzar a organizar tus estudios.</p>
+      <ion-button (click)="openAddSubjectModal()" class="empty-state-button">
+        <ion-icon slot="start" name="add-outline"></ion-icon>
+        Añadir primera materia
+      </ion-button>
+    </div>
+
     <div class="subject-list" *ngIf="subjects.length > 0">
       <ion-card class="subject-card" *ngFor="let subject of subjects">
         <div class="subject-card-top-decoration"></div>
@@ -73,17 +90,6 @@
       </ion-card>
     </div>
     
-    <!-- Estado vacío mejorado -->
-    <div class="empty-state" *ngIf="subjects.length === 0">
-      <ion-icon name="book-outline"></ion-icon>
-      <h2>No hay materias registradas</h2>
-      <p>Comienza añadiendo tu primera materia para organizar tu horario académico.</p>
-      <ion-button expand="block" class="empty-state-button" (click)="openAddSubjectModal()">
-        <ion-icon name="add-outline" slot="start"></ion-icon>
-        Añadir materia
-      </ion-button>
-    </div>
-
     <!-- Botón flotante mejorado -->
     <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="fab-fixed">
       <ion-fab-button class="custom-fab" (click)="openAddSubjectModal()">

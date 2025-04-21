@@ -102,17 +102,17 @@
   <!-- Floating Action Button -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="fab-controls">
     <ion-fab-button class="shimmer-button main-fab">
-      <ion-icon name="apps"></ion-icon>
+      <ion-icon name="calendar"></ion-icon>
     </ion-fab-button>
     <ion-fab-list side="top">
       <ion-fab-button class="shimmer-button" (click)="changeView('calendar')" [ngClass]="{'active': currentView === 'calendar'}">
         <ion-icon name="calendar"></ion-icon>
       </ion-fab-button>
-      <ion-fab-button class="shimmer-button" (click)="changeView('schedule')" [ngClass]="{'active': currentView === 'schedule'}">
-        <ion-icon name="time"></ion-icon>
-      </ion-fab-button>
       <ion-fab-button class="shimmer-button" (click)="changeView('week')" [ngClass]="{'active': currentView === 'week'}">
         <ion-icon name="grid"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button class="shimmer-button" (click)="changeView('schedule')" [ngClass]="{'active': currentView === 'schedule'}">
+        <ion-icon name="time"></ion-icon>
       </ion-fab-button>
     </ion-fab-list>
   </ion-fab>

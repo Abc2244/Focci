@@ -19,7 +19,10 @@
     <!-- Lista de Recordatorios -->
     <div class="reminder-list" *ngIf="!isLoading && reminders.length > 0">
       <!-- Recordatorios Pendientes -->
-      <ion-card class="reminder-card" *ngFor="let reminder of pendingReminders">
+      <ion-card 
+        class="reminder-card" 
+        [ngClass]="{'auto-completed': reminder.auto_completed || isReminderExpired(reminder.reminder_date)}"
+        *ngFor="let reminder of pendingReminders">
         <div class="reminder-card-top-decoration"></div>
         <ion-card-header>
           <div class="card-header-content">
@@ -27,14 +30,9 @@
               <ion-icon name="alarm-outline" class="reminder-icon"></ion-icon>
             </div>
             <div class="card-title-container">
-              <ion-card-title
-                >{{ getTaskName(reminder.task_id) }}</ion-card-title
-              >
+              <ion-card-title>{{ getTaskName(reminder.task_id) }}</ion-card-title>
               <ion-card-subtitle class="date-badge">
-                <ion-icon
-                  name="calendar-outline"
-                  class="subtitle-icon"
-                ></ion-icon>
+                <ion-icon name="calendar-outline" class="subtitle-icon"></ion-icon>
                 {{ reminder.reminder_date | date:'MMM d, y, h:mm a' }}
               </ion-card-subtitle>
             </div>
@@ -42,66 +40,45 @@
         </ion-card-header>
 
         <ion-card-content>
-          <!-- Mensaje del recordatorio -->
-          <div
-            class="reminder-message"
-            *ngIf="reminder.message && reminder.message.trim() !== ''"
-          >
+          <div class="reminder-message" *ngIf="reminder.message && reminder.message.trim() !== ''">
             <p>{{ reminder.message }}</p>
           </div>
 
-          <!-- Chips de información -->
           <div class="reminder-info">
-            <ion-chip
-              class="priority-chip"
-              [ngClass]="'priority-' + reminder.priority"
-            >
+            <ion-chip class="priority-chip" [ngClass]="'priority-' + reminder.priority">
               <ion-icon name="flag-outline" class="chip-icon"></ion-icon>
-              <span class="chip-text"
-                >{{ getPriorityText(reminder.priority) }}</span
-              >
+              <span class="chip-text">{{ getPriorityText(reminder.priority) }}</span>
             </ion-chip>
-            <ion-chip
-              class="status-chip"
-              [ngClass]="'status-' + reminder.status"
-            >
+            <ion-chip class="status-chip" [ngClass]="'status-' + reminder.status">
               <ion-icon name="hourglass-outline" class="chip-icon"></ion-icon>
               <span class="chip-text">{{ reminder.status | titlecase }}</span>
             </ion-chip>
-            <ion-chip
-              class="insistence-chip"
-              [ngClass]="getInsistenceClass(reminder.insistence_level)"
-            >
+            <ion-chip class="insistence-chip" [ngClass]="getInsistenceClass(reminder.insistence_level)">
               <ion-icon name="repeat-outline" class="chip-icon"></ion-icon>
-              <span class="chip-text"
-                >{{ getInsistenceText(reminder.insistence_level) }}</span
-              >
+              <span class="chip-text">{{ getInsistenceText(reminder.insistence_level) }}</span>
             </ion-chip>
           </div>
 
-          <!-- Acciones -->
           <div class="reminder-actions">
             <ion-button
               fill="clear"
               (click)="completeReminder(reminder._id)"
               class="action-button complete-button"
-            >
+              *ngIf="shouldShowCompleteButton(reminder)">
               <ion-icon name="checkmark-circle-outline"></ion-icon>
               Completar
             </ion-button>
             <ion-button
               fill="clear"
               (click)="editReminder(reminder)"
-              class="action-button edit-button"
-            >
+              class="action-button edit-button">
               <ion-icon name="create-outline"></ion-icon>
               Editar
             </ion-button>
             <ion-button
               fill="clear"
               (click)="deleteReminder(reminder._id)"
-              class="action-button delete-button"
-            >
+              class="action-button delete-button">
               <ion-icon name="trash-outline"></ion-icon>
               Eliminar
             </ion-button>
@@ -117,28 +94,17 @@
       </div>
 
       <!-- Lista de Completados -->
-      <ion-card
-        class="reminder-card completed"
-        *ngFor="let reminder of completedReminders"
-      >
+      <ion-card class="reminder-card completed" *ngFor="let reminder of completedReminders">
         <div class="reminder-card-top-decoration"></div>
         <ion-card-header>
           <div class="card-header-content">
             <div class="reminder-icon-container">
-              <ion-icon
-                name="checkmark-circle"
-                class="reminder-icon completed-icon"
-              ></ion-icon>
+              <ion-icon name="checkmark-circle" class="reminder-icon completed-icon"></ion-icon>
             </div>
             <div class="card-title-container">
-              <ion-card-title
-                >{{ getTaskName(reminder.task_id) }}</ion-card-title
-              >
+              <ion-card-title>{{ getTaskName(reminder.task_id) }}</ion-card-title>
               <ion-card-subtitle class="date-badge">
-                <ion-icon
-                  name="calendar-outline"
-                  class="subtitle-icon"
-                ></ion-icon>
+                <ion-icon name="calendar-outline" class="subtitle-icon"></ion-icon>
                 {{ reminder.completed_date | date:'MMM d, y, h:mm a' }}
               </ion-card-subtitle>
             </div>
@@ -146,20 +112,14 @@
         </ion-card-header>
 
         <ion-card-content>
-          <div
-            class="reminder-message"
-            *ngIf="reminder.message && reminder.message.trim() !== ''"
-          >
+          <div class="reminder-message" *ngIf="reminder.message && reminder.message.trim() !== ''">
             <p>{{ reminder.message }}</p>
           </div>
 
           <div class="reminder-info">
             <ion-chip color="success">
               <ion-icon name="checkmark-done-outline"></ion-icon>
-              <span
-                >Completado: {{ reminder.completed_date | date:'MMM d, y, h:mm
-                a' }}</span
-              >
+              <span>Completado: {{ reminder.completed_date | date:'MMM d, y, h:mm a' }}</span>
             </ion-chip>
           </div>
 
@@ -167,8 +127,7 @@
             <ion-button
               fill="clear"
               (click)="reactivateReminder(reminder._id)"
-              class="action-button reactivate-button"
-            >
+              class="action-button reactivate-button">
               <ion-icon name="refresh-outline"></ion-icon>
               Reactivar
             </ion-button>
@@ -182,11 +141,7 @@
       <ion-icon name="notifications-off-outline" class="empty-icon"></ion-icon>
       <h2>No hay recordatorios</h2>
       <p>Aún no has creado ningún recordatorio. ¡Comienza creando uno nuevo!</p>
-      <ion-button
-        expand="block"
-        (click)="openAddReminderModal()"
-        class="empty-state-button"
-      >
+      <ion-button expand="block" (click)="openAddReminderModal()" class="empty-state-button">
         <ion-icon name="add-outline" slot="start"></ion-icon>
         Crear recordatorio
       </ion-button>
@@ -194,17 +149,11 @@
   </div>
 
   <!-- Botón flotante -->
-  <ion-fab
-    vertical="bottom"
-    horizontal="end"
-    slot="fixed"
-    *ngIf="reminders.length > 0"
-    class="fab-fixed"
-  >
-    <ion-fab-button class="custom-fab" (click)="openAddReminderModal()">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="reminders.length > 0" class="fab-fixed">
+  <ion-fab-button class="custom-fab" (click)="openAddReminderModal()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
 </ion-content>
 
 <!-- Modal para agregar/editar recordatorio -->

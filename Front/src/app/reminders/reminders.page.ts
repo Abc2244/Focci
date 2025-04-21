@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
@@ -12,7 +12,7 @@ import { LocalNotifications } from '@capacitor/local-notifications';
   templateUrl: './reminders.page.html',
   styleUrls: ['./reminders.page.scss'],
 })
-export class RemindersPage implements OnInit {
+export class RemindersPage implements OnInit, OnDestroy {
   @ViewChild(IonModal) modal!: IonModal;
   presentingElement: HTMLElement | null = null;
 
@@ -27,6 +27,8 @@ export class RemindersPage implements OnInit {
   reminderForm: FormGroup = this.initForm();
   currentReminderId: string | null = null;
   minDate: string = new Date().toISOString();
+  currentDate = new Date();
+  private dateUpdateInterval: any;
 
   constructor(
     private apiService: ApiService,
@@ -44,6 +46,17 @@ export class RemindersPage implements OnInit {
     this.requestNotificationPermissions();
     this.scheduleAllPendingReminders();
     this.presentingElement = document.querySelector('.ion-page');
+    this.dateUpdateInterval = setInterval(() => {
+      this.currentDate = new Date();
+    }, 60000); // Actualizar cada minuto
+  }
+
+  ngOnDestroy() {
+    if (this.dateUpdateInterval) {
+      clearInterval(this.dateUpdateInterval);
+    }
+    this.loadReminders();
+    this.loadTasks();
   }
 
   ionViewWillEnter() {
@@ -110,13 +123,29 @@ export class RemindersPage implements OnInit {
 
   filterReminders(): void {
     console.log('Filtering reminders. Total:', this.reminders.length);
+    
+    // Verificar y actualizar recordatorios vencidos
+    const now = new Date();
+    this.reminders.forEach(async (reminder) => {
+      const reminderDate = new Date(reminder.reminder_date);
+      if (reminder.status === 'pendiente' && reminderDate < now) {
+        // Actualizar el estado a completado automáticamente
+        await this.updateReminderStatus(reminder._id, 'completado', true);
+      }
+    });
+
+    // Filtrar recordatorios después de la actualización
     this.pendingReminders = this.reminders.filter(
-      (reminder) => reminder.status === 'pendiente'
+      (reminder) => {
+        const reminderDate = new Date(reminder.reminder_date);
+        return reminder.status === 'pendiente' && reminderDate >= now;
+      }
     );
-    console.log('Pending reminders:', this.pendingReminders.length);
+    
     this.completedReminders = this.reminders.filter(
       (reminder) => reminder.status === 'completado'
     );
+    
     this.canceledReminders = this.reminders.filter(
       (reminder) => reminder.status === 'cancelado'
     );
@@ -220,29 +249,35 @@ export class RemindersPage implements OnInit {
   }
 
   // Método para actualizar el estado de un recordatorio
-  updateReminderStatus(reminderId: string, newStatus: string): void {
-    // Crear objeto con los datos a actualizar
+  updateReminderStatus(reminderId: string, newStatus: string, isAutoComplete: boolean = false): void {
     const updateData = {
       status: newStatus,
-      completed_date:
-        newStatus === 'completado' ? new Date().toISOString() : null,
+      completed_date: newStatus === 'completado' ? new Date().toISOString() : null,
+      auto_completed: isAutoComplete // Nuevo campo para indicar si fue autocompletado
     };
 
     this.apiService.updateReminder(reminderId, updateData).subscribe(
       async (response: any) => {
-        this.toastService.showToast(
-          `Recordatorio ${
-            newStatus === 'completado' ? 'completado' : 'reactivado'
-          }`,
-          'success'
-        );
-        this.loadReminders();
+        if (!isAutoComplete) {
+          // Solo mostrar el toast si no es autocompletado
+          this.toastService.showToast(
+            `Recordatorio ${newStatus === 'completado' ? 'completado' : 'reactivado'}`,
+            'success'
+          );
+        }
+        
+        // Actualizar la lista de recordatorios
+        const reminderIndex = this.reminders.findIndex(r => r._id === reminderId);
+        if (reminderIndex !== -1) {
+          this.reminders[reminderIndex] = { ...this.reminders[reminderIndex], ...updateData };
+          this.filterReminders();
+        }
 
-        // Si se completa, cancelar la notificación
+        // Cancelar la notificación si se completa
         if (newStatus === 'completado') {
           await this.notificationsService.cancelNotification(reminderId);
         }
-        // Si se reactiva, programar la notificación
+        // Programar la notificación si se reactiva
         else if (newStatus === 'pendiente') {
           const reminder = this.reminders.find((r) => r._id === reminderId);
           if (reminder) {
@@ -252,10 +287,9 @@ export class RemindersPage implements OnInit {
       },
       (error: any) => {
         console.error('Error updating reminder status:', error);
-        this.toastService.showToast(
-          'Error al actualizar el recordatorio',
-          'error'
-        );
+        if (!isAutoComplete) {
+          this.toastService.showToast('Error al actualizar el recordatorio', 'error');
+        }
       }
     );
   }
@@ -420,5 +454,13 @@ export class RemindersPage implements OnInit {
     });
     this.currentReminderId = null;
     this.isEditing = false;
+  }
+
+  isReminderExpired(reminderDate: string): boolean {
+    return new Date(reminderDate) < this.currentDate;
+  }
+
+  shouldShowCompleteButton(reminder: any): boolean {
+    return !reminder.auto_completed && new Date(reminder.reminder_date) >= this.currentDate;
   }
 }

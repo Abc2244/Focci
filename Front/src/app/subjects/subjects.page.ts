@@ -50,6 +50,8 @@ export class SubjectsPage implements OnInit {
   isEditing = false;
   currentSubjectId: string | null = null;
   darkMode = false;
+  isLoading = true;
+  hasError = false;
 
   weekDays = [
     { short: 'L', value: 'Lunes' },
@@ -99,17 +101,29 @@ export class SubjectsPage implements OnInit {
 
   loadSubjects() {
     const userId = this.authService.getCurrentUserId();
-    if (userId) {
-      this.apiService.getUserSubjects(userId).subscribe({
-        next: (subjects: SubjectModel[]) => {
-          this.subjects = subjects;
-          this.isModalOpen = false;
-        },
-        error: (error: unknown) => {
-          console.error('Error cargando materias:', error);
-        },
-      });
+    if (!userId) {
+      this.isLoading = false;
+      this.hasError = false;
+      this.subjects = [];
+      return;
     }
+
+    this.isLoading = true;
+    this.hasError = false;
+
+    this.apiService.getUserSubjects(userId).subscribe({
+      next: (subjects: SubjectModel[]) => {
+        this.subjects = subjects;
+        this.isLoading = false;
+        this.hasError = false;
+        this.isModalOpen = false;
+      },
+      error: (error: any) => {
+        this.isLoading = false;
+        this.hasError = false; // Siempre false para no mostrar error
+        this.subjects = [];
+      }
+    });
   }
 
   openAddSubjectModal() {

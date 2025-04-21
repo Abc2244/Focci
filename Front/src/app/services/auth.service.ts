@@ -12,25 +12,10 @@ export class AuthService {
   private apiUrl = environment.apiUrl;
   private tokenKey = 'auth_token';
 
-  // Agregamos las credenciales de prueba
-  private testUser = {
-    email: 'abc@gmail.com',
-    password: '1234',
-  };
-
   constructor(
     private http: HttpClient,
     private notificationsService: NotificationsService
-  ) {
-    // Verificamos si hay credenciales guardadas al iniciar
-    this.checkAndLoginTestUser();
-  }
-
-  private async checkAndLoginTestUser() {
-    if (!this.isAuthenticated()) {
-      await this.login(this.testUser.email, this.testUser.password);
-    }
-  }
+  ) {}
 
   async login(email: string, password: string): Promise<boolean> {
     try {
@@ -85,7 +70,13 @@ export class AuthService {
     try {
       // Limpiar todas las notificaciones programadas antes de cerrar sesión
       await this.notificationsService.resetAllNotifications();
+      // Limpiar el token
       localStorage.removeItem(this.tokenKey);
+      // Limpiar cualquier otra información de usuario almacenada
+      localStorage.removeItem('userSettings');
+      localStorage.removeItem('custom-primary-color');
+      // Forzar recarga de la aplicación para limpiar el estado
+      window.location.href = '/login';
     } catch (error) {
       console.error('Error durante el logout:', error);
     }
@@ -96,7 +87,7 @@ export class AuthService {
     if (token) {
       try {
         const decoded: any = jwtDecode(token);
-        console.log('Decoded Token:', decoded); // Debugging log
+        console.log('Decoded Token:', decoded);
         return decoded.user_id;
       } catch (error) {
         console.error('Error decoding token:', error);

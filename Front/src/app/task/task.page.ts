@@ -27,6 +27,8 @@ export class TaskPage implements OnInit {
   minDate: string;
   hourValues: number[] = Array.from({ length: 24 }, (_, i) => i);
   minuteValues: number[] = [0, 15, 30, 45];
+  isLoading = false;
+  hasError = false;
 
   get incompleteTasks() {
     return this.tasks
@@ -92,8 +94,8 @@ export class TaskPage implements OnInit {
           });
         },
         error: (error) => {
-          this.toastService.showToast('Error al cargar las materias', 'error');
-          console.error('Error al cargar las materias:', error);
+          this.subjects = [];
+          this.subjectMap.clear();
         },
       });
     }
@@ -102,15 +104,30 @@ export class TaskPage implements OnInit {
   loadTasks() {
     const userId = this.authService.getCurrentUserId();
     if (userId) {
+      this.isLoading = true;
       this.apiService.getUserTasks(userId).subscribe({
         next: (tasks) => {
           this.tasks = tasks;
+          this.isLoading = false;
+          this.hasError = false;
         },
         error: (error) => {
-          this.toastService.showToast('Error al cargar las tareas', 'error');
           console.error('Error al cargar las tareas:', error);
+          this.isLoading = false;
+          // Solo mostrar error si no es 404 (no hay tareas)
+          if (error.status !== 404) {
+            this.hasError = true;
+            this.toastService.showToast('Error al cargar las tareas', 'error');
+          } else {
+            this.hasError = false;
+          }
+          this.tasks = [];
         },
       });
+    } else {
+      this.tasks = [];
+      this.isLoading = false;
+      this.hasError = false;
     }
   }
 
