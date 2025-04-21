@@ -1,74 +1,124 @@
 @import "src/app/shared/styles/common";
 .login-content {
-  @extend .page-content;
+  --background: var(--app-background-light);
+  
+  &::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(var(--ion-color-primary-rgb), 0.05)" stroke-width="2"/></svg>');
+    background-size: 300px 300px;
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: -1;
+  }
 
   .login-container {
-    @include flex-center;
-    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
     padding: 2rem;
   }
 
+  .login-card {
+    background: var(--app-card-color);
+    border-radius: var(--app-border-radius-lg);
+    box-shadow: var(--app-shadow-lg);
+    padding: 2rem;
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
+  }
+
   .logo-container {
-    margin-top: 2rem;
     text-align: center;
+    margin-bottom: 2rem;
 
     .logo {
-      width: 180px;
-      height: 180px;
+      width: 120px;
+      height: 120px;
       margin-bottom: 1rem;
     }
 
     h1 {
       color: var(--ion-color-primary);
       font-size: 2rem;
-      margin-bottom: 2rem;
+      margin-bottom: 0.5rem;
       font-weight: 600;
+    }
+
+    .subtitle {
+      color: var(--app-text-color-medium);
+      font-size: 1rem;
+      margin: 0;
     }
   }
 
   .form-container {
-    width: 100%;
-    max-width: 400px;
-  }
+    .custom-input {
+      --background: transparent;
+      --border-color: transparent;
+      background: var(--app-background-light);
+      border-radius: var(--app-border-radius-md);
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      box-shadow: var(--app-shadow-sm);
 
-  .custom-input {
-    --background: transparent;
-    --border-color: transparent;
-    background: rgba(255, 255, 255, 0.7);
-    border-radius: 10px;
-    margin-bottom: 1rem;
-    padding: 0.3rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    --highlight-color: var(--ion-color-primary);
-    
+      ion-label {
+        color: var(--ion-color-primary);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
 
-    ion-label {
-      color: var(--ion-color-primary);
-      font-weight: 500;
-      margin-bottom: 0.5rem;
-    }
+        ion-icon {
+          font-size: 1.2rem;
+          color: var(--ion-color-primary);
+        }
+      }
 
-    ion-input {
-      --color: var(--app-text-color);
-      --padding-start: 1rem;
-      --placeholder-color: var(--app-color-medium);
-      --placeholder-opacity: 0.7;
+      ion-input {
+        --color: var(--app-text-color);
+        --padding-start: 1rem;
+        --placeholder-color: var(--app-text-color-light);
+        --placeholder-opacity: 0.7;
+        font-size: 1rem;
+      }
+
+      &.item-has-focus {
+        background: rgba(var(--ion-color-primary-rgb), 0.05);
+      }
     }
   }
 
   .login-button {
-    @extend .custom-button;
-    margin-top: 2rem;
+    --background: var(--ion-color-primary);
+    --background-hover: var(--ion-color-primary-tint);
+    --color: white;
+    margin: 2rem 0 1rem;
+    height: 48px;
     font-size: 1.1rem;
+    font-weight: 500;
+    --border-radius: var(--app-border-radius-md);
+    
+    ion-icon {
+      font-size: 1.2rem;
+      margin-right: 0.5rem;
+    }
   }
 
   .register-link {
-    margin-top: 2rem;
     text-align: center;
+    margin-top: 1.5rem;
 
     p {
-      color: var(--ion-color-primary);
+      color: var(--app-text-color-medium);
       margin-bottom: 0.5rem;
+      font-size: 0.9rem;
     }
 
     .register-button {
@@ -76,18 +126,17 @@
       font-weight: 500;
       text-transform: none;
       font-size: 1rem;
+      
+      ion-icon {
+        margin-left: 0.5rem;
+      }
     }
   }
 }
 
-// Estilos para los items de ion-input cuando están enfocados
-ion-item.item-has-focus {
-  --highlight-background: var(--ion-color-primary-tint);
-}
-
-// Animación suave para los botones
+// Animaciones
 ion-button {
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease;
 
   &:active {
     transform: scale(0.98);
