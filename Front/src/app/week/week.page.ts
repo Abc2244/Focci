@@ -1,11 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
-import { Task, CreateTaskDTO } from '../interfaces/task.interface';
-import { Subject, ScheduleItem } from '../interfaces/subject.interface';
-import { IonModal } from '@ionic/angular';
+import { Task } from '../interfaces/task.interface';
+import { Subject } from '../interfaces/subject.interface';
 import { firstValueFrom } from 'rxjs';
 
 interface WeekDay {
@@ -26,25 +24,12 @@ interface EventItem {
   color: string;
 }
 
-type DayMap = {
-  Lunes: number;
-  Martes: number;
-  Miércoles: number;
-  Jueves: number;
-  Viernes: number;
-  Sábado: number;
-  Domingo: number;
-};
-
 @Component({
   selector: 'app-week',
   templateUrl: './week.page.html',
   styleUrls: ['./week.page.scss'],
 })
 export class WeekPage implements OnInit {
-  @ViewChild('taskModal') taskModal!: IonModal;
-  @ViewChild('subjectModal') subjectModal!: IonModal;
-
   selectedDay: number = 0;
   weekDays: WeekDay[] = [];
   userId: string = '';
@@ -57,51 +42,11 @@ export class WeekPage implements OnInit {
   filteredTasks: Task[] = [];
   subjects: Subject[] = [];
 
-  // Variables para modales
-  showTaskModalFlag = false;
-  showSubjectModalFlag = false;
-  isEditingTask = false;
-  isEditingSubject = false;
-  currentTaskId: string | null = null;
-  currentSubjectId: string | null = null;
-
-  // Formularios
-  taskForm: FormGroup;
-  subjectForm: FormGroup;
-
-  // Horarios para materias
-  selectedScheduleItems: ScheduleItem[] = [];
-  availableDays = [
-    { value: 'Lunes' },
-    { value: 'Martes' },
-    { value: 'Miércoles' },
-    { value: 'Jueves' },
-    { value: 'Viernes' },
-    { value: 'Sábado' },
-    { value: 'Domingo' },
-  ];
-
-  // Fecha mínima para tareas (hoy)
-  minDate: string = new Date().toISOString();
-
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
-    private toastService: ToastService,
-    private formBuilder: FormBuilder
-  ) {
-    // Inicializar formularios
-    this.taskForm = this.formBuilder.group({
-      description: ['', [Validators.required]],
-      subject_id: ['', [Validators.required]],
-      due_date: [this.minDate, [Validators.required]],
-    });
-
-    this.subjectForm = this.formBuilder.group({
-      name: ['', [Validators.required]],
-      credits: ['', [Validators.required, Validators.min(1)]],
-    });
-  }
+    private toastService: ToastService
+  ) {}
 
   ngOnInit() {
     this.setupWeekDays();
@@ -109,21 +54,18 @@ export class WeekPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    // Este método se llama cada vez que la página está a punto de ser mostrada
-    this.loadUserData(); // Recargar los datos del usuario
+    this.loadUserData();
   }
 
   setupWeekDays() {
     this.weekDays = [];
     const today = new Date();
-    const currentDay = today.getDay(); // 0 = Domingo, 1 = Lunes, ...
+    const currentDay = today.getDay();
 
-    // Crear array con los 7 días de la semana
     for (let i = 0; i < 7; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() - currentDay + i);
 
-      // Nombres de los días en español
       const dayNames = [
         'Domingo',
         'Lunes',
@@ -141,7 +83,6 @@ export class WeekPage implements OnInit {
       });
     }
 
-    // Seleccionar el día actual por defecto
     const todayIndex = this.weekDays.findIndex(
       (day) =>
         day.date.getDate() === today.getDate() &&
@@ -168,26 +109,21 @@ export class WeekPage implements OnInit {
     }
 
     try {
-      // Cargar materias primero
       const subjects = await firstValueFrom(
         this.apiService.getUserSubjects(userId)
       ).catch(() => []);
       this.subjects = subjects || [];
       this.generateEventsFromSubjects(this.subjects);
 
-      // Cargar todas las tareas
       const tasks = await firstValueFrom(
         this.apiService.getUserTasks(userId)
       ).catch(() => []);
       this.tasks = tasks || [];
       this.filterTasksForSelectedDay();
 
-      // Cargar recordatorios
       const reminders = await firstValueFrom(
         this.apiService.getUserReminders(userId)
       ).catch(() => []);
-      // Procesar recordatorios si es necesario
-      
     } catch (error) {
       console.warn('No se encontraron datos para mostrar');
     } finally {
@@ -198,7 +134,7 @@ export class WeekPage implements OnInit {
   selectDay(index: number) {
     this.selectedDay = index;
     this.filterTasksForSelectedDay();
-    this.generateEventsFromSubjects(this.subjects); // Regenerar eventos para el día seleccionado
+    this.generateEventsFromSubjects(this.subjects);
   }
 
   filterTasksForSelectedDay() {
@@ -222,20 +158,14 @@ export class WeekPage implements OnInit {
         color: this.getEventColor('task', index),
       }));
 
-    // Ordenar las tareas filtradas por la hora de entrega
     this.filteredTasks.sort((a, b) => {
       const timeA = new Date(a.due_date).getTime();
       const timeB = new Date(b.due_date).getTime();
       return timeA - timeB;
     });
-
-    // Debug para verificar el filtrado
-    console.log('Fecha seleccionada:', selectedDate);
-    console.log('Tareas filtradas:', this.filteredTasks);
   }
 
   generateEventsFromSubjects(subjects: Subject[]): void {
-    // Limpiar eventos existentes
     this.morningEvents = [];
     this.afternoonEvents = [];
 
@@ -273,15 +203,12 @@ export class WeekPage implements OnInit {
       }
     });
 
-    // Ordenar eventos por hora
     this.morningEvents.sort((a, b) =>
       this.compareTime(a.startTime, b.startTime)
     );
   }
 
   private getDayNumber(day: string): number {
-    // Mapeo correcto de días en español a números
-    // donde Lunes es 1, Martes es 2, etc.
     const dayMap: { [key: string]: number } = {
       Lunes: 1,
       Martes: 2,
@@ -298,7 +225,6 @@ export class WeekPage implements OnInit {
     if (!time) return '00:00';
 
     try {
-      // Si ya está en formato HH:mm, retornarlo
       if (time.includes(':')) {
         const [hours, minutes] = time.split(':');
         if (hours && minutes) {
@@ -306,7 +232,6 @@ export class WeekPage implements OnInit {
         }
       }
 
-      // Si es una fecha ISO, convertirla
       if (time.includes('T')) {
         const date = new Date(time);
         return date.toLocaleTimeString('es-ES', {
@@ -337,174 +262,13 @@ export class WeekPage implements OnInit {
       this.apiService.completeTask(taskId).subscribe({
         next: () => {
           this.toastService.showToast('Tarea completada', 'success');
-          this.loadUserData(); // Refrescar datos
+          this.loadUserData();
         },
         error: (error) => {
           console.error('Error al completar tarea:', error);
           this.toastService.showToast('Error al completar la tarea', 'error');
         },
       });
-    }
-  }
-
-  // Funciones para el modal de tareas
-  showTaskModal() {
-    this.isEditingTask = false;
-    this.currentTaskId = null;
-    this.taskForm.reset();
-    this.taskForm.patchValue({
-      due_date: this.minDate,
-    });
-    this.showTaskModalFlag = true;
-  }
-
-  dismissTaskModal() {
-    this.showTaskModalFlag = false;
-    this.taskForm.reset();
-    this.currentTaskId = null;
-  }
-
-  saveTask() {
-    if (this.taskForm.valid) {
-      const userId = this.authService.getCurrentUserId();
-      if (!userId) {
-        this.toastService.showToast(
-          'Error: No se encontró ID de usuario',
-          'error'
-        );
-        return;
-      }
-
-      const formData = this.taskForm.value;
-      const taskData = {
-        user_id: userId,
-        description: formData.description,
-        subject_id: formData.subject_id,
-        due_date: new Date(formData.due_date).toISOString(),
-        completed: false,
-      };
-
-      this.apiService.createTask(taskData).subscribe({
-        next: async () => {
-          this.toastService.showToast('Tarea creada con éxito', 'success');
-          this.dismissTaskModal();
-          await this.loadUserData();
-        },
-        error: (error) => {
-          console.error('Error al crear tarea:', error);
-          this.toastService.showToast(
-            'Error al crear la tarea. Por favor, intente nuevamente',
-            'error'
-          );
-        },
-      });
-    }
-  }
-
-  // Funciones para el modal de materias
-  showSubjectModal() {
-    this.isEditingSubject = false;
-    this.currentSubjectId = null;
-    this.subjectForm.reset();
-    this.selectedScheduleItems = [];
-    this.showSubjectModalFlag = true;
-  }
-
-  dismissSubjectModal() {
-    this.showSubjectModalFlag = false;
-    this.subjectForm.reset();
-    this.selectedScheduleItems = [];
-    this.currentSubjectId = null;
-  }
-
-  addScheduleItem() {
-    this.selectedScheduleItems.push({
-      day: 'Lunes',
-      startTime: '08:00',
-      endTime: '09:00',
-    });
-  }
-
-  removeScheduleItem(index: number) {
-    this.selectedScheduleItems.splice(index, 1);
-  }
-
-  updateScheduleDay(index: number, day: string) {
-    if (index >= 0 && index < this.selectedScheduleItems.length) {
-      this.selectedScheduleItems[index].day = day;
-      // Ordenar los horarios después de cambiar un día
-      this.selectedScheduleItems = this.sortScheduleByDay(
-        this.selectedScheduleItems
-      );
-    }
-  }
-
-  updateScheduleTime(
-    index: number,
-    value: string | string[] | null,
-    field: 'startTime' | 'endTime'
-  ) {
-    if (value && typeof value === 'string') {
-      this.selectedScheduleItems[index][field] = value;
-    }
-  }
-
-  sortScheduleByDay(scheduleItems: ScheduleItem[]): ScheduleItem[] {
-    const dayOrder: { [key: string]: number } = {
-      Lunes: 0,
-      Martes: 1,
-      Miércoles: 2,
-      Jueves: 3,
-      Viernes: 4,
-      Sábado: 5,
-      Domingo: 6,
-    };
-
-    return [...scheduleItems].sort((a, b) => {
-      // First sort by day
-      const dayDiff = dayOrder[a.day] - dayOrder[b.day];
-      if (dayDiff !== 0) return dayDiff;
-
-      // If same day, sort by startTime
-      return a.startTime.localeCompare(b.startTime);
-    });
-  }
-
-  saveSubject() {
-    if (this.subjectForm.valid) {
-      const userId = this.authService.getCurrentUserId();
-      if (!userId) {
-        this.toastService.showToast(
-          'Error: No se encontró ID de usuario',
-          'error'
-        );
-        return;
-      }
-
-      const formData = this.subjectForm.value;
-      const subjectData = {
-        user_id: userId,
-        name: formData.name,
-        credits: parseInt(formData.credits || '0'),
-        schedule: this.selectedScheduleItems,
-      };
-
-      this.apiService.createSubject(subjectData).subscribe({
-        next: async (response) => {
-          this.toastService.showToast('Materia creada con éxito', 'success');
-          this.dismissSubjectModal();
-          await this.loadUserData(); // Recargar todos los datos
-        },
-        error: (error) => {
-          console.error('Error al crear materia:', error);
-          this.toastService.showToast('Error al crear la materia', 'error');
-        },
-      });
-    } else {
-      this.toastService.showToast(
-        'Por favor complete todos los campos requeridos',
-        'warning'
-      );
     }
   }
 
@@ -520,7 +284,6 @@ export class WeekPage implements OnInit {
           hour12: true,
         });
       }
-      // Si ya está en formato HH:mm, retornarlo formateado
       const [hours, minutes] = timeString.split(':');
       const date = new Date();
       date.setHours(parseInt(hours), parseInt(minutes));
@@ -545,14 +308,6 @@ export class WeekPage implements OnInit {
     const [h2, m2] = time2.split(':').map(Number);
     if (h1 !== h2) return h1 - h2;
     return m1 - m2;
-  }
-
-  private isSameDay(date1: Date, date2: Date): boolean {
-    return (
-      date1.getFullYear() === date2.getFullYear() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getDate() === date2.getDate()
-    );
   }
 
   private getEventColor(type: string, index: number = 0): string {

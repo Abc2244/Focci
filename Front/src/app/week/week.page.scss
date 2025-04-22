@@ -178,10 +178,6 @@
             font-weight: 600;
             color: var(--ion-color-primary);
           }
-
-          ion-button {
-            --color: var(--ion-color-primary);
-          }
         }
 
         &.tasks-section {
@@ -376,127 +372,6 @@
         color: var(--app-text-color);
         font-size: 16px;
         font-weight: 500;
-      }
-    }
-  }
-
-  ion-modal {
-    --background: var(--app-background-light);
-
-    ion-header ion-toolbar {
-      --background: var(--app-card-color);
-      --color: var(--app-text-color);
-
-      ion-title {
-        color: var(--app-text-color);
-        font-weight: 600;
-      }
-
-      ion-button {
-        --color: var(--ion-color-primary);
-      }
-    }
-
-    ion-content {
-      --background: var(--app-background-light);
-
-      form {
-        .form-container {
-          padding: 20px;
-
-          .input-group {
-            background: var(--app-card-color);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: var(--app-shadow-sm);
-
-            .custom-input {
-              --background: transparent;
-              --border-color: rgba(var(--ion-color-primary-rgb), 0.3);
-              --highlight-color-focused: var(--ion-color-primary);
-              margin-bottom: 15px;
-
-              ion-label,
-              ion-select,
-              ion-datetime,
-              ion-input {
-                --color: var(--app-text-color) !important;
-                color: var(--app-text-color) !important;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  ion-select::part(text),
-  ion-select::part(placeholder),
-  ion-datetime::part(text),
-  ion-datetime::part(placeholder) {
-    color: var(--app-text-color) !important;
-  }
-
-  ion-select-option {
-    color: var(--app-text-color) !important;
-  }
-}
-
-.task-modal,
-.subject-modal {
-  --height: 100%;
-  --width: 100%;
-  --background: var(--app-card-color);
-
-  ion-header {
-    ion-toolbar {
-      --background: var(--app-card-color);
-      --color: var(--ion-color-primary);
-      --border-style: none;
-
-      ion-title {
-        color: var(--ion-color-primary);
-        font-weight: 600;
-      }
-
-      ion-buttons {
-        ion-button {
-          --color: var(--ion-color-primary);
-        }
-      }
-    }
-  }
-
-  .modal-content {
-    --background: var(--app-background-light);
-
-    form {
-      .form-container {
-        padding: 20px;
-
-        .input-group {
-          background: var(--app-card-color);
-          border-radius: 12px;
-          padding: 15px;
-          margin-bottom: 20px;
-          box-shadow: var(--app-shadow-sm);
-
-          .custom-input {
-            --background: transparent;
-            --border-color: rgba(var(--ion-color-primary-rgb), 0.3);
-            --highlight-color-focused: var(--ion-color-primary);
-            margin-bottom: 15px;
-
-            ion-label,
-            ion-select,
-            ion-datetime,
-            ion-input {
-              --color: var(--app-text-color) !important;
-              color: var(--app-text-color) !important;
-            }
-          }
-        }
       }
     }
   }
