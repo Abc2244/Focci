@@ -238,11 +238,6 @@ export class RemindersPage implements OnInit, OnDestroy {
     this.showModal = true;
   }
 
-  // Método para completar un recordatorio
-  completeReminder(reminderId: string): void {
-    this.updateReminderStatus(reminderId, 'completado');
-  }
-
   // Método para reactivar un recordatorio
   reactivateReminder(reminderId: string): void {
     this.updateReminderStatus(reminderId, 'pendiente');
@@ -458,9 +453,5 @@ export class RemindersPage implements OnInit, OnDestroy {
 
   isReminderExpired(reminderDate: string): boolean {
     return new Date(reminderDate) < this.currentDate;
-  }
-
-  shouldShowCompleteButton(reminder: any): boolean {
-    return !reminder.auto_completed && new Date(reminder.reminder_date) >= this.currentDate;
   }
 }

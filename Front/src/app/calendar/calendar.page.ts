@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
+import { firstValueFrom } from 'rxjs';
 
 interface CalendarDay {
   date: Date;
@@ -132,7 +133,7 @@ export class CalendarPage implements OnInit {
   }
 
   // Cargar datos del usuario
-  loadUserData() {
+  async loadUserData() {
     this.isLoading = true;
     const userId = this.authService.getCurrentUserId();
 
@@ -145,55 +146,33 @@ export class CalendarPage implements OnInit {
       return;
     }
 
-    this.userId = userId;
+    try {
+      // Cargar todas las fuentes de datos en paralelo
+      const [subjects, tasks, reminders] = await Promise.all([
+        firstValueFrom(this.apiService.getUserSubjects(userId)).catch(() => []),
+        firstValueFrom(this.apiService.getUserTasks(userId)).catch(() => []),
+        firstValueFrom(this.apiService.getUpcomingReminders(userId)).catch(() => [])
+      ]);
 
-    // Cargar materias
-    this.apiService.getUserSubjects(this.userId).subscribe({
-      next: (subjects) => {
-        this.subjects = subjects;
-        console.log('Materias cargadas:', subjects.length);
-
-        // Cargar tareas
-        this.apiService.getUserTasks(this.userId).subscribe({
-          next: (tasks) => {
-            this.tasks = tasks;
-            console.log('Tareas cargadas:', tasks.length);
-
-            // Cargar recordatorios
-            this.apiService.getUpcomingReminders(this.userId).subscribe({
-              next: (reminders) => {
-                this.reminders = reminders;
-                console.log(
-                  'Recordatorios cargados:',
-                  reminders.length,
-                  reminders
-                );
-                this.updateCalendarEvents();
-                this.isLoading = false;
-              },
-              error: (error) => {
-                console.error('Error al cargar recordatorios:', error);
-                this.toastService.showToast(
-                  'Error al cargar recordatorios',
-                  'error'
-                );
-                this.isLoading = false;
-              },
-            });
-          },
-          error: (error) => {
-            console.error('Error al cargar tareas:', error);
-            this.toastService.showToast('Error al cargar tareas', 'error');
-            this.isLoading = false;
-          },
-        });
-      },
-      error: (error) => {
-        console.error('Error al cargar materias:', error);
-        this.toastService.showToast('Error al cargar materias', 'error');
-        this.isLoading = false;
-      },
-    });
+      this.subjects = subjects || [];
+      this.tasks = tasks || [];
+      this.reminders = reminders || [];
+      
+      console.log('Materias cargadas:', this.subjects.length);
+      console.log('Tareas cargadas:', this.tasks.length);
+      console.log('Recordatorios cargados:', this.reminders.length);
+      
+      this.updateCalendarEvents();
+    } catch (error) {
+      console.warn('No se encontraron datos para mostrar');
+      // Inicializar arrays vacíos en caso de error
+      this.subjects = [];
+      this.tasks = [];
+      this.reminders = [];
+      this.updateCalendarEvents();
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   // Añadir después del constructor
@@ -455,36 +434,35 @@ export class CalendarPage implements OnInit {
   loadEventsForMonth() {
     const userId = this.authService.getCurrentUserId();
     if (!userId) {
-      this.toastService.showToast(
-        'Error: ID de usuario no encontrado',
-        'error'
-      );
+      console.warn('No se encontró ID de usuario');
       return;
     }
 
     // Cargar recordatorios
     this.apiService.getUpcomingReminders(userId).subscribe({
       next: (reminders) => {
-        this.reminders = reminders;
-        console.log('Recordatorios cargados:', reminders.length, reminders);
+        this.reminders = reminders || [];
+        console.log('Recordatorios cargados:', this.reminders.length);
         this.updateCalendarEvents();
       },
-      error: (error) => {
-        console.error('Error al cargar recordatorios:', error);
-        this.toastService.showToast('Error al cargar recordatorios', 'error');
+      error: () => {
+        console.warn('No se encontraron recordatorios');
+        this.reminders = [];
+        this.updateCalendarEvents();
       },
     });
 
     // Cargar tareas
     this.apiService.getUserTasks(userId).subscribe({
       next: (tasks) => {
-        this.tasks = tasks;
-        console.log('Tareas cargadas:', tasks.length, tasks);
+        this.tasks = tasks || [];
+        console.log('Tareas cargadas:', this.tasks.length);
         this.updateCalendarEvents();
       },
-      error: (error) => {
-        console.error('Error al cargar tareas:', error);
-        this.toastService.showToast('Error al cargar tareas', 'error');
+      error: () => {
+        console.warn('No se encontraron tareas');
+        this.tasks = [];
+        this.updateCalendarEvents();
       },
     });
   }

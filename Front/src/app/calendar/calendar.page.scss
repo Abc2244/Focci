@@ -159,6 +159,8 @@
       border-radius: 12px;
       box-shadow: var(--app-shadow-sm);
       border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
+      width: 100%;
+      box-sizing: border-box;
 
       .weekday {
         text-align: center;
@@ -174,8 +176,10 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        height: 40px;
-        width: 40px;
+        aspect-ratio: 1;
+        width: 100%;
+        max-width: 40px;
+        margin: 0 auto;
         font-size: 16px;
         font-weight: 500;
         color: var(--app-text-color);
@@ -185,6 +189,10 @@
         cursor: pointer;
         transition: all 0.3s ease;
         border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
+
+        @media (max-width: 360px) {
+          font-size: 14px;
+        }
 
         &:hover {
           transform: translateY(-2px);

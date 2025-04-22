@@ -97,24 +97,34 @@ export class SchedulePage implements OnInit {
       this.isLoading = true;
 
       Promise.all([
-        this.apiService.getUserSubjects(userId).toPromise(),
-        this.apiService.getUserTasks(userId).toPromise(),
-        this.apiService.getUpcomingReminders(userId).toPromise(),
+        this.apiService.getUserSubjects(userId).toPromise().catch(() => []),
+        this.apiService.getUserTasks(userId).toPromise().catch(() => []),
+        this.apiService.getUpcomingReminders(userId).toPromise().catch(() => [])
       ])
         .then(([subjects, tasks, reminders]) => {
           this.subjects = subjects || [];
           this.tasks = tasks || [];
           this.reminders = reminders || [];
+          
+          console.log('Materias cargadas:', this.subjects.length);
+          console.log('Tareas cargadas:', this.tasks.length);
+          console.log('Recordatorios cargados:', this.reminders.length);
+          
           this.updateEventsForCurrentWeek();
-          this.isLoading = false;
         })
         .catch((error) => {
-          console.error('Error loading data:', error);
-          this.toastService.showToast('Error al cargar los datos', 'error');
+          console.warn('No se encontraron datos para mostrar');
+          // Inicializar arrays vacíos en caso de error
+          this.subjects = [];
+          this.tasks = [];
+          this.reminders = [];
+          this.updateEventsForCurrentWeek();
+        })
+        .finally(() => {
           this.isLoading = false;
         });
     } else {
-      this.toastService.showToast('Usuario no autenticado', 'error');
+      console.warn('Usuario no autenticado');
       this.isLoading = false;
     }
   }

@@ -62,14 +62,6 @@
           <div class="reminder-actions">
             <ion-button
               fill="clear"
-              (click)="completeReminder(reminder._id)"
-              class="action-button complete-button"
-              *ngIf="shouldShowCompleteButton(reminder)">
-              <ion-icon name="checkmark-circle-outline"></ion-icon>
-              Completar
-            </ion-button>
-            <ion-button
-              fill="clear"
               (click)="editReminder(reminder)"
               class="action-button edit-button">
               <ion-icon name="create-outline"></ion-icon>

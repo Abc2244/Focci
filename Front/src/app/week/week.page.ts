@@ -171,30 +171,25 @@ export class WeekPage implements OnInit {
       // Cargar materias primero
       const subjects = await firstValueFrom(
         this.apiService.getUserSubjects(userId)
-      );
+      ).catch(() => []);
       this.subjects = subjects || [];
       this.generateEventsFromSubjects(this.subjects);
 
       // Cargar todas las tareas
-      const tasks = await firstValueFrom(this.apiService.getUserTasks(userId));
+      const tasks = await firstValueFrom(
+        this.apiService.getUserTasks(userId)
+      ).catch(() => []);
       this.tasks = tasks || [];
-      this.filterTasksForSelectedDay(); // Filtrar tareas para el día seleccionado
+      this.filterTasksForSelectedDay();
 
       // Cargar recordatorios
-      try {
-        const reminders = await firstValueFrom(
-          this.apiService.getUserReminders(userId)
-        );
-        // Procesar recordatorios si es necesario
-      } catch (reminderError) {
-        console.warn('No se pudieron cargar los recordatorios:', reminderError);
-      }
+      const reminders = await firstValueFrom(
+        this.apiService.getUserReminders(userId)
+      ).catch(() => []);
+      // Procesar recordatorios si es necesario
+      
     } catch (error) {
-      console.error('Error al cargar datos:', error);
-      this.toastService.showToast(
-        'Error al cargar los datos. Por favor, intente más tarde',
-        'error'
-      );
+      console.warn('No se encontraron datos para mostrar');
     } finally {
       this.isLoading = false;
     }
