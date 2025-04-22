@@ -658,13 +658,13 @@ export class SmartPage implements OnInit {
   hasReminderInTimeSlot(plan: TaskWithSlots, slot: TimeSlot): boolean {
     if (!plan.reminderPlan || !plan.reminderPlan.reminders) return false;
 
-    return plan.reminderPlan.reminders.some(reminder => {
+    return plan.reminderPlan.reminders.some((reminder) => {
       if (!reminder.date) return false;
-      
+
       const reminderDate = new Date(reminder.date);
       const slotStart = new Date(slot.start);
       const slotEnd = new Date(slot.end);
-      
+
       return reminderDate >= slotStart && reminderDate <= slotEnd;
     });
   }
@@ -690,7 +690,7 @@ export class SmartPage implements OnInit {
       const reminderTimes = [
         { minutes: 30, level: 3 },
         { minutes: 15, level: 4 },
-        { minutes: 5, level: 5 }
+        { minutes: 5, level: 5 },
       ];
 
       for (const { minutes, level } of reminderTimes) {
@@ -702,7 +702,7 @@ export class SmartPage implements OnInit {
           _id: `study_session_${plan.task._id}_${minutes}_${Date.now()}`,
           task_id: plan.task._id,
           reminder_date: reminderTime.toISOString(),
-          priority: level
+          priority: level,
         };
 
         await this.notificationsService.scheduleNotification(notificationData);
