@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouteReuseStrategy } from '@angular/router';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
@@ -13,12 +14,15 @@ import { HttpClientModule } from '@angular/common/http';
 import { ThemeService } from './services/theme.service';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [
+    AppComponent
+  ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     IonicModule.forRoot(),
     AppRoutingModule,
-    HttpClientModule, // AÑADIR HttpClientModule AQUÍ
+    HttpClientModule,
     SharedModule,
   ],
   providers: [
