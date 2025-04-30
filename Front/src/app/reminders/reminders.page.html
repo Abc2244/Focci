@@ -142,10 +142,10 @@
 
   <!-- Botón flotante -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="reminders.length > 0" class="fab-fixed">
-  <ion-fab-button class="custom-fab" (click)="openAddReminderModal()">
-    <ion-icon name="add"></ion-icon>
-  </ion-fab-button>
-</ion-fab>
+    <ion-fab-button class="custom-fab add-reminder-button" (click)="openAddReminderModal()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
 
 <!-- Modal para agregar/editar recordatorio -->

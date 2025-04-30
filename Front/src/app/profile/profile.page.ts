@@ -5,6 +5,7 @@ import { AuthService } from '../services/auth.service';
 import { ToastController, AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { ThemeService, ColorTheme } from '../services/theme.service';
+import { TutorialService } from '../services/tutorial.service';
 
 @Component({
   selector: 'app-profile',
@@ -49,7 +50,8 @@ export class ProfilePage implements OnInit {
     private toastController: ToastController,
     private alertController: AlertController,
     private router: Router,
-    public themeService: ThemeService
+    public themeService: ThemeService,
+    private tutorialService: TutorialService
   ) {
     this.profileForm = this.fb.group({
       username: ['', Validators.required],
@@ -300,5 +302,9 @@ export class ProfilePage implements OnInit {
       position: 'bottom',
     });
     toast.present();
+  }
+
+  startTutorial() {
+    this.tutorialService.startTutorial();
   }
 }
