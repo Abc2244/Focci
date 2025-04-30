@@ -5,13 +5,15 @@ export interface Task {
   subject_id: string;
   description: string;
   due_date: string;
-  completed?: boolean;
+  completed: boolean;
   completed_date?: string;
   created_at?: string;
   // Nuevos campos
-  task_type?: 'examen' | 'proyecto' | 'lectura' | 'general';
+  task_type?: string;
   priority?: number;
   estimated_time?: number;
+  classification_confidence?: number;
+  insistence_level?: number;
   reminders?: string[];
 }
 
@@ -29,7 +31,8 @@ export interface TaskResponse {
   keywords?: string[];
   adjusted_priority: number;
   insistence_level: number;
-  task_type: 'examen' | 'proyecto' | 'lectura' | 'general';
+  task_type: string;
   reminders: string[];
+  classification_confidence: number;
   message?: string;
 }

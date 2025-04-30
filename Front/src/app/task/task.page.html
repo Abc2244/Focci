@@ -46,19 +46,30 @@
         class="task-card"
         *ngFor="let task of incompleteTasks"
         [attr.priority]="task.priority"
+        [class]="getPriorityClass(task.priority)"
       >
         <ion-card-header>
           <div class="card-header-content">
-            <ion-icon
-              [name]="getTaskTypeIcon(task.task_type || '')"
-              class="task-icon"
-            ></ion-icon>
+            <div class="priority-indicator">
+              <div class="priority-number">P{{task.priority || 1}}</div>
+              <div class="priority-label">Prioridad</div>
+            </div>
             <div class="card-title-container">
               <ion-card-title>{{ task.description }}</ion-card-title>
-              <ion-card-subtitle>
-                <ion-icon name="book-outline"></ion-icon>
-                <span>{{ getSubjectName(task.subject_id) }}</span>
-              </ion-card-subtitle>
+              <div class="task-metadata">
+                <ion-chip class="subject-chip">
+                  <ion-icon name="book-outline"></ion-icon>
+                  <ion-label>{{ getSubjectName(task.subject_id) }}</ion-label>
+                </ion-chip>
+                <ion-chip 
+                  [class]="'type-chip type-' + (task.task_type || 'tarea')" 
+                  [attr.data-confidence]="formatConfidence(task.classification_confidence)"
+                  [color]="getConfidenceColor(task.classification_confidence)"
+                >
+                  <ion-icon [name]="getTaskTypeIcon(task.task_type || '')"></ion-icon>
+                  <ion-label>{{task.task_type || 'Tarea' | titlecase}}</ion-label>
+                </ion-chip>
+              </div>
             </div>
           </div>
         </ion-card-header>
@@ -70,16 +81,14 @@
               <ion-label>{{ task.due_date | date:'dd MMM, HH:mm' }}</ion-label>
             </ion-chip>
 
-            <ion-chip [class]="'type-chip type-' + (task.task_type || 'tarea')">
-              <ion-icon
-                [name]="getTaskTypeIcon(task.task_type || '')"
-              ></ion-icon>
-              <ion-label>{{task.task_type || 'Tarea' | titlecase}}</ion-label>
-            </ion-chip>
-
             <ion-chip class="time-chip" *ngIf="task.estimated_time">
               <ion-icon name="time-outline"></ion-icon>
               <ion-label>{{task.estimated_time}} min</ion-label>
+            </ion-chip>
+
+            <ion-chip class="insistence-chip" *ngIf="task.insistence_level">
+              <ion-icon name="notifications-outline"></ion-icon>
+              <ion-label>Nivel {{task.insistence_level}}</ion-label>
             </ion-chip>
           </div>
 

@@ -1,14 +1,10 @@
 # database.py
-import os
-from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
-
-load_dotenv(dotenv_path="/Users/juliveevart/Documents/University/Focci/Back/.env")
 
 class MongoDB:
     def __init__(self):
-        self.client = AsyncIOMotorClient(os.getenv("MONGO_URI"))
-        self.db = self.client[os.getenv("MONGO_DB")]
+        self.client = AsyncIOMotorClient("mongodb+srv://focci:AjAT6cPe81cPB2n5@cluster0.chcvh.mongodb.net/BaseFocci?retryWrites=true&w=majority")
+        self.db = self.client["BaseFocci"]
 
     def get_collection(self, collection_name):
         return self.db[collection_name]

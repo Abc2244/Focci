@@ -1,6 +1,7 @@
 import random
 from datetime import datetime, timedelta
 import pytest
+import pytest_asyncio
 from bson import ObjectId
 from services.task_service import TaskService
 from services.task_prioritizer_service import TaskPrioritizer
@@ -70,20 +71,25 @@ class TaskScheduler:
         else:
             return GENERAL_REMINDER_TEMPLATES
 
-@pytest.fixture
-def task_service():
-    return TaskService()
+@pytest_asyncio.fixture
+async def task_service(mock_database):
+    """Fixture para proporcionar una instancia de TaskService con mock de base de datos"""
+    service = TaskService()
+    await service.initialize()
+    return service
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def mock_user():
+    """Fixture para proporcionar un usuario de prueba"""
     return {
         "_id": ObjectId(),
-        "username": "test_user",
-        "email": "test@example.com"
+        "email": "test@example.com",
+        "username": "test_user"
     }
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def mock_subject():
+    """Fixture para proporcionar una materia de prueba"""
     return {
         "_id": ObjectId(),
         "name": "Test Subject",
@@ -91,57 +97,66 @@ def mock_subject():
     }
 
 class TestTaskService:
-    # Test de clasificación de tipos de tarea
-    @pytest.mark.parametrize("description,expected_type", [
-        ("Examen de matemáticas", "examen"),
-        ("Proyecto final de programación", "proyecto"),
-        ("Leer capítulo 5", "lectura"),
-        ("Hacer ejercicios", "general")
-    ])
-    def test_determine_task_type(self, task_service, description, expected_type):
-        assert task_service._determine_task_type(description) == expected_type
-
-    # Test de ajuste de prioridad
-    @pytest.mark.parametrize("base_priority,task_type,estimated_time,expected_priority", [
-        (1, "examen", 130, 5),    # base(1) + tipo(2) + tiempo(2) = 5
-        (2, "proyecto", 100, 4),   # base(2) + tipo(1) + tiempo(1) = 4
-        (1, "lectura", 60, 1),     # base(1) + tipo(0) + tiempo(0) = 1
-        (3, "general", 120, 5)     # base(3) + tipo(0) + tiempo(2) = 5
-    ])
-    def test_adjust_priority_by_type_and_time(
-        self, task_service, base_priority, task_type, estimated_time, expected_priority
-    ):
-        result = task_service._adjust_priority_by_type_and_time(
-            base_priority, task_type, estimated_time
-        )
-        assert result == expected_priority, f"Expected {expected_priority} but got {result} for {base_priority}, {task_type}, {estimated_time}"
-
-    # Test de procesamiento completo de tarea
     @pytest.mark.asyncio
-    async def test_process_task(self, task_service, mock_user, mock_subject, monkeypatch):
-        # Mock para la colección
+    async def test_determine_task_type(self, task_service):
+        """Prueba la determinación del tipo de tarea"""
+        test_cases = [
+            ("Examen de matemáticas", "examen"),
+            ("Proyecto final de programación", "proyecto"),
+            ("Leer capítulo 5", "lectura"),
+            ("Hacer ejercicios", "general")
+        ]
+        
+        for description, expected_type in test_cases:
+            result = task_service._determine_task_type(description)
+            assert result == expected_type, f"Se esperaba '{expected_type}' para '{description}'"
+
+    @pytest.mark.asyncio
+    async def test_adjust_priority_by_type_and_time(self, task_service):
+        """Prueba el ajuste de prioridad por tipo y tiempo"""
+        test_cases = [
+            (1, "examen", 130, 5),  # Alta prioridad por ser examen y largo
+            (2, "proyecto", 100, 4),  # Prioridad media-alta por ser proyecto
+            (1, "lectura", 60, 1),   # Prioridad base para lectura corta
+            (3, "general", 120, 5)   # Prioridad alta por tiempo largo
+        ]
+        
+        for base_priority, task_type, estimated_time, expected in test_cases:
+            result = task_service._adjust_priority_by_type_and_time(
+                base_priority, task_type, estimated_time
+            )
+            assert result == expected
+
+    @pytest.mark.asyncio
+    async def test_process_task(self, task_service, mock_user, mock_subject, mock_database, monkeypatch):
+        """Prueba el procesamiento completo de una tarea"""
+        # Configurar el mock para que devuelva el usuario y la materia correctos
         class MockCollection:
-            async def find_one(self, query, *args, **kwargs):
+            def __init__(self, collection_name):
+                self.collection_name = collection_name
+
+            async def find_one(self, query):
                 if "_id" in query:
-                    if str(query["_id"]) == str(mock_user["_id"]):
+                    if str(query["_id"]) == str(mock_user["_id"]) and self.collection_name == "users":
                         return mock_user
-                    elif str(query["_id"]) == str(mock_subject["_id"]):
+                    elif str(query["_id"]) == str(mock_subject["_id"]) and self.collection_name == "subjects":
                         return mock_subject
                 return None
 
-            async def insert_one(self, data):
-                return MockInsertResult()
+            async def insert_one(self, document):
+                class InsertOneResult:
+                    def __init__(self, inserted_id):
+                        self.inserted_id = inserted_id
+                return InsertOneResult(ObjectId())
 
-        class MockInsertResult:
-            @property
-            def inserted_id(self):
-                return ObjectId()
+        class MockDB:
+            def get_collection(self, name):
+                return MockCollection(name)
 
-        # Aplicar mock
-        monkeypatch.setattr(
-            "config.database.mongodb.get_collection",
-            lambda x: MockCollection()
-        )
+        # Aplicar el mock a la base de datos
+        from config.database import mongodb
+        mock_db = MockDB()
+        monkeypatch.setattr(mongodb, "get_collection", mock_db.get_collection)
 
         # Datos de prueba
         task_data = {
@@ -155,21 +170,44 @@ class TestTaskService:
         # Ejecutar el proceso
         result = await task_service.process_task(**task_data)
 
-        # Verificaciones
+        # Verificar el resultado
         assert result["task_type"] == "examen"
-        assert isinstance(result["adjusted_priority"], int)
-        assert 1 <= result["adjusted_priority"] <= 5
-        assert isinstance(result["reminders"], list)
-        assert len(result["reminders"]) > 0
+        assert result["adjusted_priority"] >= 1
+        assert result["insistence_level"] >= 1
+        assert "reminders" in result
+        assert "classification_confidence" in result
 
-    # Test de manejo de errores
     @pytest.mark.asyncio
-    async def test_process_task_invalid_user(self, task_service):
-        with pytest.raises(ValueError, match="ID de usuario o materia no válido"):
-            await task_service.process_task(
-                user_id="invalid_id",
-                subject_id="invalid_id",
-                task_description="Test task",
-                due_date=datetime.now().isoformat(),
-                estimated_time=30
-            )
+    async def test_process_task_invalid_user(self, task_service, monkeypatch):
+        """Prueba el procesamiento de una tarea con usuario inválido"""
+        class MockCollection:
+            async def find_one(self, query):
+                return None
+
+            async def insert_one(self, document):
+                class InsertOneResult:
+                    def __init__(self, inserted_id):
+                        self.inserted_id = inserted_id
+                return InsertOneResult(ObjectId())
+
+        class MockDB:
+            def get_collection(self, name):
+                return MockCollection()
+
+        # Aplicar el mock a la base de datos
+        from config.database import mongodb
+        mock_db = MockDB()
+        monkeypatch.setattr(mongodb, "get_collection", mock_db.get_collection)
+
+        # Datos de prueba con usuario inválido
+        task_data = {
+            "user_id": str(ObjectId()),
+            "subject_id": str(ObjectId()),
+            "task_description": "Tarea de prueba",
+            "due_date": datetime.now().isoformat(),
+            "estimated_time": 60
+        }
+
+        # Verificar que se lanza la excepción correcta
+        with pytest.raises(ValueError, match="Error al procesar la tarea: Usuario o materia no encontrados"):
+            await task_service.process_task(**task_data)

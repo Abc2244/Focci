@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.routes import auth_router, users_router, subjects_router, tasks_router, reminders_router, stats_router, schedule_router
+from api.routes.task_keywords import router as task_keywords_router
 import asyncio
 import logging
 from datetime import datetime
@@ -31,6 +32,7 @@ app.include_router(tasks_router)
 app.include_router(reminders_router)
 app.include_router(stats_router)
 app.include_router(schedule_router)
+app.include_router(task_keywords_router, prefix="/api", tags=["task-keywords"])
 
 def keep_alive():
     while True:

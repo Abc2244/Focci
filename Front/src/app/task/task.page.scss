@@ -170,20 +170,54 @@
         background: var(--priority-color, var(--ion-color-medium));
       }
 
-      &[priority="1"] {
-        --priority-color: var(--ion-color-success);
-      }
-      &[priority="2"] {
-        --priority-color: var(--ion-color-warning);
-      }
-      &[priority="3"] {
-        --priority-color: var(--ion-color-primary);
-      }
-      &[priority="4"] {
-        --priority-color: var(--ion-color-secondary);
-      }
-      &[priority="5"] {
+      &.priority-critical {
         --priority-color: var(--ion-color-danger);
+        .priority-indicator {
+          background: rgba(var(--ion-color-danger-rgb), 0.1);
+          .priority-number {
+            color: var(--ion-color-danger);
+          }
+        }
+      }
+
+      &.priority-high {
+        --priority-color: var(--ion-color-warning);
+        .priority-indicator {
+          background: rgba(var(--ion-color-warning-rgb), 0.1);
+          .priority-number {
+            color: var(--ion-color-warning);
+          }
+        }
+      }
+
+      &.priority-medium {
+        --priority-color: var(--ion-color-primary);
+        .priority-indicator {
+          background: rgba(var(--ion-color-primary-rgb), 0.1);
+          .priority-number {
+            color: var(--ion-color-primary);
+          }
+        }
+      }
+
+      &.priority-low {
+        --priority-color: var(--ion-color-success);
+        .priority-indicator {
+          background: rgba(var(--ion-color-success-rgb), 0.1);
+          .priority-number {
+            color: var(--ion-color-success);
+          }
+        }
+      }
+
+      &.priority-normal {
+        --priority-color: var(--ion-color-medium);
+        .priority-indicator {
+          background: rgba(var(--ion-color-medium-rgb), 0.1);
+          .priority-number {
+            color: var(--ion-color-medium);
+          }
+        }
       }
 
       ion-card-header {
@@ -195,10 +229,29 @@
           align-items: flex-start;
           gap: 0.75rem;
 
-          .task-icon {
-            font-size: 1.25rem;
-            color: var(--ion-color-primary);
-            margin-top: 0.25rem;
+          .priority-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 48px;
+            height: 48px;
+            background: rgba(var(--ion-color-primary-rgb), 0.1);
+            border-radius: 12px;
+            padding: 4px;
+
+            .priority-number {
+              font-size: 1.2rem;
+              font-weight: 600;
+              color: var(--ion-color-primary);
+              line-height: 1;
+            }
+
+            .priority-label {
+              font-size: 0.7rem;
+              color: var(--ion-color-medium);
+              margin-top: 2px;
+            }
           }
 
           .card-title-container {
@@ -209,7 +262,7 @@
               font-size: 1.1rem;
               font-weight: 500;
               color: var(--app-text-color);
-              margin-bottom: 0.5rem;
+              margin-bottom: 0.75rem;
               white-space: normal;
               overflow: hidden;
               display: -webkit-box;
@@ -217,17 +270,72 @@
               -webkit-box-orient: vertical;
             }
 
-            ion-card-subtitle {
+            .task-metadata {
               display: flex;
-              align-items: center;
+              flex-wrap: wrap;
               gap: 0.5rem;
-              color: var(--ion-color-medium);
-              font-size: 0.9rem;
-              margin: 0;
+              margin-bottom: 0.5rem;
 
-              ion-icon {
-                font-size: 1rem;
-                min-width: 1rem;
+              ion-chip {
+                margin: 0;
+                height: 24px;
+                font-size: 0.85rem;
+
+                &.subject-chip {
+                  --background: rgba(var(--ion-color-tertiary-rgb), 0.1);
+                  --color: var(--ion-color-tertiary);
+                }
+
+                &.type-chip {
+                  position: relative;
+                  overflow: visible;
+
+                  &::after {
+                    content: attr(data-confidence);
+                    position: absolute;
+                    top: -8px;
+                    right: -8px;
+                    background: var(--ion-color-success);
+                    color: white;
+                    border-radius: 10px;
+                    padding: 2px 4px;
+                    min-width: 24px;
+                    height: 16px;
+                    font-size: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    opacity: 0;
+                    transition: opacity 0.2s ease;
+                  }
+
+                  &[data-confidence]:not([data-confidence=""]) {
+                    &::after {
+                      opacity: 1;
+                    }
+                  }
+
+                  &.type-examen {
+                    --background: rgba(var(--ion-color-danger-rgb), 0.1);
+                    --color: var(--ion-color-danger);
+                  }
+
+                  &.type-proyecto {
+                    --background: rgba(var(--ion-color-warning-rgb), 0.1);
+                    --color: var(--ion-color-warning);
+                  }
+
+                  &.type-lectura {
+                    --background: rgba(var(--ion-color-success-rgb), 0.1);
+                    --color: var(--ion-color-success);
+                  }
+
+                  &.type-tarea {
+                    --background: rgba(var(--ion-color-primary-rgb), 0.1);
+                    --color: var(--ion-color-primary);
+                  }
+                }
               }
             }
           }
@@ -250,9 +358,9 @@
             font-size: 0.85rem;
             padding: 0 0.75rem;
 
-            ion-icon {
-              font-size: 1rem;
-              margin-right: 4px;
+            &.insistence-chip {
+              --background: rgba(var(--ion-color-warning-rgb), 0.1);
+              --color: var(--ion-color-warning);
             }
 
             &.date-chip {
@@ -262,7 +370,13 @@
               &.urgent {
                 --background: rgba(var(--ion-color-danger-rgb), 0.1);
                 --color: var(--ion-color-danger);
+                animation: pulse 2s infinite;
               }
+            }
+
+            &.time-chip {
+              --background: rgba(var(--ion-color-success-rgb), 0.1);
+              --color: var(--ion-color-success);
             }
           }
         }
@@ -551,5 +665,20 @@
       color: var(--ion-color-primary) !important;
       background: rgba(var(--ion-color-primary-rgb), 0.1) !important;
     }
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
 }

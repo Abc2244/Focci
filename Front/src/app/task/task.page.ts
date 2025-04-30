@@ -72,6 +72,50 @@ export class TaskPage implements OnInit {
     this.minDate = new Date().toISOString();
   }
 
+  getTaskTypeIcon(type: string | undefined): string {
+    switch (type?.toLowerCase()) {
+      case 'examen':
+        return 'school-outline';
+      case 'proyecto':
+        return 'build-outline';
+      case 'lectura':
+        return 'book-outline';
+      case 'tarea':
+        return 'document-text-outline';
+      default:
+        return 'clipboard-outline';
+    }
+  }
+
+  getPriorityClass(priority: number | undefined): string {
+    if (!priority) return 'priority-normal';
+    switch (priority) {
+      case 5:
+        return 'priority-critical';
+      case 4:
+        return 'priority-high';
+      case 3:
+        return 'priority-medium';
+      case 2:
+        return 'priority-low';
+      default:
+        return 'priority-normal';
+    }
+  }
+
+  getConfidenceColor(confidence: number | undefined): string {
+    if (!confidence) return 'medium';
+    if (confidence >= 0.8) return 'success';
+    if (confidence >= 0.6) return 'primary';
+    if (confidence >= 0.4) return 'warning';
+    return 'danger';
+  }
+
+  formatConfidence(confidence: number | undefined): string {
+    if (!confidence) return '';
+    return `${(confidence * 100).toFixed(0)}%`;
+  }
+
   ngOnInit() {
     this.loadSubjects();
     this.loadTasks();
@@ -152,24 +196,10 @@ export class TaskPage implements OnInit {
     return diffHours <= 24; // Es urgente si faltan 24 horas o menos
   }
 
-  getTaskTypeIcon(type: string | undefined): string {
-    switch (type?.toLowerCase()) {
-      case 'examen':
-        return 'school-outline';
-      case 'proyecto':
-        return 'build-outline';
-      case 'tarea':
-        return 'document-text-outline';
-      default:
-        return 'clipboard-outline';
-    }
-  }
-
   getTotalEstimatedTime(): number {
-    return this.incompleteTasks.reduce(
-      (total, task) => total + (task.estimated_time || 0),
-      0
-    );
+    return this.tasks
+      .filter((task) => !task.completed)
+      .reduce((total, task) => total + (task.estimated_time || 0), 0);
   }
 
   async completeTask(taskId: string) {
