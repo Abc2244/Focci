@@ -3,20 +3,10 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
 import { AlertController, IonInput, IonModal, ToastController } from '@ionic/angular';
-import { ScheduleItem } from '../interfaces/subject.interface';
+import { Subject, SubjectModel, ScheduleItem } from '../interfaces/subject.interface';
 import { ToastService } from '../services/toast.service';
 import { ThemeService } from '../services/theme.service';
 import { Observable } from 'rxjs';
-
-// Usamos un nombre diferente para evitar conflicto con la interfaz importada
-export interface SubjectModel {
-  id?: string;
-  name: string;
-  credits: number;
-  schedule: ScheduleItem[];
-  _id?: string; // Mantener compatibilidad con el código existente
-  userId?: string; // Añadimos el userId
-}
 
 interface DayOption {
   value: string;
@@ -112,15 +102,19 @@ export class SubjectsPage implements OnInit {
     this.hasError = false;
 
     this.apiService.getUserSubjects(userId).subscribe({
-      next: (subjects: SubjectModel[]) => {
-        this.subjects = subjects;
+      next: (subjects: Subject[]) => {
+        this.subjects = subjects.map(s => ({
+          ...s,
+          userId: s.user_id,
+          id: s._id
+        })) as SubjectModel[];
         this.isLoading = false;
         this.hasError = false;
         this.isModalOpen = false;
       },
       error: (error: any) => {
         this.isLoading = false;
-        this.hasError = false; // Siempre false para no mostrar error
+        this.hasError = false;
         this.subjects = [];
       }
     });
@@ -187,11 +181,12 @@ export class SubjectsPage implements OnInit {
         return;
       }
       
-      const subjectData: SubjectModel = {
+      const subjectData: Subject = {
         name: this.subjectForm.value.name,
         credits: this.subjectForm.value.credits,
         schedule: this.subjectForm.value.schedule || [],
-        userId: userId // Corregido a userId para coincidir con la interfaz
+        user_id: userId,
+        end_date: this.subjectForm.value.end_date || new Date()
       };
 
       try {
@@ -279,7 +274,8 @@ export class SubjectsPage implements OnInit {
     return this.fb.group({
       name: ['', [Validators.required]],
       credits: ['', [Validators.required, Validators.min(1)]],
-      schedule: this.fb.array([])
+      schedule: this.fb.array([]),
+      end_date: [new Date()]
     });
   }
 

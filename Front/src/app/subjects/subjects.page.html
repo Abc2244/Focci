@@ -40,6 +40,10 @@
                 <ion-icon name="star-outline" class="subtitle-icon"></ion-icon>
                 {{ subject.credits }} créditos
               </ion-card-subtitle>
+              <ion-card-subtitle class="end-date-badge">
+                <ion-icon name="calendar-outline" class="subtitle-icon"></ion-icon>
+                Fecha límite: {{ subject.end_date | date:'dd/MM/yyyy' }}
+              </ion-card-subtitle>
             </div>
           </div>
         </ion-card-header>
@@ -158,6 +162,19 @@
             type="number"
             formControlName="credits"
             placeholder="Ej. 4"
+            required
+          ></ion-input>
+        </ion-item>
+        
+        <!-- Campo fecha límite -->
+        <div class="field-label">
+          <ion-icon name="calendar-outline"></ion-icon>
+          Fecha límite de la materia
+        </div>
+        <ion-item class="custom-input">
+          <ion-input
+            type="date"
+            formControlName="end_date"
             required
           ></ion-input>
         </ion-item>

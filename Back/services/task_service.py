@@ -123,7 +123,7 @@ class TaskService:
 
     def _determine_task_type(self, description: str) -> str:
         description_lower = description.lower()
-        if any(word in description_lower for word in ["examen", "prueba", "test", "evaluación"]):
+        if any(word in description_lower for word in ["examen", "prueba", "test", "evaluación","parcial","quiz"]):
             return "examen"
         elif any(word in description_lower for word in ["proyecto", "trabajo", "investigación"]):
             return "proyecto"

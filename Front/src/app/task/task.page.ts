@@ -86,11 +86,11 @@ export class TaskPage implements OnInit {
     const userId = this.authService.getCurrentUserId();
     if (userId) {
       this.apiService.getUserSubjects(userId).subscribe({
-        next: (subjects) => {
-          this.subjects = subjects as Subject[];
+        next: (subjects: Subject[]) => {
+          this.subjects = subjects.map(s => ({...s, userId: s.user_id}));
           this.subjectMap.clear();
-          subjects.forEach((subject: any) => {
-            this.subjectMap.set(subject._id, subject.name);
+          subjects.forEach((subject) => {
+            this.subjectMap.set(subject._id || '', subject.name);
           });
         },
         error: (error) => {

@@ -111,8 +111,8 @@ export class WeekPage implements OnInit {
     try {
       const subjects = await firstValueFrom(
         this.apiService.getUserSubjects(userId)
-      ).catch(() => []);
-      this.subjects = subjects || [];
+      ).catch(() => [] as Subject[]);
+      this.subjects = subjects.map(s => ({...s, userId: s.user_id}));
       this.generateEventsFromSubjects(this.subjects);
 
       const tasks = await firstValueFrom(

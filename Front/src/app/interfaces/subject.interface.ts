@@ -6,8 +6,15 @@ export interface ScheduleItem {
 
 export interface Subject {
   _id?: string;
+  user_id: string;
+  userId?: string;
   name: string;
   credits: number;
   schedule: ScheduleItem[];
-  userId: string;
+  end_date: Date;
+}
+
+// Interfaz para el modelo de Subject en los componentes
+export interface SubjectModel extends Subject {
+  id?: string;
 }

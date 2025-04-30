@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List
+from datetime import datetime
 
 class ScheduleItem(BaseModel):
     day: str  # Día de la semana (ej. "Lunes", "Martes", etc.)
@@ -11,3 +12,4 @@ class Subject(BaseModel):
     name: str
     credits: int
     schedule: List[ScheduleItem]  # Lista de horarios con día y hora
+    end_date: datetime  # Fecha límite de la materia

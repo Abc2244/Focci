@@ -97,12 +97,12 @@ export class SchedulePage implements OnInit {
       this.isLoading = true;
 
       Promise.all([
-        this.apiService.getUserSubjects(userId).toPromise().catch(() => []),
+        this.apiService.getUserSubjects(userId).toPromise().catch(() => [] as Subject[]),
         this.apiService.getUserTasks(userId).toPromise().catch(() => []),
         this.apiService.getUpcomingReminders(userId).toPromise().catch(() => [])
       ])
         .then(([subjects, tasks, reminders]) => {
-          this.subjects = subjects || [];
+          this.subjects = (subjects || []).map(s => ({...s, userId: s.user_id}));
           this.tasks = tasks || [];
           this.reminders = reminders || [];
           
