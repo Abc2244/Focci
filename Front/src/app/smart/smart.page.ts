@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
 import { ScheduleService, ScheduleItem } from '../services/schedule.service';
@@ -13,6 +13,7 @@ import {
 } from '../services/smart-assistant.service';
 import { NotificationsService } from '../services/notifications.service';
 import { firstValueFrom } from 'rxjs';
+import { IonModal } from '@ionic/angular';
 
 // Actualizar la interfaz ReminderSuggestion para incluir la propiedad date y timeFormat
 interface ExtendedReminderSuggestion extends Omit<ReminderSuggestion, 'time'> {
@@ -48,6 +49,7 @@ interface TaskWithSlots {
   styleUrls: ['./smart.page.scss'],
 })
 export class SmartPage implements OnInit {
+  @ViewChild('reminderPlanModal') reminderPlanModal!: IonModal;
   isLoading = true;
   userId: string | null = null;
   tasks: Task[] = [];
@@ -490,32 +492,47 @@ export class SmartPage implements OnInit {
         });
       }
 
-      // Usar el servicio para crear los recordatorios
-      this.smartAssistant
-        .createRemindersFromPlan(this.currentReminderPlan, userId)
-        .subscribe(
-          (responses) => {
-            console.log('Recordatorios creados:', responses);
+      // Guardar una referencia al plan actual antes de limpiarlo
+      const planToCreate = { ...this.currentReminderPlan };
 
-            // Cerrar el modal
-            this.showReminderPlanModal = false;
-
-            // Recargar los datos
-            this.loadData();
-
-            this.toastService.showToast(
-              'Plan de recordatorios aceptado correctamente',
-              'success'
+      try {
+        // Usar el servicio para crear los recordatorios
+        await new Promise((resolve, reject) => {
+          this.smartAssistant
+            .createRemindersFromPlan(planToCreate, userId)
+            .subscribe(
+              (responses) => {
+                console.log('Recordatorios creados:', responses);
+                resolve(responses);
+              },
+              (error) => {
+                console.error('Error al crear recordatorios:', error);
+                reject(error);
+              }
             );
-          },
-          (error) => {
-            console.error('Error al crear recordatorios:', error);
-            this.toastService.showToast(
-              'Error al crear los recordatorios',
-              'error'
-            );
-          }
+        });
+
+        // Cerrar el modal usando dismiss()
+        await this.reminderPlanModal.dismiss();
+        
+        // Limpiar el estado
+        this.showReminderPlanModal = false;
+        this.currentReminderPlan = null;
+
+        // Recargar los datos
+        await this.loadData();
+
+        this.toastService.showToast(
+          'Plan de recordatorios aceptado correctamente',
+          'success'
         );
+      } catch (error) {
+        this.toastService.showToast(
+          'Error al crear los recordatorios',
+          'error'
+        );
+        throw error;
+      }
     } catch (error) {
       console.error('Error al aceptar el plan de recordatorios:', error);
       this.toastService.showToast(
