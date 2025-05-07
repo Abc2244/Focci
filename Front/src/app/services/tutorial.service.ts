@@ -23,10 +23,10 @@ export interface TutorialSection {
 })
 export class TutorialService {
   private readonly SCROLL_DURATION = 100;
-  private readonly NAVIGATION_DELAY = 700; // Aumentar a 700ms para dar más tiempo
-  private readonly ELEMENT_CHECK_DELAY = 100;
-  private readonly MAX_RETRY_ATTEMPTS = 10;
-  private readonly CLEANUP_DELAY = 100;
+  private readonly NAVIGATION_DELAY = 1000; // Aumentado a 1000ms para dar más tiempo
+  private readonly ELEMENT_CHECK_DELAY = 200; // Aumentado a 200ms
+  private readonly MAX_RETRY_ATTEMPTS = 15; // Aumentado a 15 intentos
+  private readonly CLEANUP_DELAY = 300; // Aumentado a 300ms
 
   private currentStepSubject = new BehaviorSubject<number>(0);
   currentStep$ = this.currentStepSubject.asObservable();
@@ -78,15 +78,8 @@ export class TutorialService {
           title: 'Personalización',
           content: 'Selecciona entre diferentes temas de color o crea uno personalizado.',
           position: 'left',
-          dataAttribute: 'theme-selector'
-        },
-        {
-          target: 'ion-list ion-item:has(ion-icon[name="key-outline"]), [data-tutorial="security"]',
-          title: 'Seguridad',
-          content: 'Mantén tu cuenta segura actualizando tu contraseña regularmente.',
-          position: 'left',
           nextButton: 'Continuar a Materias',
-          dataAttribute: 'security'
+          dataAttribute: 'theme-selector'
         }
       ]
     },
@@ -94,10 +87,11 @@ export class TutorialService {
       route: '/tabs/subjects',
       steps: [
         {
-          target: 'div.subject-container',
+          target: 'div.page-header',
           title: 'Tus Materias',
-          content: 'Aquí encontrarás todas tus materias organizadas por semestre.',
-          position: 'right'
+          content: 'Esta es la sección donde encontrarás todas tus materias organizadas por semestre.',
+          position: 'bottom',
+          dataAttribute: 'subjects-header'
         },
         {
           target: 'ion-card.subject-card',
@@ -120,10 +114,11 @@ export class TutorialService {
       route: '/tabs/tasks',
       steps: [
         {
-          target: 'none',
+          target: 'ion-tab-button[tab="tasks"]',
           title: 'Tus Tareas',
           content: 'Aquí podrás gestionar todas tus tareas académicas. Organiza tus actividades, establece fechas límite y mantén un seguimiento de tu progreso.',
-          position: 'right'
+          position: 'bottom',
+          dataAttribute: 'tasks-tab'
         },
         {
           target: '.stats-container',
@@ -243,29 +238,8 @@ export class TutorialService {
           title: 'Resumen General',
           content: 'Visualiza rápidamente tus métricas clave: tareas creadas, completadas y tu tasa de éxito general.',
           position: 'bottom',
-          dataAttribute: 'stats-summary'
-        },
-        {
-          target: '.detail-card:has(#punctualityChart)',
-          title: 'Análisis de Puntualidad',
-          content: 'Revisa tu tasa de puntualidad en la entrega de tareas. El gráfico muestra la proporción de tareas completadas a tiempo versus con retraso.',
-          position: 'right',
-          dataAttribute: 'punctuality-chart'
-        },
-        {
-          target: '.detail-card:has(#subjectChart)',
-          title: 'Distribución por Materias',
-          content: 'Observa cómo se distribuyen tus tareas entre las diferentes materias. Identifica qué materias requieren más atención.',
-          position: 'right',
-          dataAttribute: 'subject-distribution'
-        },
-        {
-          target: '.detail-card:has(#weeklyChart)',
-          title: 'Actividad Semanal',
-          content: 'Analiza tus patrones de actividad durante la semana. Identifica tus días más productivos y optimiza tu planificación.',
-          position: 'right',
-          nextButton: 'Finalizar Tutorial',
-          dataAttribute: 'weekly-activity'
+          dataAttribute: 'stats-summary',
+          nextButton: 'Finalizar Tutorial'
         }
       ]
     }
@@ -359,21 +333,22 @@ export class TutorialService {
 
       // Navegar a la nueva sección
       this.router.navigate([section.route]).then(() => {
-        // Limpiar UI después de la navegación
+        // Esperar a que la página se cargue completamente
         setTimeout(() => {
           this.cleanupTutorialUI();
           
-          // Solo buscar elemento si el paso actual tiene target
-          const currentStep = this.getCurrentStep();
-          if (currentStep && currentStep.target) {
-            setTimeout(() => {
+          // Esperar un tiempo adicional antes de buscar el elemento
+          setTimeout(() => {
+            // Solo buscar elemento si el paso actual tiene target
+            const currentStep = this.getCurrentStep();
+            if (currentStep && currentStep.target) {
+              this.retryCount = 0; // Reiniciar contador de intentos
               this.locateAndScrollToCurrentElement();
-            }, this.CLEANUP_DELAY);
-          } else {
-            // Si no hay target, marcar como encontrado
-            this.elementFoundSubject.next(true);
-          }
-        }, this.NAVIGATION_DELAY);
+            } else {
+              this.elementFoundSubject.next(true);
+            }
+          }, this.NAVIGATION_DELAY);
+        }, this.CLEANUP_DELAY);
       });
     }
   }
@@ -420,12 +395,30 @@ export class TutorialService {
     if (this.retryCount >= this.MAX_RETRY_ATTEMPTS) {
       console.warn(`No se pudo encontrar el elemento '${selector}' después de ${this.MAX_RETRY_ATTEMPTS} intentos`);
       this.elementFoundSubject.next(false);
+      // Intentar una última vez con un selector más general
+      const generalSelector = selector.split(',')[0].trim();
+      const element = document.querySelector(generalSelector);
+      if (element) {
+        this.scrollToElement(element);
+        this.elementFoundSubject.next(true);
+      }
       return;
     }
     
-    const element = document.querySelector(selector);
+    let element = document.querySelector(selector);
     
     if (element) {
+      // Verificar si el elemento está realmente visible
+      const rect = element.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) {
+        // El elemento existe pero no es visible aún
+        this.retryCount++;
+        setTimeout(() => {
+          this.findElementAndScroll(selector);
+        }, this.ELEMENT_CHECK_DELAY);
+        return;
+      }
+      
       this.scrollToElement(element);
       this.elementFoundSubject.next(true);
       this.retryCount = 0;
@@ -490,15 +483,16 @@ export class TutorialService {
       // Avanzar al siguiente paso en la misma sección
       this.currentStepSubject.next(currentStep + 1);
       
-      // Esperar a que se limpie la UI
+      // Esperar a que se limpie la UI y la página se actualice
       setTimeout(() => {
         const nextStep = this.getCurrentStep();
         if (nextStep && nextStep.target) {
-      this.locateAndScrollToCurrentElement();
+          this.retryCount = 0; // Reiniciar contador de intentos
+          this.locateAndScrollToCurrentElement();
         } else {
           this.elementFoundSubject.next(true);
         }
-      }, this.CLEANUP_DELAY);
+      }, this.NAVIGATION_DELAY);
     } else if (this.currentSectionIndex < this.tutorialSections.length - 1) {
       // Avanzar a la primera paso de la siguiente sección
       this.currentSectionIndex++;
