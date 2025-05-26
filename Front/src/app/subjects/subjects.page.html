@@ -122,7 +122,6 @@
         <ion-buttons slot="end">
           <ion-button
             class="save-button"
-            [disabled]="!subjectForm.valid"
             (click)="saveSubject()"
           >
             Guardar
@@ -175,6 +174,7 @@
           <ion-input
             type="date"
             formControlName="end_date"
+            [min]="minDate"
             required
           ></ion-input>
         </ion-item>

@@ -590,11 +590,15 @@ ion-fab {
     .add-schedule-btn {
       margin-top: 16px;
       --border-radius: 10px;
-      --background: rgba(var(--ion-color-primary-rgb), 0.1);
-      --color: var(--ion-color-primary);
-      --background-hover: rgba(var(--ion-color-primary-rgb), 0.15);
-      font-weight: 500;
+      --background: var(--ion-color-primary);
+      --color: #ffffff;
+      --background-hover: var(--ion-color-primary-shade);
+      font-weight: 600;
       height: 44px;
+      
+      ion-icon {
+        margin-right: 8px;
+      }
     }
   }
 }

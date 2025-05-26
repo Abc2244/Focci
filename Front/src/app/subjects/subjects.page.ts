@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
 import { AlertController, IonInput, IonModal, ToastController } from '@ionic/angular';
@@ -33,6 +33,7 @@ export class SubjectsPage implements OnInit {
   @ViewChild('nameInput', { static: false }) nameInput?: IonInput;
   
   presentingElement: HTMLElement | null = null;
+  minDate: string; // Fecha mínima permitida
 
   subjects: SubjectModel[] = [];
   subjectForm: FormGroup;
@@ -73,10 +74,15 @@ export class SubjectsPage implements OnInit {
     private themeService: ThemeService,
     private toastController: ToastController
   ) {
+    // Establecer la fecha mínima como el día actual
+    const today = new Date();
+    this.minDate = today.toISOString().split('T')[0];
+
     this.subjectForm = this.fb.group({
       name: ['', Validators.required],
       credits: ['', [Validators.required, Validators.min(1)]],
-      schedule: this.fb.array([])
+      schedule: this.fb.array([]),
+      end_date: ['', [Validators.required, this.dateValidator.bind(this)]]
     });
   }
 
@@ -142,9 +148,17 @@ export class SubjectsPage implements OnInit {
     this.isEditing = true;
     this.currentSubjectId = subject._id || null;
 
+    // Formatear la fecha para el input type="date"
+    let formattedDate = '';
+    if (subject.end_date) {
+      const date = new Date(subject.end_date);
+      formattedDate = date.toISOString().split('T')[0];
+    }
+
     this.subjectForm.patchValue({
       name: subject.name,
       credits: subject.credits,
+      end_date: formattedDate
     });
 
     // Limpiar horarios existentes antes de agregar los nuevos
@@ -169,7 +183,47 @@ export class SubjectsPage implements OnInit {
     }, 300);
   }
 
+  // Validador personalizado para la fecha
+  dateValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) {
+      return null;
+    }
+
+    const selectedDate = new Date(control.value);
+    selectedDate.setHours(0, 0, 0, 0);
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+      return { dateInvalid: true };
+    }
+
+    return null;
+  }
+
   async saveSubject() {
+    // Verificar cada campo y mostrar mensaje específico
+    if (!this.subjectForm.get('name')?.valid) {
+      this.toastService.showToast('Por favor, ingresa el nombre de la materia', 'warning');
+      return;
+    }
+    
+    if (!this.subjectForm.get('credits')?.valid) {
+      this.toastService.showToast('Por favor, ingresa un número válido de créditos', 'warning');
+      return;
+    }
+    
+    if (!this.subjectForm.get('end_date')?.valid) {
+      const endDateControl = this.subjectForm.get('end_date');
+      if (endDateControl?.errors?.['dateInvalid']) {
+        this.toastService.showToast('La fecha límite no puede ser anterior al día actual', 'warning');
+      } else {
+        this.toastService.showToast('Por favor, selecciona la fecha límite de la materia', 'warning');
+      }
+      return;
+    }
+
     if (this.subjectForm.valid) {
       const userId = this.authService.getCurrentUserId();
       
@@ -180,13 +234,17 @@ export class SubjectsPage implements OnInit {
         );
         return;
       }
+
+      // Convertir la fecha string a objeto Date
+      const endDate = new Date(this.subjectForm.value.end_date);
+      endDate.setHours(23, 59, 59); // Establecer la hora al final del día
       
       const subjectData: Subject = {
         name: this.subjectForm.value.name,
         credits: this.subjectForm.value.credits,
         schedule: this.subjectForm.value.schedule || [],
         user_id: userId,
-        end_date: this.subjectForm.value.end_date || new Date()
+        end_date: endDate
       };
 
       try {
@@ -275,7 +333,7 @@ export class SubjectsPage implements OnInit {
       name: ['', [Validators.required]],
       credits: ['', [Validators.required, Validators.min(1)]],
       schedule: this.fb.array([]),
-      end_date: [new Date()]
+      end_date: ['', [Validators.required, this.dateValidator.bind(this)]]
     });
   }
 
