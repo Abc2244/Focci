@@ -1,0 +1,67 @@
+@startuml Recommendation_System
+
+skinparam packageStyle rectangle
+skinparam componentStyle uml2
+
+title Sistema de Recomendaciones
+
+package "Entrada de Datos" {
+    [Tarea Clasificada] as ClassifiedTask
+    [Perfil Usuario] as UserProfile
+    [Calendario Academico] as Calendar
+}
+
+package "Analisis de Prioridad" {
+    [Random Forest Classifier] as RFClassifier
+    [Evaluador Contexto] as ContextEval
+    [Calculador Peso Academico] as AcademicWeight
+}
+
+package "Factores Temporales" {
+    [Calculador Ventanas] as WindowCalc
+    [Ajustador Frecuencia] as FreqAdjuster
+    [Analizador Patrones] as PatternAnalyzer
+}
+
+package "Sistema de Optimizacion" {
+    [Monitor Efectividad] as EffectivityMonitor
+    [Ajustador Parametros] as ParamAdjuster
+    [Adaptador Respuesta] as ResponseAdapter
+}
+
+package "Motor de Recomendaciones" {
+    [Generador Recordatorios] as ReminderGen
+    [Priorizador] as Prioritizer
+    [Personalizador] as Customizer
+}
+
+database "Base de Conocimiento" {
+    [Historico Respuestas]
+    [Patrones Comportamiento]
+    [Metricas Rendimiento]
+}
+
+ClassifiedTask --> RFClassifier
+UserProfile --> ContextEval
+Calendar --> WindowCalc
+
+RFClassifier --> Prioritizer
+ContextEval --> AcademicWeight
+AcademicWeight --> Prioritizer
+
+WindowCalc --> FreqAdjuster
+FreqAdjuster --> ReminderGen
+PatternAnalyzer --> Customizer
+
+EffectivityMonitor --> ParamAdjuster
+ParamAdjuster --> ResponseAdapter
+ResponseAdapter --> ReminderGen
+
+Prioritizer --> ReminderGen
+Customizer --> ReminderGen
+
+[Historico Respuestas] --> PatternAnalyzer
+[Patrones Comportamiento] --> Customizer
+[Metricas Rendimiento] --> ParamAdjuster
+
+@enduml 

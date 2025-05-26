@@ -6,8 +6,8 @@ from services.task_classifier_service import TaskClassifier
 from services.task_service import TaskService
 
 # Datos de prueba
-TEST_USER_ID = str(ObjectId())
-TEST_SUBJECT_ID = str(ObjectId())
+TEST_USER_ID = "507f1f77bcf86cd799439011"  # ID del usuario de prueba del mock
+TEST_SUBJECT_ID = "507f1f77bcf86cd799439012"  # ID de la materia de prueba del mock
 
 TEST_CASES = [
     {
@@ -60,47 +60,36 @@ async def test_task_classification(task_classifier):
 async def test_task_processing(task_service):
     """Prueba el procesamiento completo de tareas"""
     for test_case in TEST_CASES:
-        try:
-            result = await task_service.process_task(
-                user_id=TEST_USER_ID,
-                subject_id=TEST_SUBJECT_ID,
-                task_description=test_case["description"],
-                due_date=test_case["due_date"],
-                estimated_time=test_case["estimated_time"]
-            )
+        result = await task_service.process_task(
+            user_id=TEST_USER_ID,
+            subject_id=TEST_SUBJECT_ID,
+            task_description=test_case["description"],
+            due_date=test_case["due_date"],
+            estimated_time=test_case["estimated_time"]
+        )
 
-            # Verificar estructura básica del resultado
-            assert "task_id" in result
-            assert "task_type" in result
-            assert "adjusted_priority" in result
-            assert "insistence_level" in result
-            assert "reminders" in result
-            assert "classification_confidence" in result
+        # Verificar estructura básica del resultado
+        assert "task_id" in result
+        assert "task_type" in result
+        assert "adjusted_priority" in result
+        assert "insistence_level" in result
+        assert "reminders" in result
+        assert "classification_confidence" in result
 
-            # Verificar tipo de tarea
-            assert result["task_type"] == test_case["expected_type"]
+        # Verificar tipo de tarea
+        assert result["task_type"] == test_case["expected_type"]
 
-            # Verificar que la prioridad cumple con el mínimo esperado
-            assert result["adjusted_priority"] >= test_case["min_priority"]
+        # Verificar que la prioridad cumple con el mínimo esperado
+        assert result["adjusted_priority"] >= test_case["min_priority"]
 
-            # Verificar que la prioridad está en el rango correcto
-            assert 1 <= result["adjusted_priority"] <= 5
+        # Verificar que la prioridad está en el rango correcto
+        assert 1 <= result["adjusted_priority"] <= 5
 
-            # Verificar que hay recordatorios generados
-            assert len(result["reminders"]) > 0
+        # Verificar que hay recordatorios generados
+        assert len(result["reminders"]) > 0
 
-            # Verificar confianza de clasificación
-            assert 0 <= result["classification_confidence"] <= 1
-
-            print(f"\n✅ Prueba exitosa para: {test_case['description']}")
-            print(f"   Tipo: {result['task_type']}")
-            print(f"   Prioridad: {result['adjusted_priority']}")
-            print(f"   Confianza: {result['classification_confidence']:.2f}")
-            print(f"   Nivel de insistencia: {result['insistence_level']}")
-            print(f"   Número de recordatorios: {len(result['reminders'])}")
-
-        except Exception as e:
-            pytest.fail(f"Error procesando tarea: {str(e)}")
+        # Verificar confianza de clasificación
+        assert 0 <= result["classification_confidence"] <= 1
 
 @pytest.mark.asyncio
 async def test_priority_keywords(task_service):

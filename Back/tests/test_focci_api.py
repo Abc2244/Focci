@@ -206,7 +206,7 @@ def test_delete_completed_tasks(mock_client, access_token, user_data, task_id):
     mock_client.patch(f"tasks/{task_id}/complete/", headers={"Authorization": f"Bearer {access_token}"})
     response = mock_client.delete(f"users/{user_data['user_id']}/tasks/completed/", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200
-    assert "tareas completadas eliminadas" in response.json()["message"]
+    assert "Eliminado correctamente" in response.json()["message"]
 
 # ✅ Eliminar una Tarea
 def test_delete_task(mock_client, access_token, task_id):
@@ -246,7 +246,7 @@ def test_delete_reminder(mock_client, access_token, reminder_id):
 def test_clean_user_data(mock_client, access_token, user_data):
     response = mock_client.delete(f"users/{user_data['user_id']}/clean/", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200
-    assert "Se eliminaron" in response.json()["message"]
+    assert "Eliminado correctamente" in response.json()["message"]
 
 # 🔥 **Ejecución Automática**
 if __name__ == "__main__":

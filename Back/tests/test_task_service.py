@@ -25,6 +25,10 @@ GENERAL_REMINDER_TEMPLATES = [
     "Recuerda {task_description} antes de {reminder_time}.",
 ]
 
+# IDs de prueba que coinciden con el mock de la base de datos
+TEST_USER_ID = "507f1f77bcf86cd799439011"
+TEST_SUBJECT_ID = "507f1f77bcf86cd799439012"
+
 class TaskScheduler:
     def generate_advanced_reminders(self, task_description: str, priority: int, due_date_dt: datetime, task_type: str) -> list:
         reminders = []
@@ -82,7 +86,7 @@ async def task_service(mock_database):
 def mock_user():
     """Fixture para proporcionar un usuario de prueba"""
     return {
-        "_id": ObjectId(),
+        "_id": ObjectId(TEST_USER_ID),
         "email": "test@example.com",
         "username": "test_user"
     }
@@ -91,7 +95,7 @@ def mock_user():
 def mock_subject():
     """Fixture para proporcionar una materia de prueba"""
     return {
-        "_id": ObjectId(),
+        "_id": ObjectId(TEST_SUBJECT_ID),
         "name": "Test Subject",
         "priority": 2
     }
@@ -128,49 +132,18 @@ class TestTaskService:
             assert result == expected
 
     @pytest.mark.asyncio
-    async def test_process_task(self, task_service, mock_user, mock_subject, mock_database, monkeypatch):
+    async def test_process_task(self, task_service, mock_user, mock_subject):
         """Prueba el procesamiento completo de una tarea"""
-        # Configurar el mock para que devuelva el usuario y la materia correctos
-        class MockCollection:
-            def __init__(self, collection_name):
-                self.collection_name = collection_name
-
-            async def find_one(self, query):
-                if "_id" in query:
-                    if str(query["_id"]) == str(mock_user["_id"]) and self.collection_name == "users":
-                        return mock_user
-                    elif str(query["_id"]) == str(mock_subject["_id"]) and self.collection_name == "subjects":
-                        return mock_subject
-                return None
-
-            async def insert_one(self, document):
-                class InsertOneResult:
-                    def __init__(self, inserted_id):
-                        self.inserted_id = inserted_id
-                return InsertOneResult(ObjectId())
-
-        class MockDB:
-            def get_collection(self, name):
-                return MockCollection(name)
-
-        # Aplicar el mock a la base de datos
-        from config.database import mongodb
-        mock_db = MockDB()
-        monkeypatch.setattr(mongodb, "get_collection", mock_db.get_collection)
-
-        # Datos de prueba
         task_data = {
-            "user_id": str(mock_user["_id"]),
-            "subject_id": str(mock_subject["_id"]),
+            "user_id": TEST_USER_ID,
+            "subject_id": TEST_SUBJECT_ID,
             "task_description": "Examen importante de matemáticas",
             "due_date": (datetime.now() + timedelta(days=7)).isoformat(),
             "estimated_time": 120
         }
 
-        # Ejecutar el proceso
         result = await task_service.process_task(**task_data)
 
-        # Verificar el resultado
         assert result["task_type"] == "examen"
         assert result["adjusted_priority"] >= 1
         assert result["insistence_level"] >= 1
@@ -178,36 +151,16 @@ class TestTaskService:
         assert "classification_confidence" in result
 
     @pytest.mark.asyncio
-    async def test_process_task_invalid_user(self, task_service, monkeypatch):
+    async def test_process_task_invalid_user(self, task_service):
         """Prueba el procesamiento de una tarea con usuario inválido"""
-        class MockCollection:
-            async def find_one(self, query):
-                return None
-
-            async def insert_one(self, document):
-                class InsertOneResult:
-                    def __init__(self, inserted_id):
-                        self.inserted_id = inserted_id
-                return InsertOneResult(ObjectId())
-
-        class MockDB:
-            def get_collection(self, name):
-                return MockCollection()
-
-        # Aplicar el mock a la base de datos
-        from config.database import mongodb
-        mock_db = MockDB()
-        monkeypatch.setattr(mongodb, "get_collection", mock_db.get_collection)
-
-        # Datos de prueba con usuario inválido
+        invalid_id = str(ObjectId())
         task_data = {
-            "user_id": str(ObjectId()),
-            "subject_id": str(ObjectId()),
+            "user_id": invalid_id,
+            "subject_id": invalid_id,
             "task_description": "Tarea de prueba",
             "due_date": datetime.now().isoformat(),
             "estimated_time": 60
         }
 
-        # Verificar que se lanza la excepción correcta
         with pytest.raises(ValueError, match="Error al procesar la tarea: Usuario o materia no encontrados"):
             await task_service.process_task(**task_data)

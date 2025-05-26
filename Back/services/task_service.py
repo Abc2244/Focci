@@ -68,16 +68,34 @@ class TaskService:
             )
 
             # Detectar palabras clave de urgencia en la descripción
-            urgency_keywords = ["urgente", "inmediata", "crítico", "crucial", "importante"]
-            urgency_boost = 2 if any(keyword in task_description.lower() for keyword in urgency_keywords) else 0
+            urgency_keywords = {
+                "urgente": 3,
+                "inmediata": 3,
+                "crítico": 3,
+                "crucial": 3,
+                "importante": 2,
+                "prioritario": 2,
+                "esencial": 2,
+                "vital": 2,
+                "apremiante": 2,
+                "indispensable": 2
+            }
+            
+            # Calcular boost de urgencia basado en palabras clave
+            task_description_lower = task_description.lower()
+            urgency_boost = 0
+            for keyword, weight in urgency_keywords.items():
+                if keyword in task_description_lower:
+                    urgency_boost = max(urgency_boost, weight)
             
             # Ajustar prioridad final considerando la confianza de la clasificación
             confidence_boost = classification_confidence * 0.5
             final_priority = self._adjust_priority_by_type_and_time(
-                base_priority + urgency_boost,  # Añadir el boost por urgencia
+                base_priority,  # La prioridad base ya incluye el boost del TaskPrioritizer
                 task_type,
                 estimated_time,
-                confidence_boost
+                confidence_boost,
+                urgency_boost  # Pasar el boost de urgencia como parámetro
             )
 
             # Procesar la fecha
@@ -93,11 +111,10 @@ class TaskService:
                 raise ValueError(f"Error al procesar la fecha: {str(e)}")
 
             # Calcular nivel de insistencia
-            urgent_keywords_detected = any(keyword in task_description.lower() for keyword in ["urgente", "importante", "crítico"])
             insistence_level = self.task_scheduler.calculate_insistence_level(
                 final_priority,
                 due_date_dt,
-                urgent_keywords_detected
+                urgency_boost > 0  # Usar el boost de urgencia para determinar si hay palabras clave
             )
 
             # Generar recordatorios
@@ -153,43 +170,67 @@ class TaskService:
         base_priority: int,
         task_type: str,
         estimated_time: int,
-        confidence_boost: float = 0.0
+        confidence_boost: float = 0.0,
+        urgency_boost: int = 0
     ) -> int:
         # Ajustar prioridad según el tipo de tarea
         type_priority_boost = {
-            "examen": 2,
-            "proyecto": 1,
-            "lectura": 0,
-            "general": 0,
-            "taller": 1
+            "examen": 3,      # Aumentado para asegurar prioridad mínima de 3
+            "proyecto": 2,    # Aumentado para asegurar prioridad mínima de 4
+            "lectura": 0,     # Sin boost para lecturas
+            "general": 0,     # Sin cambios
+            "taller": 1       # Sin cambios
         }
         
         # Ajustar prioridad según tiempo estimado
         time_priority_boost = 0
-        if estimated_time >= 120:
-            time_priority_boost = 2
-        elif estimated_time > 90:
-            time_priority_boost = 1
-        
-        # Palabras clave de urgencia
-        urgency_keywords = ["urgente", "inmediata", "crítico", "crucial", "importante"]
-        urgency_boost = 0
-        
-        # Verificar si hay palabras clave de urgencia en la descripción
-        if any(keyword in task_type.lower() for keyword in urgency_keywords):
-            urgency_boost = 2
+        if task_type == "proyecto":
+            # Para proyectos, ajustamos el boost de tiempo para mantener la prioridad en 4
+            if estimated_time >= 120:
+                time_priority_boost = 1
+            elif estimated_time >= 60:
+                time_priority_boost = 0
+        elif task_type == "lectura":
+            # Para lecturas, solo aumentar prioridad si son largas
+            if estimated_time >= 120:
+                time_priority_boost = 2
+            elif estimated_time >= 90:
+                time_priority_boost = 1
+        else:
+            # Para otros tipos de tareas
+            if estimated_time >= 120:
+                time_priority_boost = 2
+            elif estimated_time >= 60:
+                time_priority_boost = 1
         
         # Calcular prioridad final incluyendo todos los factores
         final_priority = (
             base_priority +
             type_priority_boost.get(task_type, 0) +
             time_priority_boost +
-            urgency_boost +
-            confidence_boost
+            urgency_boost +  # Incluir el boost de urgencia
+            round(confidence_boost)  # Redondear el boost de confianza
         )
         
-        # Asegurar que la prioridad esté entre 1 y 5
-        return max(1, min(5, int(round(final_priority))))
+        # Asegurar prioridades mínimas por tipo
+        min_priorities = {
+            "examen": 3,
+            "proyecto": 4,
+            "lectura": 1,  # Prioridad base para lecturas
+            "general": 1,
+            "taller": 1
+        }
+        
+        # Si hay palabras de urgencia, asegurar una prioridad mínima de 4
+        if urgency_boost > 0:
+            return max(4, min(5, int(round(final_priority))))
+        
+        # Para lecturas, mantener la prioridad base si son cortas
+        if task_type == "lectura" and estimated_time < 90:
+            return base_priority
+        
+        # Para otros casos, asegurar que la prioridad esté entre el mínimo para el tipo y 5
+        return max(min_priorities.get(task_type, 1), min(5, int(round(final_priority))))
 
     def extract_keywords(self, doc) -> list:
         return [token.text for token in doc if not token.is_stop and not token.is_punct]

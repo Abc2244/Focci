@@ -3,6 +3,10 @@ import pytest_asyncio
 from bson import ObjectId
 from datetime import datetime, timezone, timedelta
 
+# IDs de prueba constantes
+TEST_USER_ID = "507f1f77bcf86cd799439011"
+TEST_SUBJECT_ID = "507f1f77bcf86cd799439012"
+
 @pytest.fixture(scope="session")
 def event_loop():
     """Create an instance of the default event loop for each test case."""
@@ -38,6 +42,28 @@ async def mock_database(monkeypatch):
                         "name": "Test Subject",
                         "priority": 1
                     }
+                },
+                "tasks": {},
+                "reminders": {},
+                "task_keywords": {
+                    "exam": {
+                        "type": "examen",
+                        "keywords": ["examen", "prueba", "evaluación", "test", "quiz"],
+                        "weight": 2.0,
+                        "context": ["estudiar", "preparar", "repasar"]
+                    },
+                    "project": {
+                        "type": "proyecto",
+                        "keywords": ["proyecto", "trabajo", "desarrollo", "implementación"],
+                        "weight": 1.5,
+                        "context": ["equipo", "planear", "diseñar"]
+                    },
+                    "reading": {
+                        "type": "lectura",
+                        "keywords": ["lectura", "leer", "libro", "capítulo", "artículo"],
+                        "weight": 1.0,
+                        "context": ["comprender", "analizar", "resumir"]
+                    }
                 }
             }
 
@@ -54,37 +80,79 @@ async def mock_database(monkeypatch):
                 for item in collection_data.values():
                     if str(item["_id"]) == _id:
                         return item
-                return None
+                
+                # Si no se encuentra y es un ID inválido, retornar None
+                if _id not in [TEST_USER_ID, TEST_SUBJECT_ID]:
+                    return None
+                
+                # Si no se encuentra, crear un nuevo documento para pruebas
+                if self.collection_name == "users":
+                    return {"_id": _id, "email": "test@example.com", "username": "test_user"}
+                elif self.collection_name == "subjects":
+                    return {"_id": _id, "name": "Test Subject", "priority": 1}
+                
             return None
 
         async def insert_one(self, document):
             class InsertOneResult:
                 def __init__(self, inserted_id):
                     self.inserted_id = inserted_id
-            return InsertOneResult("test_id")
+
+            # Generar un nuevo ObjectId si no se proporciona
+            if "_id" not in document:
+                document["_id"] = ObjectId()
+
+            # Almacenar el documento en test_data
+            self.test_data[self.collection_name][str(document["_id"])] = document
+            return InsertOneResult(document["_id"])
+
+        async def delete_one(self, query):
+            class DeleteResult:
+                def __init__(self, deleted_count):
+                    self.deleted_count = deleted_count
+
+            if "_id" in query:
+                _id = str(query["_id"])
+                if _id in self.test_data.get(self.collection_name, {}):
+                    del self.test_data[self.collection_name][_id]
+                    return DeleteResult(1)
+            return DeleteResult(0)
+
+        async def delete_many(self, query):
+            class DeleteResult:
+                def __init__(self, deleted_count):
+                    self.deleted_count = deleted_count
+            
+            deleted = 0
+            if "completed" in query and query["completed"]:
+                tasks = self.test_data.get("tasks", {})
+                completed_tasks = {k: v for k, v in tasks.items() if v.get("completed", False)}
+                for task_id in completed_tasks:
+                    del tasks[task_id]
+                    deleted += 1
+            return DeleteResult(deleted)
 
         def find(self, query=None):
-            keywords_data = [
-                {
-                    "type": "examen",
-                    "keywords": ["examen", "prueba", "evaluación", "test", "quiz"],
-                    "weight": 2.0,
-                    "context": ["estudiar", "preparar", "repasar"]
-                },
-                {
-                    "type": "proyecto",
-                    "keywords": ["proyecto", "trabajo", "desarrollo", "implementación"],
-                    "weight": 1.5,
-                    "context": ["equipo", "planear", "diseñar"]
-                },
-                {
-                    "type": "lectura",
-                    "keywords": ["lectura", "leer", "libro", "capítulo", "artículo"],
-                    "weight": 1.0,
-                    "context": ["comprender", "analizar", "resumir"]
-                }
-            ]
-            return MockCursor(keywords_data)
+            if self.collection_name == "task_keywords":
+                return MockCursor(list(self.test_data["task_keywords"].values()))
+            
+            # Para otras colecciones, devolver los datos almacenados
+            collection_data = list(self.test_data.get(self.collection_name, {}).values())
+            return MockCursor(collection_data)
+
+        async def update_one(self, query, update, upsert=False):
+            class UpdateResult:
+                def __init__(self, modified_count):
+                    self.modified_count = modified_count
+
+            if "_id" in query:
+                _id = str(query["_id"])
+                if _id in self.test_data.get(self.collection_name, {}):
+                    doc = self.test_data[self.collection_name][_id]
+                    if "$set" in update:
+                        doc.update(update["$set"])
+                    return UpdateResult(1)
+            return UpdateResult(0)
 
     class MockDB:
         def get_collection(self, name):

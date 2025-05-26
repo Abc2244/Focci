@@ -129,9 +129,18 @@ export class ApiService {
   // -----------------------------------------
 
   getUserSubjects(userId: string): Observable<Subject[]> {
+    console.log('Fetching subjects for user:', userId);
     return this.http
-      .get<Subject[]>(`${this.apiUrl}/users/${userId}/subjects`)
-      .pipe(catchError(this.handleError));
+      .get<Subject[]>(`${this.apiUrl}/users/${userId}/subjects`, {
+        headers: this.getAuthHeaders()
+      })
+      .pipe(
+        tap(subjects => console.log('Retrieved subjects:', subjects)),
+        catchError(error => {
+          console.error('Error fetching subjects:', error);
+          return throwError(() => new Error(error.error?.detail || 'Error al cargar las materias'));
+        })
+      );
   }
 
   getTasksBySubject(subject_id: string): Observable<Task[]> {

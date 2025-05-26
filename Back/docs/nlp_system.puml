@@ -1,0 +1,63 @@
+@startuml NLP_System
+
+skinparam packageStyle rectangle
+skinparam componentStyle uml2
+
+title Sistema de Procesamiento de Lenguaje Natural
+
+package "Entrada de Texto" {
+    [Texto de Tarea] as InputText
+}
+
+package "Preprocesamiento" {
+    [Lematizacion] as Lemmatization
+    [Eliminacion Stop Words] as StopWords
+    [Normalizacion] as Normalization
+}
+
+package "Analisis NLP" {
+    [spaCy es_core_news_md] as SpacyModel
+    [Word2Vec (300d)] as Word2Vec
+    [Parser Sintactico] as SyntacticParser
+}
+
+package "Extraccion de Caracteristicas" {
+    [Entidades Nombradas] as NER
+    [Vectorizacion] as Vectorization
+    [Relaciones Sintacticas] as SyntacticRel
+}
+
+package "Clasificacion" {
+    [Random Forest] as RandomForest
+    [Analisis de Urgencia] as UrgencyAnalysis
+    [Calculo de Similitud] as SimilarityCalc
+}
+
+database "Modelos y Vectores" {
+    [Embeddings]
+    [Patrones Linguisticos]
+    [Vocabulario Academico]
+}
+
+InputText --> Lemmatization
+Lemmatization --> StopWords
+StopWords --> Normalization
+
+Normalization --> SpacyModel
+SpacyModel --> NER
+SpacyModel --> SyntacticParser
+SyntacticParser --> SyntacticRel
+
+Normalization --> Word2Vec
+Word2Vec --> Vectorization
+Vectorization --> SimilarityCalc
+
+NER --> RandomForest
+SyntacticRel --> UrgencyAnalysis
+SimilarityCalc --> RandomForest
+
+Embeddings --> Word2Vec
+[Patrones Linguisticos] --> UrgencyAnalysis
+[Vocabulario Academico] --> NER
+
+@enduml 
