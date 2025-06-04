@@ -94,7 +94,7 @@ export class TaskPage implements OnInit {
   getTaskTypeIconColor(type: string | undefined): string {
     switch (type?.toLowerCase()) {
       case 'examen':
-        return '#e74c3c'; // Rojo para exámenes
+        return '#27ae60'; // Verde para exámenes (igual que las letras)
       case 'proyecto':
         return '#f39c12'; // Naranja para proyectos
       case 'lectura':
@@ -104,9 +104,9 @@ export class TaskPage implements OnInit {
       case 'taller':
         return '#9b59b6'; // Morado para talleres
       case 'general':
-        return '#95a5a6'; // Gris para general
+        return '#27ae60'; // Verde para general (igual que los otros)
       default:
-        return '#95a5a6';
+        return '#27ae60'; // Verde por defecto
     }
   }
 
