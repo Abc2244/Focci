@@ -115,7 +115,7 @@ export class TaskPage implements OnInit {
   }
 
   getSubjectIconColor(): string {
-    return '#16a085'; // Verde azulado para materias (más bonito que rojo)
+    return 'var(--ion-color-primary)'; // Color primary de Ionic para materias
   }
 
   getPriorityClass(priority: number | undefined): string {
