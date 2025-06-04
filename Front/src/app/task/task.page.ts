@@ -82,6 +82,10 @@ export class TaskPage implements OnInit {
         return 'book-outline';
       case 'tarea':
         return 'document-text-outline';
+      case 'taller':
+        return 'flask-outline';
+      case 'general':
+        return 'clipboard-outline';
       default:
         return 'clipboard-outline';
     }

@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.routes import auth_router, users_router, subjects_router, tasks_router, reminders_router, stats_router, schedule_router
 from api.routes.task_keywords import router as task_keywords_router
+from api.routes.tasks import ensure_service_initialized
 import asyncio
 import logging
 from datetime import datetime
@@ -46,6 +47,14 @@ def keep_alive():
 
 @app.on_event("startup")
 async def start_keep_alive():
+    # Inicializar el TaskService para que el clasificador funcione
+    try:
+        await ensure_service_initialized()
+        logger.info("🎯 TaskService inicializado correctamente")
+    except Exception as e:
+        logger.error(f"❌ Error al inicializar TaskService: {str(e)}")
+    
+    # Iniciar el servicio de auto-ping
     thread = threading.Thread(target=keep_alive, daemon=True)
     thread.start()
     logger.info("🚀 Auto-ping service started")

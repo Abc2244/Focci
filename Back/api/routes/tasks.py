@@ -9,6 +9,16 @@ from services.task_service import TaskService
 router = APIRouter()
 task_service = TaskService()
 
+# Variable para controlar si ya se inicializó
+_service_initialized = False
+
+async def ensure_service_initialized():
+    """Asegurar que el TaskService esté inicializado"""
+    global _service_initialized
+    if not _service_initialized:
+        await task_service.initialize()
+        _service_initialized = True
+
 def serialize_mongo_document(doc):
     doc["_id"] = str(doc["_id"])
     return doc
@@ -16,6 +26,9 @@ def serialize_mongo_document(doc):
 @router.post("/tasks/", response_model=dict)
 async def create_task(task: Task):
     try:
+        # Asegurar que el servicio esté inicializado
+        await ensure_service_initialized()
+        
         if not task.user_id or not task.subject_id:
             raise HTTPException(
                 status_code=400,

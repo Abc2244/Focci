@@ -335,6 +335,16 @@
                     --background: rgba(var(--ion-color-primary-rgb), 0.1);
                     --color: var(--ion-color-primary);
                   }
+
+                  &.type-general {
+                    --background: rgba(var(--ion-color-medium-rgb), 0.1);
+                    --color: var(--ion-color-medium);
+                  }
+
+                  &.type-taller {
+                    --background: rgba(var(--ion-color-tertiary-rgb), 0.1);
+                    --color: var(--ion-color-tertiary);
+                  }
                 }
               }
             }
