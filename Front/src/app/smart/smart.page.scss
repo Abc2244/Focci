@@ -393,6 +393,98 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     }
 
+    // Estilos para la explicación del sistema
+    .system-explanation {
+      margin-bottom: 30px;
+
+      .explanation-card {
+        background: var(--ion-color-primary);
+        color: var(--ion-color-primary-contrast);
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+
+        ion-card-header {
+          padding-bottom: 10px;
+
+          ion-card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--ion-color-primary-contrast);
+
+            ion-icon {
+              font-size: 24px;
+            }
+          }
+        }
+
+        .explanation-steps {
+          display: grid;
+          gap: 20px;
+
+          .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+
+            .step-number {
+              width: 40px;
+              height: 40px;
+              background: rgba(255, 255, 255, 0.2);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-weight: bold;
+              font-size: 18px;
+              flex-shrink: 0;
+              color: var(--ion-color-primary-contrast);
+            }
+
+            .step-content {
+              flex: 1;
+
+              h4 {
+                margin: 0 0 8px 0;
+                font-size: 16px;
+                font-weight: 600;
+                color: var(--ion-color-primary-contrast);
+              }
+
+              p {
+                margin: 0 0 8px 0;
+                font-size: 14px;
+                line-height: 1.4;
+                color: var(--ion-color-primary-contrast);
+              }
+
+              ul {
+                margin: 0;
+                padding-left: 20px;
+
+                li {
+                  font-size: 13px;
+                  line-height: 1.3;
+                  margin-bottom: 4px;
+                  color: var(--ion-color-primary-contrast);
+
+                  strong {
+                    color: #ffd700;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
     .plan-cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -400,7 +492,7 @@
       margin-top: 20px;
 
       .plan-card {
-        background: linear-gradient(145deg, #ffffff, #f5f7fa);
+        background: var(--ion-card-background);
         border-radius: 16px;
         padding: 20px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -431,13 +523,12 @@
           h3.task-name {
             font-size: 18px;
             font-weight: 600;
-            color: var(--ion-color-primary-shade);
+            color: var(--ion-text-color);
             margin: 0;
             flex: 1;
             background-color: rgba(var(--ion-color-primary-rgb), 0.08);
             padding: 6px 10px;
             border-radius: 6px;
-            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
           }
         }
 
@@ -447,7 +538,7 @@
           .subject {
             font-size: 16px;
             font-weight: 500;
-            color: var(--ion-color-primary-shade);
+            color: var(--ion-text-color);
             margin-bottom: 8px;
             padding: 6px 10px;
             background-color: rgba(var(--ion-color-primary-rgb), 0.1);
@@ -457,17 +548,105 @@
 
           .due-date {
             font-size: 14px;
-            color: var(--ion-color-medium);
-            margin-bottom: 0;
+            color: var(--ion-text-color);
+            margin-bottom: 8px;
             padding: 4px 8px;
             background-color: rgba(var(--ion-color-medium-rgb), 0.1);
             border-radius: 4px;
             display: inline-block;
 
+            .days-left {
+              font-weight: 600;
+              color: var(--ion-color-primary);
+            }
+
             &.urgent {
               color: var(--ion-color-danger);
               background-color: rgba(var(--ion-color-danger-rgb), 0.1);
               font-weight: 500;
+
+              .days-left {
+                color: var(--ion-color-danger);
+              }
+            }
+          }
+
+          // Estilos para el análisis automático
+          .ai-analysis {
+            background: rgba(var(--ion-color-primary-rgb), 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
+
+            h4 {
+              margin: 0 0 12px 0;
+              font-size: 16px;
+              font-weight: 600;
+              color: var(--ion-color-primary);
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            }
+
+            .analysis-chips {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 8px;
+              margin-bottom: 15px;
+
+              ion-chip {
+                --background: rgba(var(--ion-color-primary-rgb), 0.1);
+                --color: var(--ion-color-primary);
+                border: 1px solid rgba(var(--ion-color-primary-rgb), 0.3);
+
+                &.priority-chip {
+                  --background: rgba(var(--ion-color-danger-rgb), 0.1);
+                  --color: var(--ion-color-danger);
+                  border-color: rgba(var(--ion-color-danger-rgb), 0.3);
+                }
+
+                &.insistence-chip {
+                  --background: rgba(var(--ion-color-warning-rgb), 0.1);
+                  --color: var(--ion-color-warning);
+                  border-color: rgba(var(--ion-color-warning-rgb), 0.3);
+                }
+
+                &.type-chip {
+                  --background: rgba(var(--ion-color-success-rgb), 0.1);
+                  --color: var(--ion-color-success);
+                  border-color: rgba(var(--ion-color-success-rgb), 0.3);
+                }
+              }
+            }
+
+            .calculation-explanation {
+              background: var(--ion-card-background);
+              border-radius: 8px;
+              padding: 12px;
+              border: 1px solid rgba(var(--ion-color-medium-rgb), 0.2);
+
+              p {
+                margin: 0 0 8px 0;
+                font-weight: 600;
+                color: var(--ion-color-primary);
+              }
+
+              ul {
+                margin: 0;
+                padding-left: 20px;
+
+                li {
+                  font-size: 13px;
+                  line-height: 1.4;
+                  margin-bottom: 6px;
+                  color: var(--ion-text-color);
+
+                  strong {
+                    font-weight: 600;
+                  }
+                }
+              }
             }
           }
         }
@@ -484,6 +663,92 @@
             color: var(--ion-color-secondary);
             margin-top: 0;
             margin-bottom: 10px;
+          }
+
+          // Estilos para el resumen de recordatorios
+          .reminder-summary {
+            background: var(--ion-card-background);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(var(--ion-color-medium-rgb), 0.2);
+
+            p {
+              margin: 0 0 6px 0;
+              font-size: 14px;
+              color: var(--ion-text-color);
+
+              &.generation-logic {
+                font-size: 12px;
+                color: var(--ion-color-medium);
+                
+                em {
+                  font-style: normal;
+                  font-weight: 500;
+                }
+              }
+            }
+          }
+
+          // Estilos para la lista de recordatorios
+          .reminders-list {
+            margin-bottom: 12px;
+
+            .reminder-item {
+              background: var(--ion-card-background);
+              border-radius: 8px;
+              padding: 10px;
+              margin-bottom: 8px;
+              border-left: 3px solid var(--ion-color-primary);
+              border: 1px solid rgba(var(--ion-color-medium-rgb), 0.2);
+
+              .reminder-time {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-weight: 600;
+                color: var(--ion-color-primary);
+                font-size: 14px;
+                margin-bottom: 4px;
+
+                ion-icon {
+                  font-size: 16px;
+                }
+              }
+
+              .reminder-date {
+                font-size: 12px;
+                color: var(--ion-color-medium);
+                margin-bottom: 6px;
+              }
+
+              .reminder-description {
+                font-size: 13px;
+                color: var(--ion-text-color);
+                margin-bottom: 8px;
+                line-height: 1.3;
+              }
+
+              ion-chip {
+                --height: 24px;
+                font-size: 11px;
+
+                &.level-3 {
+                  --background: rgba(var(--ion-color-primary-rgb), 0.1);
+                  --color: var(--ion-color-primary);
+                }
+
+                &.level-4 {
+                  --background: rgba(var(--ion-color-warning-rgb), 0.1);
+                  --color: var(--ion-color-warning);
+                }
+
+                &.level-5 {
+                  --background: rgba(var(--ion-color-danger-rgb), 0.1);
+                  --color: var(--ion-color-danger);
+                }
+              }
+            }
           }
 
           .reminder-status {
@@ -539,6 +804,34 @@
             }
           }
 
+          // Estilos para la explicación de slots
+          .slots-explanation {
+            background: var(--ion-card-background);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(var(--ion-color-medium-rgb), 0.2);
+
+            p {
+              margin: 0 0 8px 0;
+              font-weight: 600;
+              color: var(--ion-color-primary);
+              font-size: 14px;
+            }
+
+            ul {
+              margin: 0;
+              padding-left: 20px;
+
+              li {
+                font-size: 12px;
+                line-height: 1.3;
+                margin-bottom: 4px;
+                color: var(--ion-text-color);
+              }
+            }
+          }
+
           .slots-container {
             display: flex;
             flex-wrap: wrap;
@@ -546,8 +839,8 @@
             margin-bottom: 1rem;
 
             ion-chip {
-              --background: var(--app-card-color);
-              --color: var(--app-text-color);
+              --background: var(--ion-card-background);
+              --color: var(--ion-text-color);
               border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
               transition: all 0.2s ease;
               cursor: pointer;
@@ -596,6 +889,46 @@
           }
         }
 
+        // Estilos para cuando no hay slots disponibles
+        .no-slots {
+          margin-top: 1rem;
+
+          .warning-card {
+            background: rgba(var(--ion-color-warning-rgb), 0.1);
+            border: 1px solid rgba(var(--ion-color-warning-rgb), 0.3);
+            border-radius: 12px;
+            margin: 0;
+
+            ion-card-content {
+              text-align: center;
+              padding: 15px;
+
+              ion-icon {
+                font-size: 48px;
+                margin-bottom: 10px;
+              }
+
+              h4 {
+                margin: 0 0 10px 0;
+                color: var(--ion-color-warning);
+                font-size: 16px;
+              }
+
+              p {
+                margin: 0 0 8px 0;
+                font-size: 13px;
+                color: var(--ion-text-color);
+                line-height: 1.4;
+
+                &:last-child {
+                  margin-bottom: 0;
+                  font-weight: 500;
+                }
+              }
+            }
+          }
+        }
+
         .plan-actions {
           margin-top: 16px;
 
@@ -619,10 +952,10 @@
 
 // Estilos para el modal de detalles
 .task-details-modal {
-  --background: var(--app-background-light);
+  --background: var(--ion-background-color);
 
   ion-header ion-toolbar {
-    --background: var(--app-card-color);
+    --background: var(--ion-card-background);
     --color: var(--ion-color-primary);
 
     ion-title {
@@ -636,16 +969,16 @@
   }
 
   .task-details-content {
-    --background: var(--app-background-light);
+    --background: var(--ion-background-color);
 
     .task-title {
       font-size: 22px;
       font-weight: 600;
-      color: var(--ion-color-primary-shade);
+      color: var(--ion-text-color);
       margin-bottom: 20px;
       padding: 15px;
       border-radius: 10px;
-      background-color: rgba(255, 255, 255, 0.8);
+      background-color: var(--ion-card-background);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
       text-align: center;
     }
@@ -655,6 +988,7 @@
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
       border-left: 4px solid var(--ion-color-primary);
+      background: var(--ion-card-background);
 
       ion-icon {
         font-size: 22px;
@@ -671,7 +1005,7 @@
 
         p {
           font-size: 15px;
-          color: var(--ion-color-dark);
+          color: var(--ion-text-color);
           background-color: rgba(var(--ion-color-light-rgb), 0.5);
           padding: 4px 8px;
           border-radius: 4px;
@@ -684,33 +1018,33 @@
 
 // Estilos para el modal de plan de recordatorios
 .reminder-plan-modal {
-  --background: var(--app-background-light);
+  --background: var(--ion-background-color);
 
   ion-header ion-toolbar {
-    --background: var(--app-card-color);
-    --color: var(--ion-color-primary);
+    --background: var(--ion-color-primary);
+    --color: var(--ion-color-primary-contrast);
 
     ion-title {
-      color: var(--ion-color-primary);
+      color: var(--ion-color-primary-contrast);
       font-weight: 600;
     }
 
     ion-button {
-      --color: var(--ion-color-primary);
+      --color: var(--ion-color-primary-contrast);
     }
   }
 
   .reminder-plan-content {
-    --background: var(--app-background-light);
+    --background: var(--ion-background-color);
 
     .plan-title {
       font-size: 22px;
       font-weight: 600;
-      color: var(--ion-color-primary-shade);
+      color: var(--ion-text-color);
       margin-bottom: 20px;
       padding: 15px;
       border-radius: 10px;
-      background-color: rgba(255, 255, 255, 0.8);
+      background-color: var(--ion-card-background);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
       text-align: center;
       border-bottom: 3px solid var(--ion-color-primary);
@@ -723,18 +1057,18 @@
       margin-bottom: 20px;
       padding: 15px;
       border-radius: 10px;
-      background-color: rgba(255, 255, 255, 0.8);
+      background-color: var(--ion-card-background);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
       text-align: center;
       border-bottom: 3px solid var(--ion-color-primary);
     }
 
     .reminder-explanation {
-      color: var(--ion-color-primary);
+      color: var(--ion-text-color);
       margin-bottom: 20px;
       font-size: 16px;
       line-height: 1.5;
-      background-color: rgba(255, 255, 255, 0.8);
+      background-color: var(--ion-card-background);
       padding: 10px;
       font-weight: 600;
       text-align: center;
@@ -774,7 +1108,7 @@
         }
 
         .timeline-content {
-          background-color: rgba(255, 255, 255, 0.9);
+          background-color: var(--ion-card-background);
           border-radius: 10px;
           padding: 15px;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -782,7 +1116,7 @@
 
           .timeline-date {
             font-size: 15px;
-            color: var(--ion-color-primary-shade);
+            color: var(--ion-text-color);
             margin-bottom: 8px;
             font-weight: 600;
             display: inline-block;
@@ -791,7 +1125,7 @@
           .timeline-title {
             font-size: 16px;
             font-weight: 600;
-            color: var(--ion-color-primary-shade);
+            color: var(--ion-color-primary);
             margin-bottom: 8px;
             display: inline-block;
             margin-left: 10px;
@@ -799,11 +1133,11 @@
 
           .timeline-description {
             font-size: 15px;
-            color: var(--ion-color-primary-shade);
+            color: var(--ion-text-color);
             margin-bottom: 10px;
             line-height: 1.4;
             font-weight: 500;
-            background-color: white;
+            background-color: rgba(var(--ion-color-primary-rgb), 0.05);
             padding: 10px;
             border-radius: 6px;
             border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
@@ -916,7 +1250,7 @@
     }
 
     p {
-      color: var(--app-text-color-medium);
+      color: var(--ion-text-color);
       margin-bottom: 1.5rem;
     }
 
@@ -930,7 +1264,7 @@
         --background: transparent;
 
         ion-label {
-          color: var(--app-text-color);
+          color: var(--ion-text-color);
         }
       }
     }
