@@ -9,6 +9,8 @@ from datetime import datetime
 import httpx
 import threading
 import time
+import subprocess
+import sys
 
 app = FastAPI()
 
@@ -47,6 +49,10 @@ def keep_alive():
 
 @app.on_event("startup")
 async def start_keep_alive():
+    # Instalar modelo spaCy si es necesario
+    logger.info("🔧 Verificando modelo spaCy...")
+    install_spacy_model()
+    
     # Inicializar el TaskService para que el clasificador funcione
     try:
         await ensure_service_initialized()
@@ -58,6 +64,39 @@ async def start_keep_alive():
     thread = threading.Thread(target=keep_alive, daemon=True)
     thread.start()
     logger.info("🚀 Auto-ping service started")
+
+def install_spacy_model():
+    """Instala el modelo spaCy si no está disponible"""
+    try:
+        import spacy
+        # Intentar cargar el modelo
+        nlp = spacy.load('es_core_news_sm')
+        logger.info("✅ Modelo spaCy ya está instalado")
+        return True
+    except OSError:
+        logger.warning("⚠️ Modelo spaCy no encontrado, descargando...")
+        try:
+            # Descargar el modelo
+            result = subprocess.run([
+                sys.executable, "-m", "spacy", "download", "es_core_news_sm"
+            ], capture_output=True, text=True)
+            
+            if result.returncode == 0:
+                logger.info("✅ Modelo spaCy descargado correctamente")
+                # Verificar que se puede cargar
+                import spacy
+                nlp = spacy.load('es_core_news_sm')
+                logger.info("✅ Modelo spaCy verificado")
+                return True
+            else:
+                logger.error(f"❌ Error al descargar modelo: {result.stderr}")
+                return False
+        except Exception as e:
+            logger.error(f"❌ Error al instalar modelo spaCy: {str(e)}")
+            return False
+    except Exception as e:
+        logger.error(f"❌ Error al verificar modelo spaCy: {str(e)}")
+        return False
 
 # Ruta de prueba
 @app.get("/")

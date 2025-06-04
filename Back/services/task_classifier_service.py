@@ -17,16 +17,40 @@ class TaskClassifier:
     async def initialize(self):
         """Inicializa el clasificador cargando el modelo de spaCy y las palabras clave"""
         try:
-            self.nlp = spacy.load('es_core_news_sm')
-        except OSError:
-            # Si el modelo no está instalado, lo descargamos
-            import subprocess
-            subprocess.run(["python", "-m", "spacy", "download", "es_core_news_sm"])
-            self.nlp = spacy.load('es_core_news_sm')
-        
-        # Cargar palabras clave iniciales
-        await self.load_keywords()
-        logger.info("✅ TaskClassifier inicializado correctamente")
+            # Intentar cargar el modelo spaCy
+            try:
+                self.nlp = spacy.load('es_core_news_sm')
+                logger.info("✅ Modelo spaCy cargado correctamente")
+            except OSError:
+                logger.warning("⚠️ Modelo spaCy no encontrado, intentando descargarlo...")
+                # Si el modelo no está instalado, lo descargamos
+                import subprocess
+                result = subprocess.run(
+                    ["python", "-m", "spacy", "download", "es_core_news_sm"], 
+                    capture_output=True, 
+                    text=True
+                )
+                if result.returncode == 0:
+                    self.nlp = spacy.load('es_core_news_sm')
+                    logger.info("✅ Modelo spaCy descargado y cargado correctamente")
+                else:
+                    logger.error(f"❌ Error al descargar modelo spaCy: {result.stderr}")
+                    # Fallback: usar modelo básico sin vectores
+                    try:
+                        self.nlp = spacy.blank('es')
+                        logger.warning("⚠️ Usando modelo spaCy básico sin vectores")
+                    except Exception as e:
+                        logger.error(f"❌ Error crítico al cargar spaCy: {str(e)}")
+                        self.nlp = None
+                        return
+            
+            # Cargar palabras clave iniciales
+            await self.load_keywords()
+            logger.info("✅ TaskClassifier inicializado correctamente")
+            
+        except Exception as e:
+            logger.error(f"❌ Error al inicializar TaskClassifier: {str(e)}")
+            self.nlp = None
 
     async def load_keywords(self):
         """Cargar palabras clave desde la base de datos con caché"""
@@ -65,6 +89,20 @@ class TaskClassifier:
     async def classify_task(self, description: str) -> dict:
         """Clasificación mejorada de tareas"""
         try:
+            # Verificar que el modelo spaCy esté cargado
+            if self.nlp is None:
+                logger.warning("⚠️ Modelo spaCy no inicializado, reinicializando...")
+                await self.initialize()
+            
+            # Verificar nuevamente después de la inicialización
+            if self.nlp is None:
+                logger.error("❌ No se pudo cargar el modelo spaCy")
+                return {
+                    'task_type': 'general',
+                    'classification_confidence': 1.0,
+                    'all_scores': {'general': 1.0}
+                }
+            
             # Preprocesamiento con spaCy
             doc = self.nlp(description.lower())
             
@@ -113,16 +151,21 @@ class TaskClassifier:
             keyword_matches = text_tokens.intersection(keyword_data['keywords'])
             base_score += len(keyword_matches) * keyword_data['weight']
             
-            # 2. Análisis de similitud semántica
-            for token in doc:
-                if not token.is_stop and not token.is_punct:
-                    # Usar vectores de palabra de spaCy para similitud semántica
-                    for keyword in keyword_data['keywords']:
-                        keyword_token = self.nlp(keyword)[0]
-                        if token.has_vector and keyword_token.has_vector:
-                            similarity = token.similarity(keyword_token)
-                            base_score += similarity * 0.5
-
+            # 2. Análisis de similitud semántica (solo si hay vectores disponibles)
+            if self.nlp and hasattr(self.nlp, 'vocab') and self.nlp.vocab.vectors.size > 0:
+                for token in doc:
+                    if not token.is_stop and not token.is_punct:
+                        # Usar vectores de palabra de spaCy para similitud semántica
+                        for keyword in keyword_data['keywords']:
+                            try:
+                                keyword_token = self.nlp(keyword)[0]
+                                if token.has_vector and keyword_token.has_vector:
+                                    similarity = token.similarity(keyword_token)
+                                    base_score += similarity * 0.5
+                            except Exception:
+                                # Si hay error con vectores, continuar sin similitud semántica
+                                continue
+            
             # 3. Análisis de contexto
             context_tokens = set(token.text for token in doc if token.pos_ in {'NOUN', 'VERB', 'ADJ'})
             context_matches = context_tokens.intersection(keyword_data['context'])
