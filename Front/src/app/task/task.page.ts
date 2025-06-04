@@ -118,6 +118,14 @@ export class TaskPage implements OnInit {
     return 'var(--ion-color-primary)'; // Color primary de Ionic para materias
   }
 
+  getCalendarIconColor(): string {
+    return 'var(--ion-color-primary)'; // Azul para iconos de calendario
+  }
+
+  getTimeIconColor(): string {
+    return 'var(--ion-color-success)'; // Verde para iconos de tiempo
+  }
+
   getPriorityClass(priority: number | undefined): string {
     if (!priority) return 'priority-normal';
     switch (priority) {

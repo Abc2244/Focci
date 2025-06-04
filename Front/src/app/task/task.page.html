@@ -77,12 +77,12 @@
         <ion-card-content>
           <div class="task-info">
             <ion-chip class="date-chip" [class.urgent]="isUrgent(task)">
-              <ion-icon name="calendar-outline"></ion-icon>
+              <ion-icon name="calendar-outline" [style.color]="getCalendarIconColor()"></ion-icon>
               <ion-label>{{ task.due_date | date:'dd MMM, HH:mm' }}</ion-label>
             </ion-chip>
 
             <ion-chip class="time-chip" *ngIf="task.estimated_time">
-              <ion-icon name="time-outline"></ion-icon>
+              <ion-icon name="time-outline" [style.color]="getTimeIconColor()"></ion-icon>
               <ion-label>{{task.estimated_time}} min</ion-label>
             </ion-chip>
 
@@ -179,7 +179,7 @@
             </ion-chip>
 
             <ion-chip class="due-date-chip" [class.late]="isTaskLate(task)">
-              <ion-icon name="calendar-outline"></ion-icon>
+              <ion-icon name="calendar-outline" [style.color]="getCalendarIconColor()"></ion-icon>
               <ion-label
                 >Límite: {{ task.due_date | date:'dd MMM, HH:mm' }}</ion-label
               >
