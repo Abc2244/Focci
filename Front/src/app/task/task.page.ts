@@ -91,6 +91,33 @@ export class TaskPage implements OnInit {
     }
   }
 
+  getTaskTypeIconColor(type: string | undefined): string {
+    switch (type?.toLowerCase()) {
+      case 'examen':
+        return '#e74c3c'; // Rojo para exámenes
+      case 'proyecto':
+        return '#f39c12'; // Naranja para proyectos
+      case 'lectura':
+        return '#27ae60'; // Verde para lecturas
+      case 'tarea':
+        return '#3498db'; // Azul para tareas
+      case 'taller':
+        return '#9b59b6'; // Morado para talleres
+      case 'general':
+        return '#95a5a6'; // Gris para general
+      default:
+        return '#95a5a6';
+    }
+  }
+
+  getNotificationIconColor(): string {
+    return '#f1c40f'; // Amarillo para notificaciones (campanita)
+  }
+
+  getSubjectIconColor(): string {
+    return '#16a085'; // Verde azulado para materias (más bonito que rojo)
+  }
+
   getPriorityClass(priority: number | undefined): string {
     if (!priority) return 'priority-normal';
     switch (priority) {

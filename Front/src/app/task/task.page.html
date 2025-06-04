@@ -58,7 +58,7 @@
               <ion-card-title>{{ task.description }}</ion-card-title>
               <div class="task-metadata">
                 <ion-chip class="subject-chip">
-                  <ion-icon name="book-outline"></ion-icon>
+                  <ion-icon name="book-outline" [style.color]="getSubjectIconColor()"></ion-icon>
                   <ion-label>{{ getSubjectName(task.subject_id) }}</ion-label>
                 </ion-chip>
                 <ion-chip 
@@ -66,7 +66,7 @@
                   [attr.data-confidence]="formatConfidence(task.classification_confidence)"
                   [color]="getConfidenceColor(task.classification_confidence)"
                 >
-                  <ion-icon [name]="getTaskTypeIcon(task.task_type || '')"></ion-icon>
+                  <ion-icon [name]="getTaskTypeIcon(task.task_type || '')" [style.color]="getTaskTypeIconColor(task.task_type)"></ion-icon>
                   <ion-label>{{task.task_type || 'Tarea' | titlecase}}</ion-label>
                 </ion-chip>
               </div>
@@ -87,7 +87,7 @@
             </ion-chip>
 
             <ion-chip class="insistence-chip" *ngIf="task.insistence_level">
-              <ion-icon name="notifications-outline"></ion-icon>
+              <ion-icon name="notifications-outline" [style.color]="getNotificationIconColor()"></ion-icon>
               <ion-label>Nivel {{task.insistence_level}}</ion-label>
             </ion-chip>
           </div>
@@ -166,13 +166,14 @@
         <ion-card-content>
           <div class="task-info">
             <ion-chip class="subject-chip">
-              <ion-icon name="book-outline"></ion-icon>
+              <ion-icon name="book-outline" [style.color]="getSubjectIconColor()"></ion-icon>
               <ion-label>{{ getSubjectName(task.subject_id) }}</ion-label>
             </ion-chip>
 
             <ion-chip [class]="'type-chip type-' + (task.task_type || 'tarea')">
               <ion-icon
                 [name]="getTaskTypeIcon(task.task_type || '')"
+                [style.color]="getTaskTypeIconColor(task.task_type)"
               ></ion-icon>
               <ion-label>{{task.task_type || 'Tarea' | titlecase}}</ion-label>
             </ion-chip>

@@ -282,8 +282,9 @@
                 font-size: 0.85rem;
 
                 &.subject-chip {
-                  --background: rgba(var(--ion-color-tertiary-rgb), 0.1);
-                  --color: var(--ion-color-tertiary);
+                  --background: rgba(22, 160, 133, 0.1);
+                  --color: #16a085;
+                  border: 1px solid rgba(22, 160, 133, 0.2);
                 }
 
                 &.type-chip {
@@ -317,33 +318,39 @@
                   }
 
                   &.type-examen {
-                    --background: rgba(var(--ion-color-danger-rgb), 0.1);
-                    --color: var(--ion-color-danger);
+                    --background: rgba(231, 76, 60, 0.1);
+                    --color: #e74c3c;
+                    border: 1px solid rgba(231, 76, 60, 0.2);
                   }
 
                   &.type-proyecto {
-                    --background: rgba(var(--ion-color-warning-rgb), 0.1);
-                    --color: var(--ion-color-warning);
+                    --background: rgba(243, 156, 18, 0.1);
+                    --color: #f39c12;
+                    border: 1px solid rgba(243, 156, 18, 0.2);
                   }
 
                   &.type-lectura {
-                    --background: rgba(var(--ion-color-success-rgb), 0.1);
-                    --color: var(--ion-color-success);
+                    --background: rgba(39, 174, 96, 0.1);
+                    --color: #27ae60;
+                    border: 1px solid rgba(39, 174, 96, 0.2);
                   }
 
                   &.type-tarea {
-                    --background: rgba(var(--ion-color-primary-rgb), 0.1);
-                    --color: var(--ion-color-primary);
+                    --background: rgba(52, 152, 219, 0.1);
+                    --color: #3498db;
+                    border: 1px solid rgba(52, 152, 219, 0.2);
                   }
 
                   &.type-general {
-                    --background: rgba(var(--ion-color-medium-rgb), 0.1);
-                    --color: var(--ion-color-medium);
+                    --background: rgba(149, 165, 166, 0.1);
+                    --color: #95a5a6;
+                    border: 1px solid rgba(149, 165, 166, 0.2);
                   }
 
                   &.type-taller {
-                    --background: rgba(var(--ion-color-tertiary-rgb), 0.1);
-                    --color: var(--ion-color-tertiary);
+                    --background: rgba(155, 89, 182, 0.1);
+                    --color: #9b59b6;
+                    border: 1px solid rgba(155, 89, 182, 0.2);
                   }
                 }
               }
@@ -369,8 +376,9 @@
             padding: 0 0.75rem;
 
             &.insistence-chip {
-              --background: rgba(var(--ion-color-warning-rgb), 0.1);
-              --color: var(--ion-color-warning);
+              --background: rgba(241, 196, 15, 0.1);
+              --color: #f1c40f;
+              border: 1px solid rgba(241, 196, 15, 0.2);
             }
 
             &.date-chip {
