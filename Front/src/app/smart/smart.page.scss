@@ -25,7 +25,7 @@
     .page-title {
       margin-bottom: 20px;
       text-align: center;
-      background: rgba(255, 255, 255, 0.8);
+      background: var(--app-card-color);
       padding: 15px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -45,13 +45,13 @@
       h2 {
         font-size: 20px;
         font-weight: 600;
-        color: var(--ion-color-medium);
+        color: var(--app-text-color);
         margin-bottom: 16px;
       }
 
       .recommendation-card {
         display: flex;
-        background: white;
+        background: var(--app-card-color);
         border-radius: 16px;
         padding: 16px;
         margin-bottom: 12px;
@@ -80,13 +80,13 @@
           .recommendation-title {
             font-size: 16px;
             font-weight: 600;
-            color: var(--ion-color-medium);
+            color: var(--app-text-color);
             margin-bottom: 8px;
           }
 
           .recommendation-text {
             font-size: 14px;
-            color: var(--ion-color-medium);
+            color: var(--app-text-color-medium);
             line-height: 1.4;
           }
 
@@ -103,12 +103,12 @@
       h2 {
         font-size: 20px;
         font-weight: 600;
-        color: var(--ion-color-medium);
+        color: var(--app-text-color);
         margin-bottom: 16px;
       }
 
       .ideal-time-card {
-        background: white;
+        background: var(--app-card-color);
         border-radius: 16px;
         padding: 16px;
         margin-bottom: 12px;
@@ -128,7 +128,7 @@
           .ideal-time-title {
             font-size: 16px;
             font-weight: 600;
-            color: var(--ion-color-medium);
+            color: var(--app-text-color);
           }
         }
 
@@ -137,13 +137,13 @@
 
           .ideal-time-schedule {
             font-size: 14px;
-            color: var(--ion-color-medium);
+            color: var(--app-text-color-medium);
             margin-bottom: 4px;
           }
 
           .ideal-time-reason {
             font-size: 13px;
-            color: var(--ion-color-medium-shade);
+            color: var(--app-text-color-medium);
             font-style: italic;
           }
         }
@@ -156,7 +156,7 @@
       h2 {
         font-size: 20px;
         font-weight: 600;
-        color: var(--ion-color-medium);
+        color: var(--app-text-color);
         margin-bottom: 16px;
       }
 
@@ -202,13 +202,13 @@
 
             .timeline-title {
               font-weight: 600;
-              color: var(--ion-color-medium);
+              color: var(--app-text-color);
               margin-bottom: 4px;
             }
 
             .timeline-details {
               font-size: 14px;
-              color: var(--ion-color-medium-shade);
+              color: var(--app-text-color-medium);
             }
           }
         }
@@ -221,13 +221,13 @@
       h2 {
         font-size: 20px;
         font-weight: 600;
-        color: var(--ion-color-medium);
+        color: var(--app-text-color);
         margin-bottom: 16px;
       }
 
       .tip-card {
         display: flex;
-        background: white;
+        background: var(--app-card-color);
         border-radius: 16px;
         padding: 16px;
         margin-bottom: 12px;
@@ -256,13 +256,13 @@
           .tip-title {
             font-size: 16px;
             font-weight: 600;
-            color: var(--ion-color-dark);
+            color: var(--app-text-color);
             margin-bottom: 8px;
           }
 
           .tip-text {
             font-size: 14px;
-            color: var(--ion-color-dark-shade);
+            color: var(--app-text-color-medium);
             line-height: 1.4;
           }
         }
@@ -319,7 +319,7 @@
     h2 {
       font-size: 20px;
       font-weight: 600;
-      color: var(--ion-color-medium);
+      color: var(--app-text-color);
       margin-bottom: 16px;
     }
 
@@ -365,13 +365,13 @@
 
           .timeline-title {
             font-weight: 600;
-            color: var(--ion-color-medium);
+            color: var(--app-text-color);
             margin-bottom: 4px;
           }
 
           .timeline-details {
             font-size: 14px;
-            color: var(--ion-color-medium-shade);
+            color: var(--app-text-color-medium);
           }
         }
       }
@@ -382,101 +382,132 @@
     margin: 20px 0;
 
     h2 {
-      font-size: 22px;
-      font-weight: 600;
-      color: var(--ion-color-primary-shade);
-      margin-bottom: 20px;
       text-align: center;
-      background: rgba(255, 255, 255, 0.8);
-      padding: 12px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+      color: var(--ion-color-primary);
+      margin: 16px 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+      background: var(--app-card-color);
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
-    // Estilos para la explicación del sistema
     .system-explanation {
-      margin-bottom: 30px;
+      margin-bottom: 24px;
 
       .explanation-card {
-        background: var(--ion-color-primary);
-        color: var(--ion-color-primary-contrast);
+        background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-shade) 100%);
+        color: #ffffff;
         border-radius: 16px;
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
 
-        ion-card-header {
-          padding-bottom: 10px;
+        .clickable-header {
+          cursor: pointer;
+          transition: all 0.3s ease;
+          padding: 20px;
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.1);
+          }
 
           ion-card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--ion-color-primary-contrast);
+            justify-content: space-between;
+            gap: 12px;
+            color: #ffffff;
 
-            ion-icon {
-              font-size: 24px;
+            .toggle-icon {
+              font-size: 1.4rem;
+              transition: transform 0.3s ease;
+              color: #ffffff;
+            }
+
+            ion-icon:first-child {
+              font-size: 1.5rem;
+              color: #ffffff;
             }
           }
         }
 
-        .explanation-steps {
-          display: grid;
-          gap: 20px;
+        ion-card-content {
+          padding: 0 20px 20px 20px;
+          animation: slideDown 0.3s ease-out;
+        }
+      }
 
-          .step {
+      .explanation-steps {
+        display: grid;
+        gap: 20px;
+
+        .step {
+          display: flex;
+          align-items: flex-start;
+          gap: 16px;
+          padding: 20px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+          }
+
+          .step-number {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border-radius: 50%;
             display: flex;
-            align-items: flex-start;
-            gap: 15px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+          }
 
-            .step-number {
-              width: 40px;
-              height: 40px;
-              background: rgba(255, 255, 255, 0.2);
-              border-radius: 50%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-weight: bold;
-              font-size: 18px;
-              flex-shrink: 0;
-              color: var(--ion-color-primary-contrast);
+          .step-content {
+            flex: 1;
+
+            h4 {
+              margin: 0 0 8px 0;
+              font-size: 1.1rem;
+              font-weight: 600;
+              color: #ffffff;
             }
 
-            .step-content {
-              flex: 1;
+            p {
+              margin: 0 0 8px 0;
+              font-size: 0.95rem;
+              line-height: 1.4;
+              color: #ffffff;
+              opacity: 0.9;
+            }
 
-              h4 {
-                margin: 0 0 8px 0;
-                font-size: 16px;
-                font-weight: 600;
-                color: var(--ion-color-primary-contrast);
-              }
+            ul {
+              margin: 0;
+              padding-left: 20px;
 
-              p {
-                margin: 0 0 8px 0;
-                font-size: 14px;
-                line-height: 1.4;
-                color: var(--ion-color-primary-contrast);
-              }
+              li {
+                font-size: 0.85rem;
+                line-height: 1.3;
+                margin-bottom: 4px;
+                color: #ffffff;
+                opacity: 0.85;
 
-              ul {
-                margin: 0;
-                padding-left: 20px;
-
-                li {
-                  font-size: 13px;
-                  line-height: 1.3;
-                  margin-bottom: 4px;
-                  color: var(--ion-color-primary-contrast);
-
-                  strong {
-                    color: #ffd700;
-                  }
+                strong {
+                  color: #ffd700;
+                  font-weight: 600;
                 }
               }
             }
@@ -486,49 +517,35 @@
     }
 
     .plan-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
 
       .plan-card {
-        background: var(--ion-card-background);
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border-left: 4px solid var(--ion-color-primary);
-
-        &:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-        }
+        background: var(--app-card-color);
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--ion-color-light);
 
         .plan-header {
           display: flex;
           align-items: center;
-          margin-bottom: 16px;
-          border-bottom: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
-          padding-bottom: 12px;
+          gap: 12px;
+          margin-bottom: 12px;
 
           ion-icon {
-            font-size: 24px;
+            font-size: 1.5rem;
             color: var(--ion-color-primary);
-            margin-right: 12px;
-            background: rgba(var(--ion-color-primary-rgb), 0.1);
-            padding: 8px;
-            border-radius: 50%;
+            flex-shrink: 0;
           }
 
-          h3.task-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--ion-text-color);
+          .task-name {
             margin: 0;
-            flex: 1;
-            background-color: rgba(var(--ion-color-primary-rgb), 0.08);
-            padding: 6px 10px;
-            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--app-text-color);
+            line-height: 1.3;
           }
         }
 
@@ -536,413 +553,251 @@
           margin-bottom: 16px;
 
           .subject {
-            font-size: 16px;
+            color: var(--ion-color-primary);
             font-weight: 500;
-            color: var(--ion-text-color);
-            margin-bottom: 8px;
-            padding: 6px 10px;
-            background-color: rgba(var(--ion-color-primary-rgb), 0.1);
-            border-radius: 6px;
-            display: inline-block;
+            margin: 0 0 8px 0;
+            font-size: 0.9rem;
           }
 
           .due-date {
-            font-size: 14px;
-            color: var(--ion-text-color);
-            margin-bottom: 8px;
-            padding: 4px 8px;
-            background-color: rgba(var(--ion-color-medium-rgb), 0.1);
-            border-radius: 4px;
-            display: inline-block;
-
-            .days-left {
-              font-weight: 600;
-              color: var(--ion-color-primary);
-            }
+            color: var(--app-text-color);
+            margin: 0 0 12px 0;
+            font-size: 0.9rem;
 
             &.urgent {
               color: var(--ion-color-danger);
-              background-color: rgba(var(--ion-color-danger-rgb), 0.1);
               font-weight: 500;
+            }
 
-              .days-left {
-                color: var(--ion-color-danger);
-              }
+            .days-left {
+              font-weight: 500;
+              color: var(--app-text-color-medium);
             }
           }
+        }
 
-          // Estilos para el análisis automático
-          .ai-analysis {
-            background: rgba(var(--ion-color-primary-rgb), 0.05);
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 15px;
-            border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
+        .ai-analysis {
+          background: rgba(var(--ion-color-primary-rgb), 0.05);
+          border-radius: 8px;
+          padding: 12px;
+          margin-bottom: 16px;
+          border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
 
-            h4 {
-              margin: 0 0 12px 0;
-              font-size: 16px;
-              font-weight: 600;
-              color: var(--ion-color-primary);
-              display: flex;
-              align-items: center;
-              gap: 8px;
-            }
+          h4 {
+            margin: 0 0 8px 0;
+            font-size: 0.95rem;
+            color: var(--app-text-color);
+            font-weight: 600;
+          }
 
-            .analysis-chips {
-              display: flex;
-              flex-wrap: wrap;
-              gap: 8px;
-              margin-bottom: 15px;
+          .analysis-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
 
-              ion-chip {
-                --background: rgba(var(--ion-color-primary-rgb), 0.1);
-                --color: var(--ion-color-primary);
-                border: 1px solid rgba(var(--ion-color-primary-rgb), 0.3);
+            ion-chip {
+              --background: rgba(var(--ion-color-primary-rgb), 0.1);
+              --color: var(--ion-color-primary);
+              font-size: 0.8rem;
+              height: 28px;
 
-                &.priority-chip {
-                  --background: rgba(var(--ion-color-danger-rgb), 0.1);
-                  --color: var(--ion-color-danger);
-                  border-color: rgba(var(--ion-color-danger-rgb), 0.3);
-                }
-
-                &.insistence-chip {
-                  --background: rgba(var(--ion-color-warning-rgb), 0.1);
-                  --color: var(--ion-color-warning);
-                  border-color: rgba(var(--ion-color-warning-rgb), 0.3);
-                }
-
-                &.type-chip {
-                  --background: rgba(var(--ion-color-success-rgb), 0.1);
-                  --color: var(--ion-color-success);
-                  border-color: rgba(var(--ion-color-success-rgb), 0.3);
-                }
-              }
-            }
-
-            .calculation-explanation {
-              background: var(--ion-card-background);
-              border-radius: 8px;
-              padding: 12px;
-              border: 1px solid rgba(var(--ion-color-medium-rgb), 0.2);
-
-              p {
-                margin: 0 0 8px 0;
-                font-weight: 600;
+              ion-icon {
+                font-size: 0.9rem;
                 color: var(--ion-color-primary);
-              }
-
-              ul {
-                margin: 0;
-                padding-left: 20px;
-
-                li {
-                  font-size: 13px;
-                  line-height: 1.4;
-                  margin-bottom: 6px;
-                  color: var(--ion-text-color);
-
-                  strong {
-                    font-weight: 600;
-                  }
-                }
               }
             }
           }
         }
 
         .reminder-plan {
-          background-color: rgba(var(--ion-color-secondary-rgb), 0.1);
-          border-radius: 10px;
+          background: var(--app-card-color);
+          border-radius: 8px;
           padding: 12px;
           margin-bottom: 16px;
+          border: 1px solid var(--ion-color-light);
 
           h4 {
-            font-size: 16px;
+            margin: 0 0 12px 0;
+            font-size: 1rem;
+            color: var(--app-text-color);
             font-weight: 600;
-            color: var(--ion-color-secondary);
-            margin-top: 0;
-            margin-bottom: 10px;
           }
 
-          // Estilos para el resumen de recordatorios
           .reminder-summary {
-            background: var(--ion-card-background);
-            border-radius: 8px;
+            background: var(--app-card-color);
+            border-radius: 6px;
             padding: 10px;
             margin-bottom: 12px;
-            border: 1px solid rgba(var(--ion-color-medium-rgb), 0.2);
+            border: 1px solid var(--ion-color-light);
 
             p {
-              margin: 0 0 6px 0;
-              font-size: 14px;
-              color: var(--ion-text-color);
+              margin: 0 0 4px 0;
+              font-size: 0.85rem;
+
+              &:last-child {
+                margin-bottom: 0;
+              }
 
               &.generation-logic {
-                font-size: 12px;
-                color: var(--ion-color-medium);
-                
-                em {
-                  font-style: normal;
-                  font-weight: 500;
-                }
+                font-style: italic;
+                color: var(--app-text-color-medium);
+                font-size: 0.8rem;
               }
             }
           }
 
-          // Estilos para la lista de recordatorios
           .reminders-list {
             margin-bottom: 12px;
 
             .reminder-item {
-              background: var(--ion-card-background);
-              border-radius: 8px;
-              padding: 10px;
-              margin-bottom: 8px;
-              border-left: 3px solid var(--ion-color-primary);
-              border: 1px solid rgba(var(--ion-color-medium-rgb), 0.2);
+              background: var(--app-card-color);
+              border-radius: 6px;
+              padding: 8px;
+              margin-bottom: 6px;
+              border: 1px solid var(--ion-color-light);
+              display: flex;
+              flex-direction: column;
+              gap: 4px;
+
+              &:last-child {
+                margin-bottom: 0;
+              }
 
               .reminder-time {
                 display: flex;
                 align-items: center;
                 gap: 6px;
-                font-weight: 600;
+                font-weight: 500;
                 color: var(--ion-color-primary);
-                font-size: 14px;
-                margin-bottom: 4px;
+                font-size: 0.85rem;
 
                 ion-icon {
-                  font-size: 16px;
+                  font-size: 0.9rem;
+                  color: var(--ion-color-primary);
                 }
-              }
-
-              .reminder-date {
-                font-size: 12px;
-                color: var(--ion-color-medium);
-                margin-bottom: 6px;
               }
 
               .reminder-description {
-                font-size: 13px;
-                color: var(--ion-text-color);
-                margin-bottom: 8px;
+                color: var(--app-text-color);
+                font-size: 0.8rem;
                 line-height: 1.3;
-              }
-
-              ion-chip {
-                --height: 24px;
-                font-size: 11px;
-
-                &.level-3 {
-                  --background: rgba(var(--ion-color-primary-rgb), 0.1);
-                  --color: var(--ion-color-primary);
-                }
-
-                &.level-4 {
-                  --background: rgba(var(--ion-color-warning-rgb), 0.1);
-                  --color: var(--ion-color-warning);
-                }
-
-                &.level-5 {
-                  --background: rgba(var(--ion-color-danger-rgb), 0.1);
-                  --color: var(--ion-color-danger);
-                }
+                padding-left: 20px;
               }
             }
           }
 
-          .reminder-status {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-            padding: 6px 10px;
-            border-radius: 6px;
-            background-color: rgba(var(--ion-color-warning-rgb), 0.2);
-
-            &.accepted {
-              background-color: rgba(var(--ion-color-success-rgb), 0.2);
-            }
-
-            ion-icon {
-              font-size: 18px;
-              color: var(--ion-color-warning);
-              margin-right: 8px;
-            }
-
-            &.accepted ion-icon {
-              color: var(--ion-color-success);
-            }
-
-            span {
-              font-size: 14px;
-              color: var(--ion-color-warning);
-              font-weight: 500;
-            }
-
-            &.accepted span {
-              color: var(--ion-color-success);
-            }
+          ion-button {
+            margin-top: 8px;
+            --border-radius: 8px;
+            font-size: 0.9rem;
+            height: 36px;
           }
         }
 
         .available-slots {
-          margin-top: 1rem;
-          padding: 1rem;
-          background: rgba(var(--ion-color-primary-rgb), 0.05);
-          border-radius: 12px;
+          margin-bottom: 16px;
 
           h4 {
+            margin: 0 0 12px 0;
+            font-size: 1rem;
+            color: var(--app-text-color);
+            font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            color: var(--ion-color-primary);
-            margin: 0 0 1rem;
-            font-size: 1rem;
+            gap: 6px;
 
             ion-icon {
-              font-size: 1.2rem;
-            }
-          }
-
-          // Estilos para la explicación de slots
-          .slots-explanation {
-            background: var(--ion-card-background);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid rgba(var(--ion-color-medium-rgb), 0.2);
-
-            p {
-              margin: 0 0 8px 0;
-              font-weight: 600;
+              font-size: 1rem;
               color: var(--ion-color-primary);
-              font-size: 14px;
-            }
-
-            ul {
-              margin: 0;
-              padding-left: 20px;
-
-              li {
-                font-size: 12px;
-                line-height: 1.3;
-                margin-bottom: 4px;
-                color: var(--ion-text-color);
-              }
             }
           }
 
           .slots-container {
             display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
 
             ion-chip {
-              --background: var(--ion-card-background);
-              --color: var(--ion-text-color);
-              border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
-              transition: all 0.2s ease;
+              --background: rgba(var(--ion-color-primary-rgb), 0.1);
+              --color: var(--ion-color-primary);
+              border-radius: 8px;
+              padding: 8px 12px;
               cursor: pointer;
+              transition: all 0.2s ease;
+              width: 100%;
+              justify-content: flex-start;
 
               &.selected {
-                --background: rgba(var(--ion-color-primary-rgb), 0.1);
-                --color: var(--ion-color-primary);
-                border-color: var(--ion-color-primary);
+                --background: var(--ion-color-primary);
+                --color: var(--ion-color-primary-contrast);
               }
 
-              &.has-reminder {
-                --background: rgba(var(--ion-color-warning-rgb), 0.1);
-                border-color: var(--ion-color-warning);
+              ion-icon {
+                font-size: 1rem;
+                color: var(--ion-color-primary);
+              }
 
-                .reminder-icon {
-                  color: var(--ion-color-warning);
-                }
+              &.selected ion-icon {
+                color: var(--ion-color-primary-contrast);
               }
 
               ion-label {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-
-                .duration {
-                  font-size: 0.8rem;
-                  opacity: 0.7;
-                }
-              }
-
-              &:hover {
-                --background: rgba(var(--ion-color-primary-rgb), 0.15);
-                transform: translateY(-1px);
+                font-size: 0.85rem;
+                font-weight: 500;
               }
             }
           }
 
           .slot-actions {
-            margin-top: 1rem;
-
             ion-button {
-              margin: 0;
               --border-radius: 8px;
-              height: 40px;
+              font-size: 0.9rem;
+              height: 36px;
             }
           }
         }
 
-        // Estilos para cuando no hay slots disponibles
         .no-slots {
-          margin-top: 1rem;
+          margin-bottom: 16px;
 
           .warning-card {
             background: rgba(var(--ion-color-warning-rgb), 0.1);
             border: 1px solid rgba(var(--ion-color-warning-rgb), 0.3);
-            border-radius: 12px;
-            margin: 0;
+            border-radius: 8px;
 
             ion-card-content {
               text-align: center;
-              padding: 15px;
+              padding: 16px;
 
               ion-icon {
-                font-size: 48px;
-                margin-bottom: 10px;
+                font-size: 2rem;
+                margin-bottom: 8px;
+                color: var(--ion-color-warning);
               }
 
               h4 {
-                margin: 0 0 10px 0;
-                color: var(--ion-color-warning);
-                font-size: 16px;
+                margin: 0 0 8px 0;
+                font-size: 0.95rem;
+                color: var(--app-text-color);
+                font-weight: 600;
               }
 
               p {
-                margin: 0 0 8px 0;
-                font-size: 13px;
-                color: var(--ion-text-color);
-                line-height: 1.4;
-
-                &:last-child {
-                  margin-bottom: 0;
-                  font-weight: 500;
-                }
+                margin: 0;
+                font-size: 0.85rem;
+                color: var(--app-text-color-medium);
+                line-height: 1.3;
               }
             }
           }
         }
 
         .plan-actions {
-          margin-top: 16px;
-
           ion-button {
             --border-radius: 8px;
-            font-weight: 500;
-            text-transform: none;
-            font-size: 15px;
-            --box-shadow: none;
-            --background: var(--ion-color-primary-shade);
-
-            &:hover {
-              --opacity: 0.9;
-            }
+            font-size: 0.9rem;
+            height: 36px;
           }
         }
       }
@@ -952,10 +807,10 @@
 
 // Estilos para el modal de detalles
 .task-details-modal {
-  --background: var(--ion-background-color);
+  --background: var(--app-background-light);
 
   ion-header ion-toolbar {
-    --background: var(--ion-card-background);
+    --background: var(--app-card-color);
     --color: var(--ion-color-primary);
 
     ion-title {
@@ -969,16 +824,16 @@
   }
 
   .task-details-content {
-    --background: var(--ion-background-color);
+    --background: var(--app-background-light);
 
     .task-title {
       font-size: 22px;
       font-weight: 600;
-      color: var(--ion-text-color);
+      color: var(--app-text-color);
       margin-bottom: 20px;
       padding: 15px;
       border-radius: 10px;
-      background-color: var(--ion-card-background);
+      background-color: var(--app-card-color);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
       text-align: center;
     }
@@ -988,7 +843,7 @@
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
       border-left: 4px solid var(--ion-color-primary);
-      background: var(--ion-card-background);
+      background: var(--app-card-color);
 
       ion-icon {
         font-size: 22px;
@@ -1005,7 +860,7 @@
 
         p {
           font-size: 15px;
-          color: var(--ion-text-color);
+          color: var(--app-text-color);
           background-color: rgba(var(--ion-color-light-rgb), 0.5);
           padding: 4px 8px;
           border-radius: 4px;
@@ -1018,7 +873,7 @@
 
 // Estilos para el modal de plan de recordatorios
 .reminder-plan-modal {
-  --background: var(--ion-background-color);
+  --background: var(--app-background-light);
 
   ion-header ion-toolbar {
     --background: var(--ion-color-primary);
@@ -1035,16 +890,16 @@
   }
 
   .reminder-plan-content {
-    --background: var(--ion-background-color);
+    --background: var(--app-background-light);
 
     .plan-title {
       font-size: 22px;
       font-weight: 600;
-      color: var(--ion-text-color);
+      color: var(--app-text-color);
       margin-bottom: 20px;
       padding: 15px;
       border-radius: 10px;
-      background-color: var(--ion-card-background);
+      background-color: var(--app-card-color);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
       text-align: center;
       border-bottom: 3px solid var(--ion-color-primary);
@@ -1057,18 +912,18 @@
       margin-bottom: 20px;
       padding: 15px;
       border-radius: 10px;
-      background-color: var(--ion-card-background);
+      background-color: var(--app-card-color);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
       text-align: center;
       border-bottom: 3px solid var(--ion-color-primary);
     }
 
     .reminder-explanation {
-      color: var(--ion-text-color);
+      color: var(--app-text-color);
       margin-bottom: 20px;
       font-size: 16px;
       line-height: 1.5;
-      background-color: var(--ion-card-background);
+      background-color: var(--app-card-color);
       padding: 10px;
       font-weight: 600;
       text-align: center;
@@ -1108,7 +963,7 @@
         }
 
         .timeline-content {
-          background-color: var(--ion-card-background);
+          background-color: var(--app-card-color);
           border-radius: 10px;
           padding: 15px;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -1116,7 +971,7 @@
 
           .timeline-date {
             font-size: 15px;
-            color: var(--ion-text-color);
+            color: var(--app-text-color);
             margin-bottom: 8px;
             font-weight: 600;
             display: inline-block;
@@ -1133,7 +988,7 @@
 
           .timeline-description {
             font-size: 15px;
-            color: var(--ion-text-color);
+            color: var(--app-text-color);
             margin-bottom: 10px;
             line-height: 1.4;
             font-weight: 500;
@@ -1167,6 +1022,14 @@
 
             ion-icon {
               color: inherit;
+            }
+
+            &.high ion-icon {
+              color: var(--ion-color-danger-shade);
+            }
+
+            &.medium ion-icon {
+              color: var(--ion-color-warning-shade);
             }
           }
         }
@@ -1250,7 +1113,7 @@
     }
 
     p {
-      color: var(--ion-text-color);
+      color: var(--app-text-color);
       margin-bottom: 1.5rem;
     }
 
@@ -1264,7 +1127,7 @@
         --background: transparent;
 
         ion-label {
-          color: var(--ion-text-color);
+          color: var(--app-text-color);
         }
       }
     }
@@ -1283,3 +1146,61 @@
     }
   }
 }
+
+// Responsive para pantallas muy pequeñas
+@media (max-width: 375px) {
+  .plan-card {
+    padding: 12px !important;
+
+    .plan-header {
+      .task-name {
+        font-size: 1rem !important;
+      }
+    }
+
+    .ai-analysis,
+    .reminder-plan,
+    .available-slots {
+      padding: 10px !important;
+    }
+  }
+
+  .explanation-card {
+    ion-card-content {
+      padding: 8px 12px 12px 12px !important;
+    }
+  }
+}
+
+// Animaciones para el desplegable
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+// Animación para el ícono de toggle
+.toggle-icon {
+  transition: transform 0.3s ease !important;
+}
+
+.clickable-header:hover .toggle-icon {
+  transform: scale(1.1);
+}
+

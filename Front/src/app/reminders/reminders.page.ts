@@ -189,6 +189,59 @@ export class RemindersPage implements OnInit, OnDestroy {
     return 'Urgente';
   }
 
+  // Nuevas funciones para la interfaz mejorada
+  getReminderIcon(reminder: any): string {
+    const priority = Number(reminder.priority);
+    const level = Number(reminder.insistence_level);
+    
+    if (priority >= 5 || level >= 8) {
+      return 'alarm'; // Icono de alarma para alta prioridad
+    } else if (priority >= 3 || level >= 5) {
+      return 'notifications'; // Icono de notificación para media prioridad
+    } else {
+      return 'notifications-outline'; // Icono suave para baja prioridad
+    }
+  }
+
+  getPriorityColorClass(priority: number): string {
+    switch (Number(priority)) {
+      case 1:
+        return 'priority-low'; // Verde
+      case 2:
+        return 'priority-medium-low'; // Amarillo claro
+      case 3:
+        return 'priority-medium'; // Naranja
+      case 4:
+        return 'priority-medium-high'; // Rojo claro
+      case 5:
+        return 'priority-high'; // Rojo
+      default:
+        return 'priority-medium';
+    }
+  }
+
+  getStatusColorClass(status: string): string {
+    switch (status.toLowerCase()) {
+      case 'pendiente':
+        return 'status-pending';
+      case 'completado':
+        return 'status-completed';
+      case 'cancelado':
+        return 'status-canceled';
+      default:
+        return 'status-pending';
+    }
+  }
+
+  getInsistenceColorClass(level: number): string {
+    level = Number(level);
+    if (level <= 2) return 'insistence-very-low';
+    if (level <= 4) return 'insistence-low';
+    if (level <= 6) return 'insistence-medium';
+    if (level <= 8) return 'insistence-high';
+    return 'insistence-critical';
+  }
+
   loadTasks(): void {
     const userId = this.authService.getCurrentUserId();
     if (userId) {

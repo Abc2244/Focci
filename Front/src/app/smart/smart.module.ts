@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SmartPageRoutingModule } from './smart-routing.module';
 import { SmartPage } from './smart.page';
 import { ScheduleService } from '../services/schedule.service';

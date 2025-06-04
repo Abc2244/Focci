@@ -345,6 +345,11 @@ export class SubjectsPage implements OnInit {
       endTime: ['10:00', Validators.required],
     });
     this.scheduleFormArray.push(scheduleItem);
+    
+    this.toastService.showToast(
+      `Horario ${this.scheduleFormArray.length} agregado`,
+      'success'
+    );
   }
 
   // Añadir un horario con valores predefinidos
@@ -360,7 +365,21 @@ export class SubjectsPage implements OnInit {
 
   // Eliminar un horario del formulario
   removeSchedule(index: number) {
-    this.scheduleFormArray.removeAt(index);
+    if (this.scheduleFormArray.length <= 1) {
+      this.toastService.showToast(
+        'Debe mantener al menos un horario para la materia',
+        'warning'
+      );
+      return;
+    }
+
+    if (index >= 0 && index < this.scheduleFormArray.length) {
+      this.scheduleFormArray.removeAt(index);
+      this.toastService.showToast(
+        `Horario ${index + 1} eliminado correctamente`,
+        'success'
+      );
+    }
   }
 
   // Resetear formulario

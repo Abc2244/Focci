@@ -4,10 +4,6 @@
   </ion-refresher>
 
   <div class="page-container">
-    <div class="page-title">
-      <h1>Asistente Inteligente</h1>
-    </div>
-
     <!-- Shimmer loading effect -->
     <div class="shimmer-container" *ngIf="isLoading">
       <div class="shimmer-card" *ngFor="let i of [1, 2, 3]"></div>
@@ -16,18 +12,22 @@
     <div *ngIf="!isLoading">
       <!-- Sección de planes de estudio -->
       <div class="study-plans-section">
-        <h2>🤖 Asistente Inteligente - Planes de Estudio y Recordatorios</h2>
+        <h2>Asistente Inteligente</h2>
         
-        <!-- Explicación del sistema -->
+        <!-- Explicación del sistema (versión desplegable) -->
         <div class="system-explanation">
           <ion-card class="explanation-card">
-            <ion-card-header>
+            <ion-card-header (click)="toggleExplanation()" class="clickable-header">
               <ion-card-title>
                 <ion-icon name="information-circle-outline"></ion-icon>
-                ¿Cómo funciona el sistema inteligente?
+                ¿Cómo funciona?
+                <ion-icon 
+                  [name]="showExplanation ? 'chevron-up-outline' : 'chevron-down-outline'" 
+                  class="toggle-icon"
+                ></ion-icon>
               </ion-card-title>
             </ion-card-header>
-            <ion-card-content>
+            <ion-card-content [@slideInOut]="showExplanation ? 'in' : 'out'" *ngIf="showExplanation">
               <div class="explanation-steps">
                 <div class="step">
                   <div class="step-number">1</div>
@@ -80,111 +80,66 @@
               <h3 class="task-name">{{ plan.task.description }}</h3>
             </div>
 
-            <!-- Detalles de la tarea con análisis automático -->
+            <!-- Detalles básicos de la tarea -->
             <div class="plan-details">
               <p class="subject">{{ getSubjectName(plan.task.subject_id) }}</p>
               <p
                 class="due-date"
                 [class.urgent]="getDaysUntilDue(plan.task.due_date) < 3"
               >
-                📅 Fecha límite: {{ plan.task.due_date | date:'mediumDate' }}
-                <span class="days-left">({{ getDaysUntilDue(plan.task.due_date) }} días restantes)</span>
+                📅 {{ plan.task.due_date | date:'mediumDate' }}
+                <span class="days-left">({{ getDaysUntilDue(plan.task.due_date) }} días)</span>
               </p>
               
-              <!-- Mostrar análisis automático -->
+              <!-- Análisis automático simplificado -->
               <div class="ai-analysis" *ngIf="plan.reminderPlan">
-                <h4>🤖 Análisis Automático:</h4>
+                <h4>🤖 Análisis:</h4>
                 <div class="analysis-chips">
                   <ion-chip class="priority-chip">
                     <ion-icon name="flag-outline"></ion-icon>
-                    <ion-label>Prioridad: {{ plan.reminderPlan.taskPriority }}/5</ion-label>
+                    <ion-label>Prioridad: {{ plan.reminderPlan.taskPriority || 0 }}/5</ion-label>
                   </ion-chip>
                   <ion-chip class="insistence-chip">
                     <ion-icon name="notifications-outline"></ion-icon>
-                    <ion-label>Insistencia: {{ plan.reminderPlan.insistenceLevel }}/5</ion-label>
+                    <ion-label>Insistencia: {{ plan.reminderPlan.insistenceLevel || 0 }}/5</ion-label>
                   </ion-chip>
-                  <ion-chip class="type-chip">
-                    <ion-icon name="document-text-outline"></ion-icon>
-                    <ion-label>Tipo: {{ plan.task.task_type || 'general' }}</ion-label>
-                  </ion-chip>
-                </div>
-                
-                <!-- Explicación del cálculo -->
-                <div class="calculation-explanation">
-                  <p><strong>💡 Cálculo automático:</strong></p>
-                  <ul>
-                    <li *ngIf="getDaysUntilDue(plan.task.due_date) <= 2">
-                      🔴 <strong>Prioridad 5:</strong> Vence en ≤2 días (muy urgente)
-                    </li>
-                    <li *ngIf="getDaysUntilDue(plan.task.due_date) > 2 && getDaysUntilDue(plan.task.due_date) <= 5">
-                      🟡 <strong>Prioridad 4:</strong> Vence en 3-5 días (urgente)
-                    </li>
-                    <li *ngIf="getDaysUntilDue(plan.task.due_date) > 5 && getDaysUntilDue(plan.task.due_date) < 14">
-                      🟢 <strong>Prioridad 3:</strong> Vence en 6-13 días (normal)
-                    </li>
-                    <li *ngIf="getDaysUntilDue(plan.task.due_date) >= 14">
-                      🔵 <strong>Prioridad 2:</strong> Vence en ≥14 días (baja)
-                    </li>
-                    
-                    <li *ngIf="plan.task.task_type === 'examen'">
-                      📝 <strong>Insistencia 5:</strong> Es un examen (máxima insistencia)
-                    </li>
-                    <li *ngIf="plan.task.task_type === 'proyecto'">
-                      🏗️ <strong>Insistencia 3:</strong> Es un proyecto (insistencia media)
-                    </li>
-                    <li *ngIf="plan.task.task_type !== 'examen' && plan.task.task_type !== 'proyecto'">
-                      📋 <strong>Insistencia 1:</strong> Tarea general (insistencia baja)
-                    </li>
-                  </ul>
                 </div>
               </div>
             </div>
 
-            <!-- Plan de recordatorios generado automáticamente -->
+            <!-- Plan de recordatorios simplificado -->
             <div class="reminder-plan" *ngIf="plan.reminderPlan">
-              <h4>🔔 Plan de Recordatorios Generado</h4>
+              <h4>🔔 Plan de Recordatorios</h4>
               
-              <!-- Mostrar cuántos recordatorios se generaron y por qué -->
+              <!-- Resumen simple -->
               <div class="reminder-summary">
-                <p><strong>📊 Recordatorios generados: {{ plan.reminderPlan.reminders.length }}</strong></p>
+                <p><strong>📊 {{ plan.reminderPlan.reminders.length }} recordatorios generados</strong></p>
                 <p class="generation-logic">
                   <em>
                     <span *ngIf="(plan.reminderPlan.taskPriority || 0) >= 4 || (plan.reminderPlan.insistenceLevel || 0) >= 4">
-                      🔴 Alta prioridad/insistencia → 3 recordatorios (1 semana, 3 días, 1 día antes)
+                      🔴 Alta prioridad → 3 recordatorios
                     </span>
                     <span *ngIf="((plan.reminderPlan.taskPriority || 0) >= 3 || (plan.reminderPlan.insistenceLevel || 0) >= 2) && (plan.reminderPlan.taskPriority || 0) < 4 && (plan.reminderPlan.insistenceLevel || 0) < 4">
-                      🟡 Prioridad media → 2 recordatorios (3 días, 1 día antes)
+                      🟡 Prioridad media → 2 recordatorios
                     </span>
                     <span *ngIf="(plan.reminderPlan.taskPriority || 0) < 3 && (plan.reminderPlan.insistenceLevel || 0) < 2">
-                      🟢 Baja prioridad → 1 recordatorio (1 día antes)
+                      🟢 Baja prioridad → 1 recordatorio
                     </span>
                   </em>
                 </p>
               </div>
               
-              <!-- Lista de recordatorios con fechas calculadas -->
+              <!-- Lista compacta de recordatorios -->
               <div class="reminders-list">
-                <div class="reminder-item" *ngFor="let reminder of plan.reminderPlan.reminders">
+                <div class="reminder-item" *ngFor="let reminder of plan.reminderPlan.reminders; let i = index">
                   <div class="reminder-time">
                     <ion-icon name="time-outline"></ion-icon>
                     {{ reminder.time }}
                   </div>
-                  <div class="reminder-date" *ngIf="reminder.date">
-                    📅 {{ reminder.date | date:'medium' }}
-                  </div>
                   <div class="reminder-description">
                     {{ reminder.description }}
                   </div>
-                  <ion-chip [class]="'level-' + reminder.level">
-                    <ion-icon name="alert-outline"></ion-icon>
-                    <ion-label>Nivel {{ reminder.level }}/5</ion-label>
-                  </ion-chip>
                 </div>
-              </div>
-              
-              <div class="reminder-status">
-                <ion-icon name="notifications-outline"></ion-icon>
-                <span>{{ plan.reminderPlan.accepted ? 'Plan aceptado ✅' : 'Plan sugerido 💡' }}</span>
               </div>
               
               <ion-button
@@ -194,60 +149,34 @@
                 [disabled]="plan.reminderPlan.accepted"
               >
                 <ion-icon name="calendar-outline" slot="start"></ion-icon>
-                {{ plan.reminderPlan.accepted ? 'Ver plan activo' : 'Ver y aceptar plan' }}
+                {{ plan.reminderPlan.accepted ? 'Ver plan activo' : 'Ver y aceptar' }}
               </ion-button>
             </div>
 
-            <!-- Horarios recomendados calculados automáticamente -->
+            <!-- Horarios disponibles simplificados -->
             <div class="available-slots" *ngIf="plan.availableSlots.length > 0">
               <h4>
                 <ion-icon name="time-outline"></ion-icon>
-                ⏰ Horarios Libres Detectados ({{ plan.availableSlots.length }})
+                ⏰ Horarios Libres ({{ plan.availableSlots.length }})
               </h4>
-              
-              <!-- Explicación de cómo se calcularon -->
-              <div class="slots-explanation">
-                <p><strong>🔍 Cálculo automático:</strong></p>
-                <ul>
-                  <li>✅ Comparado con tu calendario personal</li>
-                  <li>📊 Horarios óptimos de estudio considerados</li>
-                  <li>⏳ Ordenados por proximidad temporal</li>
-                  <li *ngIf="getDaysUntilDue(plan.task.due_date) <= 3">
-                    🔴 Urgente: Mostrando 3 slots por alta prioridad
-                  </li>
-                  <li *ngIf="getDaysUntilDue(plan.task.due_date) > 3 && getDaysUntilDue(plan.task.due_date) <= 7">
-                    🟡 Moderado: Mostrando 2 slots por prioridad media
-                  </li>
-                  <li *ngIf="getDaysUntilDue(plan.task.due_date) > 7">
-                    🟢 Normal: Mostrando 1 slot por baja urgencia
-                  </li>
-                </ul>
-              </div>
               
               <div class="slots-container">
                 <ion-chip
-                  *ngFor="let slot of plan.availableSlots"
+                  *ngFor="let slot of plan.availableSlots.slice(0, 3)"
                   (click)="scheduleStudySession(plan, slot)"
                   [class.selected]="plan.selectedSlot === slot"
-                  [class.has-reminder]="hasReminderInTimeSlot(plan, slot)"
                 >
                   <ion-icon name="calendar-outline"></ion-icon>
                   <ion-label>
                     {{ formatDate(slot.start) }} - {{ formatTimeRange(slot.start, slot.end) }}
-                    <span class="duration">{{ getDurationInMinutes(slot) }} minutos</span>
                   </ion-label>
-                  <ion-icon 
-                    name="notifications" 
-                    *ngIf="hasReminderInTimeSlot(plan, slot)"
-                    class="reminder-icon"
-                  ></ion-icon>
                 </ion-chip>
               </div>
 
               <div class="slot-actions" *ngIf="plan.selectedSlot">
                 <ion-button expand="block" color="primary" (click)="confirmScheduleWithReminders(plan)">
                   <ion-icon name="calendar-outline" slot="start"></ion-icon>
-                  Programar con recordatorios automáticos
+                  Programar con recordatorios
                 </ion-button>
               </div>
             </div>
@@ -257,9 +186,8 @@
               <ion-card class="warning-card">
                 <ion-card-content>
                   <ion-icon name="calendar-outline" color="warning"></ion-icon>
-                  <h4>⚠️ No hay horarios libres detectados</h4>
-                  <p>El sistema analizó tu calendario y no encontró espacios libres en los próximos {{ getDaysUntilDue(plan.task.due_date) }} días.</p>
-                  <p><strong>Sugerencia:</strong> Revisa tu calendario o considera reprogramar otras actividades.</p>
+                  <h4>⚠️ Sin horarios libres</h4>
+                  <p>Revisa tu calendario o reprograma actividades.</p>
                 </ion-card-content>
               </ion-card>
             </div>
@@ -267,11 +195,12 @@
             <div class="plan-actions">
               <ion-button
                 expand="block"
+                fill="outline"
                 color="primary"
                 (click)="viewTaskDetails(plan.task)"
               >
                 <ion-icon name="eye-outline" slot="start"></ion-icon>
-                Ver Detalles Completos
+                Ver Detalles
               </ion-button>
             </div>
           </div>

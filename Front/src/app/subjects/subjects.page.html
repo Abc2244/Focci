@@ -193,14 +193,20 @@
               [formGroupName]="i"
             >
               <div class="schedule-item-header">
-                <span class="schedule-number">Horario {{ i + 1 }}</span>
+                <div class="schedule-info">
+                  <span class="schedule-number">Horario {{ i + 1 }}</span>
+                  <span class="schedule-count" *ngIf="scheduleFormArray.length > 1">({{ scheduleFormArray.length }} horarios)</span>
+                </div>
                 <ion-button
                   class="remove-button"
-                  fill="clear"
-                  color="primary"
+                  fill="solid"
+                  color="danger"
+                  size="small"
                   (click)="removeSchedule(i)"
+                  [disabled]="scheduleFormArray.length <= 1"
+                  title="{{ scheduleFormArray.length <= 1 ? 'Debe tener al menos un horario' : 'Eliminar este horario' }}"
                 >
-                  <ion-icon name="trash-outline"></ion-icon>
+                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
                 </ion-button>
               </div>
               

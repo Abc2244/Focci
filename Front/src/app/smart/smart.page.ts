@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 import { ApiService } from '../api.service';
 import { AuthService } from '../services/auth.service';
 import { ScheduleService, ScheduleItem } from '../services/schedule.service';
@@ -47,6 +48,23 @@ interface TaskWithSlots {
   selector: 'app-smart',
   templateUrl: './smart.page.html',
   styleUrls: ['./smart.page.scss'],
+  animations: [
+    trigger('slideInOut', [
+      state('in', style({
+        opacity: 1,
+        transform: 'translateY(0)',
+        height: '*'
+      })),
+      state('out', style({
+        opacity: 0,
+        transform: 'translateY(-10px)',
+        height: '0px',
+        overflow: 'hidden'
+      })),
+      transition('in => out', animate('300ms ease-in')),
+      transition('out => in', animate('300ms ease-out'))
+    ])
+  ]
 })
 export class SmartPage implements OnInit {
   @ViewChild('reminderPlanModal') reminderPlanModal!: IonModal;
@@ -60,6 +78,7 @@ export class SmartPage implements OnInit {
   showReminderPlanModal = false;
   currentReminderPlan: ExtendedReminderPlan | null = null;
   reminderPlans: ExtendedReminderPlan[] = [];
+  showExplanation = false; // Controla si la explicación está desplegada
 
   // Variable para controlar qué modal mostrar
   showTaskDetailsModal = false;
@@ -739,5 +758,9 @@ export class SmartPage implements OnInit {
         'error'
       );
     }
+  }
+
+  toggleExplanation() {
+    this.showExplanation = !this.showExplanation;
   }
 }
